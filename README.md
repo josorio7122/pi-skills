@@ -12,6 +12,7 @@ pi install git:github.com/josorio7122/pi-skills
 
 | Skill | Description | Source |
 |-------|-------------|--------|
+| **docker-model-runner** | Run AI models locally with Docker Model Runner | [Docker](https://docs.docker.com/reference/cli/docker/model/skills/) |
 | **exa-search** | Web search & content extraction via Exa API | [pi-packages](https://github.com/josorio7122/pi-packages) |
 | **gh** | GitHub CLI workflows | [pi-packages](https://github.com/josorio7122/pi-packages) |
 | **glab** | GitLab CLI workflows | [pi-packages](https://github.com/josorio7122/pi-packages) |
