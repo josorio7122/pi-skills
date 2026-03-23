@@ -1,10 +1,10 @@
 ---
 name: exa-search
-description: Semantic web search, content extraction, AI-powered answers, and deep research via the Exa API. Use when you need to search documentation, look up facts, find current information, extract page content from URLs, get AI answers with citations, find pages similar to a URL, or run deep multi-step research. Also use when the user asks to "look something up," "search the web," "find docs for," "what does X's documentation say," or needs any information that may be more current than your training data. Requires EXA_API_KEY environment variable.
+description: Semantic web search, content extraction, AI-powered answers, and deep research via the Exa API. Use when you need to search documentation, look up facts, find current information, extract page content from URLs, get AI answers with citations, find pages similar to a URL, research companies or people, find LinkedIn profiles, or run deep multi-step research. Also use when the user asks to "look something up," "search the web," "find docs for," "what does X's documentation say," "research this company," or needs any information that may be more current than your training data. Requires EXA_API_KEY environment variable.
 compatibility: "Requires Node.js 18+, tsx, and EXA_API_KEY environment variable set"
 metadata:
   author: josorio7122
-  version: "2.0"
+  version: "3.0"
 ---
 
 # Exa Search
@@ -32,13 +32,13 @@ Get an API key at: https://dashboard.exa.ai/api-keys
 
 This is the most important decision. Picking the wrong script wastes API credits and returns worse results.
 
-| You need to...                                      | Use                    |
-| --------------------------------------------------- | ---------------------- |
-| Answer a factual question with sources               | `scripts/answer.ts`    |
-| Find web pages about a topic                         | `scripts/search.ts`    |
-| Read the contents of a known URL                     | `scripts/contents.ts`  |
+| You need to...                                      | Use                       |
+| --------------------------------------------------- | ------------------------- |
+| Answer a factual question with sources               | `scripts/answer.ts`       |
+| Find web pages about a topic                         | `scripts/search.ts`       |
+| Read the contents of a known URL                     | `scripts/contents.ts`     |
 | Find pages similar to a URL you already have         | `scripts/find-similar.ts` |
-| Do multi-step research on a complex topic            | `scripts/research.ts`  |
+| Do multi-step research on a complex topic            | `scripts/research.ts`     |
 
 ### When to use which — decision tree
 
@@ -90,9 +90,29 @@ tsx scripts/search.ts "drizzle ORM configuration" '{"includeDomains":["orm.drizz
 # Deep search for thorough results
 tsx scripts/search.ts "quantum computing breakthroughs" '{"type":"deep","numResults":10,"text":true}'
 
+# Deep search with system prompt to guide results
+tsx scripts/search.ts "AI safety research" '{"type":"deep","systemPrompt":"Prefer official sources. Avoid duplicate results.","text":true}'
+
 # Filter by date and category
 tsx scripts/search.ts "OpenAI" '{"category":"news","startPublishedDate":"2025-01-01T00:00:00.000Z","text":true}'
 ```
+
+### Company & People Search
+
+Exa has dedicated `company` and `people` categories with enriched metadata (headcount, location, funding, revenue for companies; LinkedIn profiles for people).
+
+```bash
+# Find companies — returns rich metadata
+tsx scripts/search.ts "AI infrastructure startups San Francisco" '{"category":"company","numResults":20}'
+
+# Find people (LinkedIn profiles)
+tsx scripts/search.ts "VP Engineering AI infrastructure" '{"category":"people","numResults":15}'
+
+# Company news coverage
+tsx scripts/search.ts "Anthropic AI safety" '{"category":"news","numResults":10,"startPublishedDate":"2025-01-01T00:00:00.000Z","text":true}'
+```
+
+**⚠️ Category filter restrictions** — the `company` and `people` categories have limited filter support. See [references/api-reference.md](references/api-reference.md#category-filter-restrictions) for details. Using unsupported filters causes 400 errors.
 
 ### Fetch a Known URL
 
@@ -134,7 +154,7 @@ tsx scripts/research.ts run "Comprehensive analysis of AI chip market 2025" '{"m
 
 ### Documentation Lookup
 
-When you need to check current docs for a framework or library — this is the most common use case.
+When you need to check current docs for a framework or library — the most common use case.
 
 ```bash
 # Option A: Direct answer (faster, good for specific questions)
@@ -155,11 +175,46 @@ When your training data might be stale — API options, config formats, CLI flag
 tsx scripts/answer.ts "What are the valid values for fields.billingDetails.name in Stripe PaymentElement?"
 ```
 
+### Company Research
+
+Use query variation for better coverage — Exa returns different results for different phrasings.
+
+```bash
+# Discover companies in a space
+tsx scripts/search.ts "AI developer tools startups" '{"category":"company","numResults":20}'
+
+# Deep dive on a specific company (no category — use domain/date filters freely)
+tsx scripts/search.ts "Anthropic funding rounds valuation 2024" '{"type":"deep","includeDomains":["techcrunch.com","crunchbase.com","bloomberg.com"],"numResults":10,"text":true}'
+
+# Find LinkedIn profiles for people at a company
+tsx scripts/search.ts "Anthropic engineering team" '{"category":"people","numResults":15}'
+```
+
 ### Find Alternatives to a Tool
 
 ```bash
 tsx scripts/find-similar.ts "https://tailwindcss.com" '{"text":true,"excludeSourceDomain":true,"numResults":5}'
 ```
+
+---
+
+## Cost Awareness
+
+| Operation | Price | Notes |
+|-----------|-------|-------|
+| Search (1-25 results) | $0.005 | Default — use this range |
+| Search (26-100 results) | $0.025 | 5x more expensive |
+| Answer | $0.005 | Per query |
+| Contents | $0.005 | Per page |
+| Research (standard) | Varies | 2-10x more than search |
+| Research (pro) | Higher | Use only for complex topics |
+
+**Cost strategies:**
+- **Default to ≤25 results** — 5x cheaper and sufficient for most queries
+- **Need 50+ results?** Run multiple targeted searches with different query angles — better quality and cheaper than one large search
+- **Prefer `answer.ts` over `search.ts`** for direct questions — one API call instead of search + read
+- **Use `numResults`** to limit results to what you actually need
+- **Avoid `research.ts`** unless the topic genuinely requires multi-step synthesis
 
 ---
 
@@ -170,11 +225,11 @@ tsx scripts/find-similar.ts "https://tailwindcss.com" '{"text":true,"excludeSour
 - **Prefer `search.ts` with `includeDomains`** for documentation lookups — scopes results to official sources
 - **Use `contents.ts` only for known URLs** — don't use it to "search" (that's what `search.ts` is for)
 - **Use `research.ts` sparingly** — it's slower and more expensive; only for genuinely complex multi-faceted topics
-- **Be mindful of API costs** — set `numResults` to the minimum you need
+- **Respect category filter restrictions** — `company` and `people` categories don't support domain/date/text filters
 - **Output is always JSON** — pipe through `jq` for filtering if needed
 
 ---
 
 ## Reference
 
-For complete options, all parameters, and advanced usage for each script, see [references/api-reference.md](references/api-reference.md).
+For complete options, all parameters, category restrictions, and advanced usage for each script, see [references/api-reference.md](references/api-reference.md).
