@@ -1,0 +1,27 @@
+{
+  "name": "pi-skills",
+  "version": "1.0.0",
+  "description": "Personal pi skills collection",
+  "scripts": {},
+  "keywords": [
+    "pi-package"
+  ],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.30.1",
+  "private": "true",
+  "pi": {
+    "skills": [
+      "./skills"
+    ]
+  },
+  "type": "module",
+  "dependencies": {
+    "exa-js": "^2.8.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.2"
+  }
+}
