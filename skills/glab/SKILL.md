@@ -207,6 +207,16 @@ glab api graphql -f query='{ currentUser { username } }'
 
 ---
 
+## Known limitations
+
+- **`glab api` does not support multipart file uploads** (e.g. project uploads for attaching images to MR comments). Use `curl` instead:
+  ```bash
+  curl --request POST \
+    --header "PRIVATE-TOKEN: $(glab config get token --host gitlab.com)" \
+    --form "file=@/path/to/image.png" \
+    "https://gitlab.com/api/v4/projects/<url-encoded-path>/uploads"
+  ```
+
 ## Reference
 
 For the complete command table (every MR, issue, CI/CD, repo, release, token, stacked diff, label, snippet, SSH key, secure file, and config command), see [references/commands.md](references/commands.md).
