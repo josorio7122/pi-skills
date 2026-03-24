@@ -31,14 +31,29 @@ playwright-cli --help
 
 Once `npx` is present, proceed with the wrapper script. A global install of `playwright-cli` is optional.
 
-## Skill path (set once)
+### Browser install (first run only)
+
+After the first `open` command, if you see an error like `Chromium distribution is not found`, install the browser:
 
 ```bash
-export CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
-export PWCLI="$CODEX_HOME/skills/playwright/scripts/playwright_cli.sh"
+"$PWCLI" install chromium
 ```
 
-User-scoped skills install under `$CODEX_HOME/skills` (default: `~/.codex/skills`).
+This only needs to happen once per machine.
+
+## Skill path (set once)
+
+Locate the wrapper script bundled with this skill. The path depends on how skills are installed — use `find` to resolve it:
+
+```bash
+export PWCLI="$(find "${PI_HOME:-$HOME/.pi}" -path "*/playwright/scripts/playwright_cli.sh" -print -quit 2>/dev/null)"
+```
+
+If the above returns empty (e.g. skills installed elsewhere), fall back to a broader search:
+
+```bash
+export PWCLI="$(find "$HOME" -path "*/playwright/scripts/playwright_cli.sh" -print -quit 2>/dev/null)"
+```
 
 ## Quick start
 
