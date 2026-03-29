@@ -36,41 +36,41 @@ import {
   filterOptions,
   createClient,
   executeAndPrint,
-} from "./lib/common.js";
+} from './lib/common.js'
 
-const args = process.argv.slice(2);
+const args = process.argv.slice(2)
 
-if (args.includes("--help") || args.length === 0) {
-  showHelp(import.meta.url);
+if (args.includes('--help') || args.length === 0) {
+  showHelp(import.meta.url)
 }
 
-let urls: string | string[] = args[0];
+let urls: string | string[] = args[0]!
 try {
-  urls = JSON.parse(urls) as string[];
+  urls = JSON.parse(urls) as string[]
 } catch {
   // Single URL string — keep as-is
 }
 
 const opts: Record<string, unknown> = args[1]
   ? (JSON.parse(args[1]) as Record<string, unknown>)
-  : { text: true };
+  : { text: true }
 
-requireApiKey();
+requireApiKey()
 
-const exa = createClient();
+const exa = createClient()
 
 const contentsOpts = filterOptions(opts, [
-  "text",
-  "highlights",
-  "summary",
-  "livecrawl",
-  "livecrawlTimeout",
-  "maxAgeHours",
-  "filterEmptyResults",
-  "subpages",
-  "subpageTarget",
-]);
+  'text',
+  'highlights',
+  'summary',
+  'livecrawl',
+  'livecrawlTimeout',
+  'maxAgeHours',
+  'filterEmptyResults',
+  'subpages',
+  'subpageTarget',
+])
 
 await executeAndPrint(async () => {
-  return await exa.getContents(urls, contentsOpts);
-});
+  return await exa.getContents(urls, contentsOpts)
+})

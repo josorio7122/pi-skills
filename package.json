@@ -2,7 +2,10 @@
   "name": "pi-skills",
   "version": "1.0.0",
   "description": "Personal pi skills collection",
-  "scripts": {},
+  "scripts": {
+    "test": "tsx --test skills/posthog-skill/scripts/__tests__/*.test.ts",
+    "test:live": "POSTHOG_TEST_LIVE=1 tsx --test skills/posthog-skill/scripts/__tests__/*.test.ts"
+  },
   "keywords": [
     "pi-package"
   ],
