@@ -55,7 +55,7 @@ State what will be destroyed and wait for confirmation before running any of the
 
 ---
 
-## When Things Fail
+## Error Recovery
 
 - **`HTTP 403` or rate limiting** — check `gh auth status`; token may be expired or lack required scopes
 - **Expired or missing token** — run `gh auth refresh` to renew without re-authenticating

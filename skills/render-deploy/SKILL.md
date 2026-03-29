@@ -54,7 +54,7 @@ Analyze the codebase first; only ask if deployment intent is unclear.
 
 If unsure, default to Blueprint for safety.
 
-## Output Contract
+## Output Format
 
 Output the complete render.yaml as a single fenced YAML code block. Add brief inline comments for fields requiring user action.
 
@@ -87,6 +87,6 @@ Error catalog: [references/error-patterns.md](references/error-patterns.md)
 
 ---
 
-## Troubleshooting
+## Error Recovery
 
 If deployment fails, load [references/troubleshooting-basics.md](references/troubleshooting-basics.md) for diagnostic steps.

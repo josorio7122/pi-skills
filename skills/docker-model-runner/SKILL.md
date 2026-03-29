@@ -55,6 +55,6 @@ Load [references/docker-model-guide.md](references/docker-model-guide.md) when:
 - Installation instructions for Linux/Docker Engine
 - Configuration options (env vars, ctx-size)
 
-## Troubleshooting
+## Error Recovery
 
 If you hit an error, load [references/docker-model-guide.md](references/docker-model-guide.md) § Troubleshooting.

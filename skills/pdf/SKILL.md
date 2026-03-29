@@ -75,7 +75,7 @@ pdftoppm -png input.pdf output/pages/page
 - reportlab font/encoding error → verify strings are UTF-8 and image paths are absolute. See [references/techniques.md](references/techniques.md).
 - `get_fields()` returns None → PDF has no AcroForm fields. Tell the user it cannot be filled programmatically.
 
-## Output format for read/extract tasks
+## Output Format
 
 - Return extracted text as Markdown, preserving heading hierarchy where detectable.
 - Render tables as Markdown tables.

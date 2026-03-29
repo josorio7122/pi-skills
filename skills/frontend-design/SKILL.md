@@ -56,7 +56,7 @@ Interpret creatively and make unexpected choices that feel genuinely designed fo
 - Contradictory requirements → prioritize the technical constraint (accessibility, performance). Name the trade-off.
 - Ambiguous aesthetic direction → pick the direction least likely to match AI defaults. State why.
 
-## Output
+## Output Format
 
 Produce self-contained, runnable code. Embed all styles in a single HTML file for HTML/CSS/JS output. Use a single React component file unless the user explicitly requests scaffolding.
 

@@ -98,7 +98,7 @@ If you need a full template or anti-pattern examples, read [references/example-s
 - Generated file exceeds 100 lines → cut lowest-value sections. Prioritize: commands > boundaries > code standards.
 - User declines confirmation → ask what to change. Do not write without approval.
 
-## Output
+## Output Format
 
 **NEVER** write the file without explicit user confirmation.
 

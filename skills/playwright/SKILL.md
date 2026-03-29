@@ -8,7 +8,7 @@ description: Automate a real browser from the terminal for navigation, form fill
 Drive a real browser from the terminal using `playwright-cli`. Prefer the bundled wrapper script so the CLI works even when it is not globally installed.
 Treat this skill as CLI-first automation. Do not pivot to `@playwright/test` unless the user explicitly asks for test files.
 
-## Prerequisite check (required)
+## Prerequisites
 
 Before proposing commands, check whether `npx` is available (the wrapper depends on it):
 
@@ -53,7 +53,7 @@ The wrapper script is at `scripts/playwright_cli.sh` (relative to this skill's d
 - `npx` not found → Node.js is not installed. Ask the user to install it.
 - Session lost → re-`open` the original URL to start a new session.
 
-## Output
+## Output Format
 
 After each significant step, report: the command run, a brief summary of the result, and the path to any saved artifact.
 
@@ -103,10 +103,6 @@ Refs can go stale. When a command fails due to a missing ref, snapshot again.
 ## Recommended patterns
 
 Load [references/workflows.md](references/workflows.md) only when the task involves forms, multi-step flows, sessions, or debugging.
-
-## Prerequisites
-
-Version 1.50.1 is pinned for reproducibility. To use a newer release, replace the version in `scripts/playwright_cli.sh` and the install commands.
 
 ## References
 

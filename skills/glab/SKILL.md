@@ -18,7 +18,7 @@ If not authenticated, run `glab auth login` (browser OAuth) or `glab auth login 
 
 ---
 
-## Routing Table
+## Choosing the Right Command
 
 | Goal                                         | Load                                                       |
 | -------------------------------------------- | ---------------------------------------------------------- |
@@ -48,7 +48,7 @@ For command syntax, load [references/commands.md](references/commands.md).
 
 ---
 
-## Troubleshooting
+## Error Recovery
 
 - **Auth failure / `HTTP 401`** — run `glab auth status`; re-authenticate with `glab auth login`
 - **Wrong remote detected** — use `--repo owner/repo` or set `GITLAB_HOST` for self-hosted instances

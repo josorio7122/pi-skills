@@ -100,14 +100,14 @@ Read `references/registration-validation.md`.
 2. Run quick validation with strict depth gates.
 3. Reject shallow outputs that fail depth gates or required artifact checks.
 
-## When Things Fail
+## Error Recovery
 
 - Synthesis finds no sources → document the gap explicitly; do not fabricate content.
 - Validator returns errors → fix each error before proceeding to registration.
 - Depth gates fail → expand the source collection; do not claim completion with insufficient coverage.
 - `uv` unavailable → validate manually: check frontmatter fields, confirm references/ exists, verify SOURCES.md provenance.
 
-## Output format
+## Output Format
 
 Return:
 
