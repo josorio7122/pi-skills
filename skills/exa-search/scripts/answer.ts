@@ -26,9 +26,9 @@
  *   tsx scripts/answer.ts "List top 3 ORMs" '{"outputSchema":{"type":"object","properties":{"items":{"type":"array","items":{"type":"string"}}}}}'
  */
 
-import { parseArgs, requireApiKey, handleError, filterOptions, createClient } from './lib/common.js'
+import { parseArgs, requireApiKey, handleError, filterOptions, createClient, out } from './lib/common.js'
 
-const { query, opts } = parseArgs(import.meta.url)
+const { target: query, opts } = parseArgs(import.meta.url)
 requireApiKey()
 
 const exa = createClient()
@@ -49,13 +49,13 @@ try {
       if (typedChunk.content) process.stdout.write(typedChunk.content)
       if (typedChunk.citations) {
         process.stdout.write('\n')
-        console.log(JSON.stringify({ citations: typedChunk.citations }, null, 2))
+        out({ citations: typedChunk.citations })
       }
     }
     process.stdout.write('\n')
   } else {
     const result = await exa.answer(query, answerOpts)
-    console.log(JSON.stringify(result, null, 2))
+    out(result)
   }
 } catch (err) {
   handleError(err)

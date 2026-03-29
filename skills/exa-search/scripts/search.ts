@@ -53,7 +53,7 @@ import {
   executeAndPrint,
 } from './lib/common.js'
 
-const { query, opts } = parseArgs(import.meta.url)
+const { target: query, opts } = parseArgs(import.meta.url)
 requireApiKey()
 
 const exa = createClient()

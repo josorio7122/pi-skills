@@ -130,7 +130,7 @@ try {
         outputSchema: (opts.outputSchema as Record<string, unknown>) ?? undefined,
       })
       const createdTyped = created as { researchId: string }
-      console.error(`Research task created: ${createdTyped.researchId} — polling...`)
+      process.stderr.write(`Research task created: ${createdTyped.researchId} — polling...\n`)
       await executeAndPrint(async () =>
         exa.research.pollUntilFinished(createdTyped.researchId, {
           pollInterval: (opts.pollInterval as number) || 2000,
@@ -150,8 +150,8 @@ try {
     }
 
     default:
-      console.error(`Error: Unknown subcommand "${subcommand}".`)
-      console.error('Valid subcommands: create, get, poll, list, run')
+      process.stderr.write(`Error: Unknown subcommand "${subcommand}".\n`)
+      process.stderr.write('Valid subcommands: create, get, poll, list, run\n')
       process.exit(1)
   }
 } catch (err) {

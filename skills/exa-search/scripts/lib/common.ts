@@ -1,6 +1,16 @@
 import { readFileSync } from 'node:fs'
 import { Exa } from 'exa-js'
 
+/** Require an environment variable, exit with error if missing. */
+export function requireEnv(name: string): string {
+  const value = process.env[name]
+  if (!value) {
+    process.stderr.write(`Error: ${name} environment variable is required.\n`)
+    process.exit(1)
+  }
+  return value
+}
+
 /** Create an Exa client instance. Requires EXA_API_KEY env var. */
 export function createClient(): Exa {
   return new Exa()
@@ -9,17 +19,22 @@ export function createClient(): Exa {
 /** Require a CLI argument, exit with error if missing. */
 export function requireArg(value: string | undefined, name: string): string {
   if (!value) {
-    console.error(`Error: ${name} is required`)
+    process.stderr.write(`Error: ${name} is required\n`)
     process.exit(1)
   }
   return value
+}
+
+/** Write JSON to stdout. */
+export function out(data: unknown): void {
+  process.stdout.write(JSON.stringify(data, null, 2) + '\n')
 }
 
 /** Execute an async API call, print JSON result, exit on error. */
 export async function executeAndPrint<T>(apiCall: () => Promise<T>): Promise<void> {
   try {
     const result = await apiCall()
-    console.log(JSON.stringify(result, null, 2))
+    out(result)
   } catch (err) {
     handleError(err)
   }
@@ -27,7 +42,6 @@ export async function executeAndPrint<T>(apiCall: () => Promise<T>): Promise<voi
 
 /**
  * Show help text extracted from the JSDoc comment at the top of a script file.
- * Reads lines starting with " * " until " * /" is found.
  */
 export function showHelp(scriptUrl: string): void {
   const lines: string[] = []
@@ -38,7 +52,7 @@ export function showHelp(scriptUrl: string): void {
       lines.push(line.slice(3))
     }
   }
-  console.log(lines.join('\n'))
+  process.stdout.write(lines.join('\n') + '\n')
   process.exit(0)
 }
 
@@ -47,41 +61,41 @@ export function showHelp(scriptUrl: string): void {
  */
 export function requireApiKey(): void {
   if (!process.env.EXA_API_KEY) {
-    console.error('Error: EXA_API_KEY environment variable is required.')
-    console.error('Get one at: https://dashboard.exa.ai/api-keys')
+    process.stderr.write('Error: EXA_API_KEY environment variable is required.\n')
+    process.stderr.write('Get one at: https://dashboard.exa.ai/api-keys\n')
     process.exit(1)
   }
 }
 
 /**
- * Parse CLI args: show help if --help or no args, return query and options.
+ * Parse CLI args: show help if --help or no args, return target and options.
  */
-export function parseArgs(scriptUrl: string): { query: string; opts: Record<string, unknown> } {
+export function parseArgs(scriptUrl: string): { target: string; opts: Record<string, unknown> } {
   const args = process.argv.slice(2)
 
   if (args.includes('--help') || args.length === 0) {
     showHelp(scriptUrl)
   }
 
-  const query = requireArg(args[0], 'query')
+  const target = requireArg(args[0], 'target')
   let opts: Record<string, unknown> = {}
   if (args[1]) {
     try {
       opts = JSON.parse(args[1]) as Record<string, unknown>
     } catch {
-      console.error('Error: options argument is not valid JSON')
+      process.stderr.write('Error: options argument is not valid JSON\n')
       process.exit(1)
     }
   }
 
-  return { query, opts }
+  return { target, opts }
 }
 
 /**
  * Standardized error handler for all exa scripts.
  */
 export function handleError(err: unknown): never {
-  console.error(`Error: ${(err as Error).message}`)
+  process.stderr.write(`Error: ${err instanceof Error ? err.message : String(err)}\n`)
   process.exit(1)
 }
 

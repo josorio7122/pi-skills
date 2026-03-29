@@ -68,7 +68,7 @@ export function showHelp(scriptUrl: string): void {
       lines.push(line.slice(3))
     }
   }
-  console.log(lines.join('\n'))
+  process.stdout.write(lines.join('\n') + '\n')
   process.exit(0)
 }
 

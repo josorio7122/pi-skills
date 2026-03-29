@@ -38,7 +38,7 @@ import {
   executeAndPrint,
 } from './lib/common.js'
 
-const { query: urlArg, opts: rawOpts } = parseArgs(import.meta.url)
+const { target: urlArg, opts: rawOpts } = parseArgs(import.meta.url)
 
 let urls: string | string[] = urlArg
 try {
