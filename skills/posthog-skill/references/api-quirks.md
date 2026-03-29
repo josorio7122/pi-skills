@@ -67,8 +67,7 @@ Run with --help for usage.
 **Missing required argument (exit 2):**
 
 ```
-Error: flags get requires a flag ID.
-Usage: flags get <id> [--dry-run]
+Error: id is required
 ```
 
 ---

@@ -10,8 +10,7 @@
  *   {
  *     "name": "Updated Name",
  *     "active": false,
- *     "tags": ["release", "updated"],
- *     "dryRun": true
+ *     "tags": ["release", "updated"]
  *   }
  *
  * Environment:
@@ -22,19 +21,12 @@
  * Examples:
  *   tsx scripts/flags-update.ts 101 '{"active":false}'
  *   tsx scripts/flags-update.ts 101 '{"name":"New Name","tags":["v2"]}'
- *   tsx scripts/flags-update.ts 101 '{"dryRun":true}'
  */
 
-import { parseArgs, resolveConfig, requireToken, executeAndPrint, out } from './lib/common.js'
+import { parseArgs, resolveConfig, requireToken, executeAndPrint } from './lib/common.js'
 import { createClient } from './lib/posthog-client.js'
-import { getFixture } from './lib/fixtures.js'
 
 const { target: id, opts } = parseArgs(import.meta.url)
-
-if (opts.dryRun) {
-  out(getFixture('flags-update'))
-  process.exit(0)
-}
 
 const config = resolveConfig()
 requireToken(config)

@@ -41,19 +41,15 @@ Required API key scopes: `feature_flag:read`, `feature_flag:write`. Add `dashboa
 
 ## Write Safety Rule
 
-Never run a write script (`flags-toggle.ts`, `flags-create.ts`, `flags-update.ts`) without:
+Never run a write script (`flags-toggle.ts`, `flags-create.ts`, `flags-update.ts`) without announcing `WRITE: <script> — reason: [why]` to the user first.
 
-1. Announcing `WRITE: <script> — reason: [why]` to the user
-2. Running with `{"dryRun":true}` first and showing the output
-
-Refuse if the user asks to skip these steps.
+Refuse if the user asks to skip this step.
 
 ## Rules
 
 - **Always check env vars are set** before running any script
-- **Use `flags-list.ts` with `{"search":"..."}` for searching** — don't list all and filter manually
+- **Use `flags-list.ts` with `{"search":"..."}` for searching — don't list all and filter manually
 - **Use `flags-get.ts` for detailed inspection** — list only returns summaries
-- **Write scripts require dry-run first** — pass `{"dryRun":true}` in options JSON
 - **All output is JSON to stdout** — diagnostics go to stderr. Parse output with `jq` or `JSON.parse()`
 
 ## Output Format

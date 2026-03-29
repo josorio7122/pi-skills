@@ -3,13 +3,8 @@
  * PostHog flags toggle — enable or disable a feature flag.
  *
  * Usage:
- *   tsx scripts/flags-toggle.ts <id> [options-json]
+ *   tsx scripts/flags-toggle.ts <id>
  *   tsx scripts/flags-toggle.ts --help
- *
- * Options JSON (all optional):
- *   {
- *     "dryRun": true
- *   }
  *
  * Environment:
  *   POSTHOG_PROJECT_ID       — required
@@ -18,19 +13,12 @@
  *
  * Examples:
  *   tsx scripts/flags-toggle.ts 101
- *   tsx scripts/flags-toggle.ts 101 '{"dryRun":true}'
  */
 
-import { parseArgs, resolveConfig, requireToken, executeAndPrint, out } from './lib/common.js'
+import { parseArgs, resolveConfig, requireToken, executeAndPrint } from './lib/common.js'
 import { createClient } from './lib/posthog-client.js'
-import { getFixture } from './lib/fixtures.js'
 
-const { target: id, opts } = parseArgs(import.meta.url)
-
-if (opts.dryRun) {
-  out(getFixture('flags-toggle'))
-  process.exit(0)
-}
+const { target: id } = parseArgs(import.meta.url)
 
 const config = resolveConfig()
 requireToken(config)
