@@ -78,16 +78,6 @@ describe('posthog-client: Content-Type header', () => {
       'application/json',
     )
   })
-
-  it('sets Content-Type: application/json on PATCH requests', async () => {
-    const fetch = makeFetch({ status: 200, body: { id: 1 } })
-    const client = createClient(CONFIG, fetch)
-    await client.patchDashboard(1, { deleted: true })
-    assert.strictEqual(
-      (fetch.calls[0]!.options.headers as Record<string, string>)['Content-Type'],
-      'application/json',
-    )
-  })
 })
 
 describe('posthog-client: success responses', () => {

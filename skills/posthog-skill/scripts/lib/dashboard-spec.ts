@@ -21,14 +21,6 @@ export interface Tile {
   layout: TileLayout
 }
 
-export interface DashboardSpec {
-  name: string
-  description: string
-  tags: string[]
-  branchEvents: BranchEvent[]
-  tiles: Tile[]
-}
-
 // Key pages for the purchase funnel tile (curated subset of the 27 pages)
 const FUNNEL_PAGES = ['quote', 'delivery', 'payment', 'review', 'confirmation'] as const
 

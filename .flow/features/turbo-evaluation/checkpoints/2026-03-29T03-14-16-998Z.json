@@ -1,0 +1,904 @@
+[
+  {
+    "agent": "planner",
+    "agentSource": "builtin",
+    "task": "Create a task plan to fix 6 code organization issues in /Users/josorio/Code/pi-skills. All TypeScript code lives under skills/exa-search/scripts/ and skills/posthog-skill/scripts/.\n\n## Issue 1: Extract shared test helper in posthog-skill\nThe `run()` helper function (spawns CLI via `spawnSync(TSX, [RUN, ...args], ...)`) is copy-pasted identically in 6 CLI test files:\n- skills/posthog-skill/scripts/__tests__/status.test.ts\n- skills/posthog-skill/scripts/__tests__/inspect.test.ts\n- skills/posthog-skill/scripts/__tests__/compare.test.ts\n- skills/posthog-skill/scripts/__tests__/create.test.ts\n- skills/posthog-skill/scripts/__tests__/flags.test.ts\n- skills/posthog-skill/scripts/__tests__/live.test.ts (variant adds timeout: 30000)\n\nExtract to `skills/posthog-skill/scripts/__tests__/helpers.ts`. The helper also includes `TSX` and `RUN` path constants that use `path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'tsx')` and similar. Also the `LIVE` constant `Boolean(process.env['POSTHOG_TEST_LIVE'])` is duplicated in 5 files.\n\n## Issue 2: Remove dead exports in posthog-skill\n- `DashboardSpec` interface in lib/dashboard-spec.ts — exported, never imported\n- `patchDashboard` method in lib/posthog-client.ts — never called from run.ts\n- `'status'` and `'inspect-live'` fixture keys in lib/fixtures.ts — never requested by run.ts\nNote: `noUnusedLocals` is enabled in tsconfig, so removing unused exports may be required for clean compilation. However, exports themselves don't trigger `noUnusedLocals` — only unused local variables do. Still, dead exports should be removed for hygiene.\n\n## Issue 3: Refactor exa-search scripts to use common.ts consistently\nCurrent state of skills/exa-search/scripts/:\n- lib/common.ts exports 8 utilities: createClient, requireArg, executeAndPrint, showHelp, requireApiKey, parseArgs, handleError, filterOptions, buildContentsOptions\n- answer.ts, search.ts use common.ts helpers well\n- contents.ts manually re-implements parseArgs/showHelp boilerplate instead of using common.ts\n- research.ts manually re-implements parseArgs/showHelp AND has `console.log(JSON.stringify(result, null, 2))` repeated 5× instead of using executeAndPrint\n- search.ts and find-similar.ts share identical wantContents + buildContentsOptions pattern (minor, could extract but may be over-engineering)\n\nFocus: Make contents.ts and research.ts use the common.ts helpers they're ignoring.\n\n## Issue 4: Split run.ts (502 lines) into command modules\nCurrent structure: skills/posthog-skill/scripts/run.ts has ALL commands inline:\n- resolveConfig(), requireToken() — config section\n- out(), info(), handleApiError() — output helpers\n- cmdStatus(config) — sync, small\n- cmdInspect(flags, config) + cmdInspectLive(config) — inspect command\n- cmdCompare(flags, config) + cmdCompareLive(config) — compare command (~80 lines)\n- cmdCreate(flags, config) + cmdCreateLive(config) — create command (~100 lines)\n- parseFlagsOptions(args), cmdFlags(args, config) — flags command (~130 lines)\n- main() — entry point with switch\n\nProposed structure:\n- run.ts — slim entry point (main + switch + imports)\n- lib/config.ts — resolveConfig, requireToken, AppConfig type, out(), info(), handleApiError()\n- lib/cmd-status.ts\n- lib/cmd-inspect.ts\n- lib/cmd-compare.ts\n- lib/cmd-create.ts\n- lib/cmd-flags.ts\n\nEach command file exports a single function. The dry-run pattern (check isDryRun → return fixture → else call live) stays in each command file.\n\n## Issue 5: Type the PostHog insight response in cmdCompareLive\ncmdCompareLive in run.ts has 7+ `Record<string, unknown>` casts to extract fields from the PostHog insight response. Define typed interfaces in posthog-client.ts for the InsightVizNode/query structure and use them.\n\n## Issue 6: Add exa-search tests\n5 scripts + common.ts with zero tests. At minimum test common.ts utilities (createClient, requireArg, parseArgs, filterOptions, buildContentsOptions, handleError). These are pure functions that can be unit tested without mocking the Exa API.\n\n## Constraints\n- Tests run via `pnpm test` which currently only runs posthog tests: `tsx --test skills/posthog-skill/scripts/__tests__/*.test.ts`\n- Need to update root package.json test script to also include exa-search tests (via npm pkg set)\n- All imports use .js extensions (ESM)\n- tsconfig has noUnusedLocals, noUnusedParameters, noUncheckedIndexedAccess enabled\n- Must verify `tsc --noEmit` passes and `pnpm test` passes after each change\n- Must verify `pnpm run lint` passes after each change\n\n## Ordering\nIssues 1-2 are independent quick wins. Issue 3 is independent. Issue 4 depends on issue 5 (type the response interfaces before splitting run.ts, since the types go in posthog-client.ts). Issue 6 is independent but should come last (new tests).\n\nSuggested order: 2 → 1 → 3 → 5 → 4 → 6",
+    "exitCode": 0,
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "text": "Create a task plan to fix 6 code organization issues in /Users/josorio/Code/pi-skills. All TypeScript code lives under skills/exa-search/scripts/ and skills/posthog-skill/scripts/.\n\n## Issue 1: Extract shared test helper in posthog-skill\nThe `run()` helper function (spawns CLI via `spawnSync(TSX, [RUN, ...args], ...)`) is copy-pasted identically in 6 CLI test files:\n- skills/posthog-skill/scripts/__tests__/status.test.ts\n- skills/posthog-skill/scripts/__tests__/inspect.test.ts\n- skills/posthog-skill/scripts/__tests__/compare.test.ts\n- skills/posthog-skill/scripts/__tests__/create.test.ts\n- skills/posthog-skill/scripts/__tests__/flags.test.ts\n- skills/posthog-skill/scripts/__tests__/live.test.ts (variant adds timeout: 30000)\n\nExtract to `skills/posthog-skill/scripts/__tests__/helpers.ts`. The helper also includes `TSX` and `RUN` path constants that use `path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'tsx')` and similar. Also the `LIVE` constant `Boolean(process.env['POSTHOG_TEST_LIVE'])` is duplicated in 5 files.\n\n## Issue 2: Remove dead exports in posthog-skill\n- `DashboardSpec` interface in lib/dashboard-spec.ts — exported, never imported\n- `patchDashboard` method in lib/posthog-client.ts — never called from run.ts\n- `'status'` and `'inspect-live'` fixture keys in lib/fixtures.ts — never requested by run.ts\nNote: `noUnusedLocals` is enabled in tsconfig, so removing unused exports may be required for clean compilation. However, exports themselves don't trigger `noUnusedLocals` — only unused local variables do. Still, dead exports should be removed for hygiene.\n\n## Issue 3: Refactor exa-search scripts to use common.ts consistently\nCurrent state of skills/exa-search/scripts/:\n- lib/common.ts exports 8 utilities: createClient, requireArg, executeAndPrint, showHelp, requireApiKey, parseArgs, handleError, filterOptions, buildContentsOptions\n- answer.ts, search.ts use common.ts helpers well\n- contents.ts manually re-implements parseArgs/showHelp boilerplate instead of using common.ts\n- research.ts manually re-implements parseArgs/showHelp AND has `console.log(JSON.stringify(result, null, 2))` repeated 5× instead of using executeAndPrint\n- search.ts and find-similar.ts share identical wantContents + buildContentsOptions pattern (minor, could extract but may be over-engineering)\n\nFocus: Make contents.ts and research.ts use the common.ts helpers they're ignoring.\n\n## Issue 4: Split run.ts (502 lines) into command modules\nCurrent structure: skills/posthog-skill/scripts/run.ts has ALL commands inline:\n- resolveConfig(), requireToken() — config section\n- out(), info(), handleApiError() — output helpers\n- cmdStatus(config) — sync, small\n- cmdInspect(flags, config) + cmdInspectLive(config) — inspect command\n- cmdCompare(flags, config) + cmdCompareLive(config) — compare command (~80 lines)\n- cmdCreate(flags, config) + cmdCreateLive(config) — create command (~100 lines)\n- parseFlagsOptions(args), cmdFlags(args, config) — flags command (~130 lines)\n- main() — entry point with switch\n\nProposed structure:\n- run.ts — slim entry point (main + switch + imports)\n- lib/config.ts — resolveConfig, requireToken, AppConfig type, out(), info(), handleApiError()\n- lib/cmd-status.ts\n- lib/cmd-inspect.ts\n- lib/cmd-compare.ts\n- lib/cmd-create.ts\n- lib/cmd-flags.ts\n\nEach command file exports a single function. The dry-run pattern (check isDryRun → return fixture → else call live) stays in each command file.\n\n## Issue 5: Type the PostHog insight response in cmdCompareLive\ncmdCompareLive in run.ts has 7+ `Record<string, unknown>` casts to extract fields from the PostHog insight response. Define typed interfaces in posthog-client.ts for the InsightVizNode/query structure and use them.\n\n## Issue 6: Add exa-search tests\n5 scripts + common.ts with zero tests. At minimum test common.ts utilities (createClient, requireArg, parseArgs, filterOptions, buildContentsOptions, handleError). These are pure functions that can be unit tested without mocking the Exa API.\n\n## Constraints\n- Tests run via `pnpm test` which currently only runs posthog tests: `tsx --test skills/posthog-skill/scripts/__tests__/*.test.ts`\n- Need to update root package.json test script to also include exa-search tests (via npm pkg set)\n- All imports use .js extensions (ESM)\n- tsconfig has noUnusedLocals, noUnusedParameters, noUncheckedIndexedAccess enabled\n- Must verify `tsc --noEmit` passes and `pnpm test` passes after each change\n- Must verify `pnpm run lint` passes after each change\n\n## Ordering\nIssues 1-2 are independent quick wins. Issue 3 is independent. Issue 4 depends on issue 5 (type the response interfaces before splitting run.ts, since the types go in posthog-client.ts). Issue 6 is independent but should come last (new tests).\n\nSuggested order: 2 → 1 → 3 → 5 → 4 → 6"
+          }
+        ],
+        "timestamp": 1774753939197
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "Let me read the design document and understand the codebase before creating the task plan.",
+            "thinkingSignature": "EpUCClkIDBgCKkAMPIQSt65xPP5YS1ecKoLK4bawR7KYbHtLIZ0bTWRGhcCzUny14g7lZPj/EkIHNlwPn092cIoQ1OUY8ggvDmGFMg9jbGF1ZGUtb3B1cy00LTY4ABIMWRBTDT1YtY89jMVdGgzW0B/aKEnyIjN87gkiMBA4Wkq/Skq1/Vk0nEZHZ1oOfGr256DCQZpgEpmi/NlbELbDvKyM5bBwyJGb+/O5IypqPOVQWgtL4eokVHL5Kb0+uoPUOoxXyPHnrhHTsZHlQwVMsZea4AtCu4kECiODlwnkksmVDNrfQvV8AxvrPIY8Dvk1vHvB1Hpzpoj8x+rnxxG0tjj00+bv0MZzky3bhJExLy1mtI+jJFUseBgB"
+          },
+          {
+            "type": "text",
+            "text": "Let me examine the codebase to understand the current state before creating the plan."
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01WwLSeRSk3cCwuAQGjvPAj7",
+            "name": "find",
+            "arguments": {
+              "pattern": "**/*.ts",
+              "path": "/Users/josorio/Code/pi-skills/skills/posthog-skill/scripts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01H9u8VTWLoW9pNSRnt6MyEs",
+            "name": "find",
+            "arguments": {
+              "pattern": "**/*.ts",
+              "path": "/Users/josorio/Code/pi-skills/skills/exa-search/scripts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01Czw3zgXLPsdW2YmhGnGcwL",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/.flow/features/turbo-evaluation/design.md"
+            }
+          }
+        ],
+        "api": "anthropic-messages",
+        "provider": "anthropic",
+        "model": "claude-opus-4-6",
+        "usage": {
+          "input": 3,
+          "output": 271,
+          "cacheRead": 0,
+          "cacheWrite": 16602,
+          "totalTokens": 16876,
+          "cost": {
+            "input": 0.000015000000000000002,
+            "output": 0.006775000000000001,
+            "cacheRead": 0,
+            "cacheWrite": 0.10376250000000001,
+            "total": 0.11055250000000001
+          }
+        },
+        "stopReason": "toolUse",
+        "timestamp": 1774753939217,
+        "responseId": "msg_012giE8QWgohZGK369L7dwAk"
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01WwLSeRSk3cCwuAQGjvPAj7",
+        "toolName": "find",
+        "content": [
+          {
+            "type": "text",
+            "text": "__tests__/compare.test.ts\n__tests__/create.test.ts\n__tests__/dashboard-spec.test.ts\n__tests__/flags.test.ts\n__tests__/inspect.test.ts\n__tests__/live.test.ts\n__tests__/posthog-client.test.ts\n__tests__/status.test.ts\nlib/dashboard-spec.ts\nlib/fixtures.ts\nlib/posthog-client.ts\nrun.ts"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774753945252
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01H9u8VTWLoW9pNSRnt6MyEs",
+        "toolName": "find",
+        "content": [
+          {
+            "type": "text",
+            "text": "answer.ts\ncontents.ts\nfind-similar.ts\nlib/common.ts\nresearch.ts\nsearch.ts"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774753945252
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01Czw3zgXLPsdW2YmhGnGcwL",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "ENOENT: no such file or directory, access '/Users/josorio/Code/pi-skills/.flow/features/turbo-evaluation/design.md'"
+          }
+        ],
+        "details": {},
+        "isError": true,
+        "timestamp": 1774753945253
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "toolCall",
+            "id": "toolu_01Y7kq4iPewfdBDtc6VrorbT",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/posthog-skill/scripts/run.ts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01E43y68Y63eAqAjLDEW4S78",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/posthog-skill/scripts/__tests__/status.test.ts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_013Jkhg6N6TxVoH71MpHrabz",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/posthog-skill/scripts/__tests__/inspect.test.ts"
+            }
+          }
+        ],
+        "api": "anthropic-messages",
+        "provider": "anthropic",
+        "model": "claude-opus-4-6",
+        "usage": {
+          "input": 1,
+          "output": 201,
+          "cacheRead": 16602,
+          "cacheWrite": 531,
+          "totalTokens": 17335,
+          "cost": {
+            "input": 0.000005,
+            "output": 0.005025,
+            "cacheRead": 0.008301,
+            "cacheWrite": 0.00331875,
+            "total": 0.016649749999999998
+          }
+        },
+        "stopReason": "toolUse",
+        "timestamp": 1774753945253,
+        "responseId": "msg_012FnhtrkBVnN3z4C8BxX76P"
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01Y7kq4iPewfdBDtc6VrorbT",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "#!/usr/bin/env node\n\nimport path from 'node:path'\nimport fs from 'node:fs'\nimport { fileURLToPath } from 'node:url'\nimport { getFixture } from './lib/fixtures.js'\nimport * as spec from './lib/dashboard-spec.js'\nimport { createClient, PostHogError } from './lib/posthog-client.js'\nimport type { PostHogConfig } from './lib/posthog-client.js'\n\nconst __filename = fileURLToPath(import.meta.url)\nconst __dirname = path.dirname(__filename)\n\n// ---------------------------------------------------------------------------\n// Config resolution\n// ---------------------------------------------------------------------------\n\ninterface AppConfig extends PostHogConfig {\n  achInsightId: string\n  dashboardName: string\n}\n\nfunction resolveConfig(): AppConfig {\n  return {\n    host: process.env['POSTHOG_HOST'] ?? 'https://us.posthog.com',\n    projectId: process.env['POSTHOG_PROJECT_ID'] ?? '39507',\n    token: process.env['POSTHOG_PERSONAL_API_KEY'] ?? '',\n    achInsightId: process.env['POSTHOG_ACH_INSIGHT_ID'] ?? 'drOq2lO5',\n    dashboardName: process.env['POSTHOG_DASHBOARD_NAME'] ?? spec.name,\n  }\n}\n\nfunction requireToken(config: AppConfig): void {\n  if (!config.token) {\n    process.stderr.write(\n      'Error: POSTHOG_PERSONAL_API_KEY is required for this command.\\n' +\n        'Set it in your environment: export POSTHOG_PERSONAL_API_KEY=phx_...\\n',\n    )\n    process.exit(1)\n  }\n}\n\n// ---------------------------------------------------------------------------\n// Output helpers\n// ---------------------------------------------------------------------------\n\nfunction out(data: unknown): void {\n  process.stdout.write(JSON.stringify(data, null, 2) + '\\n')\n}\n\nfunction info(msg: string): void {\n  process.stderr.write(msg + '\\n')\n}\n\nfunction handleApiError(err: unknown, context?: string): never {\n  if (err instanceof PostHogError) {\n    if (err.status === 401) {\n      process.stderr.write(\n        `Error: PostHog returned 401 (Unauthorized) on ${err.endpoint}\\n` +\n          'Verify that POSTHOG_PERSONAL_API_KEY is valid and has not expired.\\n',\n      )\n    } else if (err.status === 403) {\n      process.stderr.write(\n        `Error: PostHog returned 403 (Forbidden) on ${err.endpoint}\\n` +\n          'Check that your API key has these scopes: dashboard:read, dashboard:write, insight:read, insight:write, query:read\\n',\n      )\n    } else if (err.status === 429) {\n      process.stderr.write(\n        `Error: PostHog rate limit exceeded on ${err.endpoint} — tried 3 times.\\n`,\n      )\n    } else {\n      process.stderr.write(`Error: ${context ?? 'PostHog request failed'}: ${err.message}\\n`)\n    }\n  } else {\n    const message = err instanceof Error ? err.message : String(err)\n    process.stderr.write(`Error: Connection to PostHog failed: ${message}\\n`)\n  }\n  process.exit(1)\n}\n\n// ---------------------------------------------------------------------------\n// Commands\n// ---------------------------------------------------------------------------\n\nfunction cmdStatus(config: AppConfig): void {\n  const tokenDisplay = config.token ? `***${config.token.slice(-4)} (present)` : 'NOT SET'\n  const achDisplay = config.achInsightId || 'NOT SET'\n\n  out({\n    host: config.host,\n    project_id: config.projectId,\n    token: tokenDisplay,\n    token_present: Boolean(config.token),\n    ach_insight_id: achDisplay,\n    dashboard_name: config.dashboardName,\n  })\n}\n\nasync function cmdInspect(flags: string[], config: AppConfig): Promise<void> {\n  const isDryRun = flags.includes('--dry-run')\n  const isLive = flags.includes('--live')\n\n  if (isDryRun) {\n    out(getFixture('inspect'))\n    return\n  }\n\n  if (isLive) {\n    requireToken(config)\n    await cmdInspectLive(config)\n    return\n  }\n\n  // Static local spec — works offline\n  out({\n    source: 'local-spec',\n    events: spec.branchEvents.map((ev) => ({\n      name: ev.name,\n      description: ev.description,\n      properties: ev.properties,\n    })),\n  })\n}\n\nasync function cmdInspectLive(config: AppConfig): Promise<void> {\n  const client = createClient(config)\n  const eventNames = spec.branchEvents.map((ev) => ev.name)\n\n  const quotedNames = eventNames.map((n) => `'${n}'`).join(', ')\n  const sql = [\n    'SELECT',\n    '  event,',\n    '  count() AS count_30d,',\n    '  max(timestamp) AS last_seen',\n    'FROM events',\n    `WHERE event IN (${quotedNames})`,\n    '  AND timestamp >= now() - INTERVAL 30 DAY',\n    'GROUP BY event',\n  ].join('\\n')\n\n  const startMs = Date.now()\n  let queryResult\n  try {\n    queryResult = await client.runQuery(sql)\n  } catch (err) {\n    handleApiError(err, 'inspect --live query failed')\n  }\n\n  const elapsed = Date.now() - startMs\n  info(`PostHog query completed in ${elapsed}ms (cached: ${queryResult.is_cached ?? false})`)\n\n  // Build map from results: event → { count_30d, last_seen }\n  // HogQL returns rows as arrays; columns order: event, count_30d, last_seen\n  const map: Record<string, { count_30d: unknown; last_seen: unknown }> = {}\n  const rows = queryResult.results ?? []\n  for (const row of rows) {\n    const eventName = row[0]\n    if (typeof eventName === 'string') {\n      map[eventName] = {\n        count_30d: row[1] ?? 0,\n        last_seen: row[2] ?? null,\n      }\n    }\n  }\n\n  // Zero-fill for events not present in result\n  const events = eventNames.map((name) => ({\n    event: name,\n    count_30d: map[name] !== undefined ? map[name].count_30d : 0,\n    last_seen: map[name] !== undefined ? map[name].last_seen : null,\n  }))\n\n  out({\n    source: 'posthog-live',\n    queried_at: new Date().toISOString(),\n    events,\n  })\n}\n\nasync function cmdCompare(flags: string[], config: AppConfig): Promise<void> {\n  const isDryRun = flags.includes('--dry-run')\n\n  if (isDryRun) {\n    out(getFixture('compare'))\n    return\n  }\n\n  requireToken(config)\n  await cmdCompareLive(config)\n}\n\nasync function cmdCompareLive(config: AppConfig): Promise<void> {\n  const client = createClient(config)\n  const shortId = config.achInsightId\n\n  let response\n  try {\n    response = await client.getInsightByShortId(shortId)\n  } catch (err) {\n    handleApiError(err, `compare: failed to fetch insight ${shortId}`)\n  }\n\n  const results = response.results ?? []\n  if (results.length === 0) {\n    process.stderr.write(\n      `Error: ACH insight not found: ${shortId} — verify the short ID is correct and the token has insight:read scope\\n`,\n    )\n    process.exit(1)\n  }\n\n  const insight = results[0]\n  if (!insight) {\n    process.exit(1)\n  }\n\n  const rawQuery: Record<string, unknown> = insight.query ?? {}\n\n  // PostHog wraps newer queries in InsightVizNode; drill into .source for actual query data\n  const isVizNode = rawQuery['kind'] === 'InsightVizNode'\n  const querySource = rawQuery['source']\n  const query: Record<string, unknown> = isVizNode\n    ? typeof querySource === 'object' && querySource !== null\n      ? (querySource as Record<string, unknown>)\n      : {}\n    : rawQuery\n\n  // Extract viz_type: funnels store it in funnelsFilter, trends in trendsFilter\n  let vizType: string | null = null\n  const funnelsFilter = query['funnelsFilter']\n  const trendsFilter = query['trendsFilter']\n  const insightFilters = insight.filters\n\n  if (typeof funnelsFilter === 'object' && funnelsFilter !== null) {\n    const ff = funnelsFilter as Record<string, unknown>\n    if (ff['funnelVizType']) {\n      vizType = `funnel:${String(ff['funnelVizType'])}`\n    }\n  } else if (typeof trendsFilter === 'object' && trendsFilter !== null) {\n    const tf = trendsFilter as Record<string, unknown>\n    if (tf['display']) {\n      vizType = String(tf['display'])\n    }\n  } else if (typeof insightFilters === 'object' && insightFilters !== null) {\n    const ifd = (insightFilters as Record<string, unknown>)['display']\n    if (ifd) {\n      vizType = String(ifd)\n    }\n  }\n\n  // Extract normalized summary fields\n  const seriesRaw = query['series']\n  const series = Array.isArray(seriesRaw)\n    ? seriesRaw.map((s: unknown) => {\n        const item = s as Record<string, unknown>\n        return { event: item['event'], name: item['name'], kind: item['kind'] }\n      })\n    : []\n\n  const breakdownFilter = query['breakdownFilter']\n  const breakdown =\n    typeof breakdownFilter === 'object' && breakdownFilter !== null\n      ? ((breakdownFilter as Record<string, unknown>)['breakdown'] ?? null)\n      : null\n\n  const dateRange = query['dateRange']\n  const dateRangeFrom =\n    typeof dateRange === 'object' && dateRange !== null\n      ? ((dateRange as Record<string, unknown>)['date_from'] ?? null)\n      : null\n\n  const queryKindInner = query['kind']\n  const rawQueryKind = rawQuery['kind']\n\n  const summary = {\n    id: insight.short_id ?? shortId,\n    name: insight.name ?? null,\n    description: insight.description ?? null,\n    query_kind: isVizNode\n      ? `InsightVizNode(${typeof queryKindInner === 'string' ? queryKindInner : '?'})`\n      : typeof rawQueryKind === 'string'\n        ? rawQueryKind\n        : null,\n    series,\n    breakdown,\n    date_range: dateRangeFrom,\n    viz_type: vizType,\n    saved_to: 'references/ach-reference-summary.json',\n  }\n\n  // Write to references/ach-reference-summary.json\n  const summaryPath = path.join(__dirname, '..', 'references', 'ach-reference-summary.json')\n  try {\n    fs.writeFileSync(summaryPath, JSON.stringify(summary, null, 2) + '\\n', 'utf8')\n  } catch (writeErr) {\n    const msg = writeErr instanceof Error ? writeErr.message : String(writeErr)\n    process.stderr.write(`Warning: could not write ${summaryPath}: ${msg}\\n`)\n  }\n\n  out(summary)\n}\n\nasync function cmdCreate(flags: string[], config: AppConfig): Promise<void> {\n  const isDryRun = flags.includes('--dry-run')\n\n  if (isDryRun) {\n    out(getFixture('create'))\n    return\n  }\n\n  requireToken(config)\n  await cmdCreateLive(config)\n}\n\nasync function cmdCreateLive(config: AppConfig): Promise<void> {\n  const client = createClient(config)\n  const dashboardName = config.dashboardName\n  const host = config.host\n  const projectId = config.projectId\n\n  // Step 1: Smoke test auth\n  try {\n    await client.listDashboards(1)\n  } catch (err) {\n    if (err instanceof PostHogError && err.status === 401) {\n      process.stderr.write('Error: auth failed — verify POSTHOG_PERSONAL_API_KEY is valid.\\n')\n    } else if (err instanceof PostHogError && err.status === 403) {\n      process.stderr.write(\n        'Error: PostHog returned 403 — check that your API key has dashboard:read, dashboard:write, insight:read, insight:write, query:read scopes\\n',\n      )\n    } else {\n      const msg = err instanceof Error ? err.message : String(err)\n      process.stderr.write(`Error: connection failed: ${msg}\\n`)\n    }\n    process.exit(1)\n  }\n\n  // Step 2: List dashboards (up to 100)\n  let dashboardList\n  try {\n    dashboardList = await client.listDashboards(100)\n  } catch (err) {\n    handleApiError(err, 'create: failed to list dashboards')\n  }\n\n  const allDashboards = dashboardList.results ?? []\n  if (dashboardList.count > 100) {\n    info('Warning: dashboard list may be truncated at 100 results')\n  }\n\n  // Step 3: Find or create dashboard\n  const existing = allDashboards.find((d) => d.name === dashboardName && !d.deleted)\n  let dashboardId: number\n\n  if (existing) {\n    dashboardId = existing.id\n    info(`Found existing dashboard \"${dashboardName}\" (id: ${dashboardId})`)\n  } else {\n    info(`Creating dashboard \"${dashboardName}\"...`)\n    let created\n    try {\n      created = await client.createDashboard(dashboardName, spec.tags)\n    } catch (err) {\n      handleApiError(err, 'create: failed to create dashboard')\n    }\n    dashboardId = created.id\n    info(`Dashboard created (id: ${dashboardId})`)\n  }\n\n  // Step 4: Fetch full dashboard (includes tiles with nested insights)\n  let dashboard\n  try {\n    dashboard = await client.getDashboard(dashboardId)\n  } catch (err) {\n    handleApiError(err, `create: failed to fetch dashboard ${dashboardId}`)\n  }\n\n  // Step 5: Build existing insight name → tile map from dashboard tiles\n  const existingTiles = dashboard.tiles ?? []\n  type ExistingTile = (typeof existingTiles)[number]\n  const existingNameToTile: Record<string, ExistingTile> = {}\n  for (const tile of existingTiles) {\n    if (tile.insight && tile.insight.name) {\n      existingNameToTile[tile.insight.name] = tile\n    }\n  }\n\n  // Step 6: Create missing insights, attaching them to the dashboard via dashboards:[id]\n  // Insights created with dashboards:[dashboardId] are auto-attached — no PATCH needed.\n  const tileResults: Array<{\n    specTile: (typeof spec.tiles)[number]\n    insightId: number | null\n    status: 'existing' | 'created' | 'failed'\n  }> = []\n  let hasFailure = false\n\n  for (const specTile of spec.tiles) {\n    const existingTile = existingNameToTile[specTile.name]\n\n    if (existingTile) {\n      const tileInsight = existingTile.insight\n      if (tileInsight) {\n        info(`Skipping existing insight: \"${specTile.name}\" (id: ${tileInsight.id})`)\n        tileResults.push({\n          specTile,\n          insightId: tileInsight.id,\n          status: 'existing',\n        })\n      }\n      continue\n    }\n\n    info(`Creating insight: \"${specTile.name}\"...`)\n    try {\n      const newInsight = await client.createInsightOnDashboard(\n        specTile.name,\n        specTile.query,\n        dashboardId,\n      )\n      info(`  Created insight (id: ${newInsight.id})`)\n      tileResults.push({\n        specTile,\n        insightId: newInsight.id,\n        status: 'created',\n      })\n    } catch (err) {\n      const msg = err instanceof Error ? err.message : String(err)\n      process.stderr.write(`Error creating insight \"${specTile.name}\": ${msg}\\n`)\n      tileResults.push({\n        specTile,\n        insightId: null,\n        status: 'failed',\n      })\n      hasFailure = true\n    }\n  }\n\n  // Step 7: Emit result (no PATCH needed — insights attach via dashboards field)\n  const tiles = tileResults.map((t) => ({\n    name: t.specTile.name,\n    insight_id: t.insightId,\n    insight_url:\n      t.insightId !== null ? `${host}/project/${projectId}/insights/${t.insightId}` : null,\n    status: t.status,\n  }))\n\n  out({\n    dashboard_id: dashboardId,\n    dashboard_url: `${host}/project/${projectId}/dashboard/${dashboardId}`,\n    tiles,\n  })\n\n  if (hasFailure) {\n    process.exit(3)\n  }\n}\n\n// ---------------------------------------------------------------------------\n// Flags command\n// ---------------------------------------------------------------------------\n\ninterface FlagsOptions {\n  search?: string\n  active?: string\n  type?: string\n  limit?: string\n  name?: string\n  tags?: string\n  dryRun: boolean\n}\n\nfunction parseFlagsOptions(args: string[]): FlagsOptions {\n  const opts: FlagsOptions = { dryRun: false }\n  let i = 0\n  while (i < args.length) {\n    const arg = args[i]\n    if (arg === undefined) break\n    switch (arg) {\n      case '--dry-run':\n        opts.dryRun = true\n        i++\n        break\n      case '--search':\n        opts.search = args[i + 1]\n        i += 2\n        break\n      case '--active':\n        opts.active = args[i + 1]\n        i += 2\n        break\n      case '--type':\n        opts.type = args[i + 1]\n        i += 2\n        break\n      case '--limit':\n        opts.limit = args[i + 1]\n        i += 2\n        break\n      case '--name':\n        opts.name = args[i + 1]\n        i += 2\n        break\n      case '--tags':\n        opts.tags = args[i + 1]\n        i += 2\n        break\n      default:\n        i++\n    }\n  }\n  return opts\n}\n\nasync function cmdFlags(args: string[], config: AppConfig): Promise<void> {\n  // Determine subcommand: if first arg starts with '--' or is missing, default to 'list'\n  let subcommand = 'list'\n  let rest = args\n  const firstArg = args[0]\n  if (firstArg !== undefined && !firstArg.startsWith('--')) {\n    subcommand = firstArg\n    rest = args.slice(1)\n  }\n\n  const opts = parseFlagsOptions(rest)\n\n  switch (subcommand) {\n    case 'list': {\n      if (opts.dryRun) {\n        out(getFixture('flags'))\n        return\n      }\n      requireToken(config)\n      const client = createClient(config)\n      try {\n        const result = await client.listFeatureFlags({\n          search: opts.search,\n          active: opts.active,\n          type: opts.type,\n          limit: opts.limit !== undefined ? Number(opts.limit) : undefined,\n        })\n        out(result)\n      } catch (err) {\n        handleApiError(err, 'flags list failed')\n      }\n      break\n    }\n    case 'get': {\n      const id = rest.find((a) => !a.startsWith('--'))\n      if (!id) {\n        process.stderr.write('Error: flags get requires a flag ID — ID is required\\n')\n        process.exit(2)\n      }\n      if (opts.dryRun) {\n        out(getFixture('flags-get'))\n        return\n      }\n      requireToken(config)\n      const client = createClient(config)\n      try {\n        const result = await client.getFeatureFlag(id)\n        out(result)\n      } catch (err) {\n        handleApiError(err, `flags get ${id} failed`)\n      }\n      break\n    }\n    case 'toggle': {\n      const id = rest.find((a) => !a.startsWith('--'))\n      if (!id) {\n        process.stderr.write('Error: flags toggle requires a flag ID\\n')\n        process.exit(2)\n      }\n      if (opts.dryRun) {\n        out(getFixture('flags-toggle'))\n        return\n      }\n      requireToken(config)\n      const client = createClient(config)\n      try {\n        const current = await client.getFeatureFlag(id)\n        await client.patchFeatureFlag(id, { active: !current.active })\n        out({\n          id: current.id,\n          key: current.key,\n          active_before: current.active,\n          active_after: !current.active,\n        })\n      } catch (err) {\n        handleApiError(err, `flags toggle ${id} failed`)\n      }\n      break\n    }\n    case 'create': {\n      const key = rest.find((a) => !a.startsWith('--'))\n      if (!key) {\n        process.stderr.write('Error: flags create requires a flag key\\n')\n        process.exit(2)\n      }\n      if (opts.dryRun) {\n        out(getFixture('flags-create'))\n        return\n      }\n      requireToken(config)\n      const client = createClient(config)\n      try {\n        const body: Record<string, unknown> = { name: opts.name }\n        if (opts.tags !== undefined) {\n          body['tags'] = opts.tags.split(',')\n        }\n        const result = await client.createFeatureFlag(key, body)\n        out(result)\n      } catch (err) {\n        handleApiError(err, `flags create ${key} failed`)\n      }\n      break\n    }\n    case 'update': {\n      const id = rest.find((a) => !a.startsWith('--'))\n      if (!id) {\n        process.stderr.write('Error: flags update requires a flag ID\\n')\n        process.exit(2)\n      }\n      if (opts.dryRun) {\n        out(getFixture('flags-update'))\n        return\n      }\n      requireToken(config)\n      const client = createClient(config)\n      try {\n        const body: Record<string, unknown> = {}\n        if (opts.name !== undefined) body['name'] = opts.name\n        if (opts.active !== undefined) body['active'] = opts.active === 'true'\n        if (opts.tags !== undefined) body['tags'] = opts.tags.split(',')\n        const result = await client.patchFeatureFlag(id, body)\n        out(result)\n      } catch (err) {\n        handleApiError(err, `flags update ${id} failed`)\n      }\n      break\n    }\n    case 'activity': {\n      const id = rest.find((a) => !a.startsWith('--'))\n      if (!id) {\n        process.stderr.write('Error: flags activity requires a flag ID\\n')\n        process.exit(2)\n      }\n      if (opts.dryRun) {\n        out(getFixture('flags-activity'))\n        return\n      }\n      requireToken(config)\n      const client = createClient(config)\n      try {\n        const result = await client.getFeatureFlagActivity(\n          id,\n          opts.limit !== undefined ? Number(opts.limit) : 10,\n        )\n        out(result)\n      } catch (err) {\n        handleApiError(err, `flags activity ${id} failed`)\n      }\n      break\n    }\n    default:\n      process.stderr.write(`Unknown flags subcommand: ${subcommand}\\n`)\n      process.exit(2)\n  }\n}\n\nfunction cmdHelp(): void {\n  process.stderr.write(\n    [\n      '',\n      'posthog-skill — PostHog analytics automation for branch 7361',\n      '',\n      'Usage:',\n      '  node scripts/run.js <command> [options]',\n      '',\n      'Commands:',\n      '  status              Show resolved config (host, project ID, token masked/missing).',\n      '                      Never requires a token. Safe to run in CI.',\n      '',\n      '  inspect             List the 9 branch-7361 events from the local spec (always).',\n      '  inspect --live      Verify events are live in PostHog (requires token).',\n      '',\n      '  compare             Fetch the ACH reference insight summary.',\n      '                      Requires POSTHOG_PERSONAL_API_KEY.',\n      '                      Saves result to references/ach-reference-summary.json.',\n      '',\n      '  create              Idempotently provision the 7361 dashboard + 8 insights.',\n      '                      Requires POSTHOG_PERSONAL_API_KEY.',\n      '',\n      'Options:',\n      '  --dry-run           Skip all HTTP. Return canned fixture output. Exit 0.',\n      '  --help              Print this help.',\n      '',\n      'Environment variables:',\n      '  POSTHOG_PERSONAL_API_KEY   Required for live commands',\n      '  POSTHOG_PROJECT_ID         Default: 39507',\n      '  POSTHOG_HOST               Default: https://us.posthog.com',\n      '  POSTHOG_ACH_INSIGHT_ID     Default: drOq2lO5',\n      '  POSTHOG_DASHBOARD_NAME     Default: 7361 Purchase & Insurance Flow Metrics',\n      '',\n      'Recovery (orphaned insights):',\n      '  If create fails between insight creation and the dashboard PATCH (exit 3),',\n      '  soft-delete the dashboard and re-run:',\n      '    PATCH /api/environments/39507/dashboards/<id>/ { \"deleted\": true }',\n      '  Then run: node scripts/run.js create',\n      '',\n      'Examples:',\n      '  node scripts/run.js status',\n      '  node scripts/run.js inspect',\n      '  node scripts/run.js inspect --live',\n      '  node scripts/run.js compare --dry-run',\n      '  node scripts/run.js compare',\n      '  node scripts/run.js create --dry-run',\n      '  node scripts/run.js create',\n      '',\n    ].join('\\n'),\n  )\n}\n\n// ---------------------------------------------------------------------------\n// Entry point\n// ---------------------------------------------------------------------------\n\nasync function main(): Promise<void> {\n  const args = process.argv.slice(2)\n\n  if (args.length === 0 || args.includes('--help') || args.includes('-h')) {\n    cmdHelp()\n    process.exit(0)\n  }\n\n  const command = args[0]\n  if (command === undefined) {\n    cmdHelp()\n    process.exit(0)\n  }\n\n  const flags = args.slice(1)\n  const config = resolveConfig()\n\n  switch (command) {\n    case 'status':\n      cmdStatus(config)\n      break\n    case 'inspect':\n      await cmdInspect(flags, config)\n      break\n    case 'compare':\n      await cmdCompare(flags, config)\n      break\n    case 'create':\n      await cmdCreate(flags, config)\n      break\n    case 'flags':\n      await cmdFlags(flags, config)\n      break\n    default:\n      process.stderr.write(`Unknown command: ${command}\\nRun with --help for usage.\\n`)\n      process.exit(2)\n  }\n}\n\nmain().catch((err) => {\n  process.stderr.write(`Fatal: ${err instanceof Error ? err.message : String(err)}\\n`)\n  process.exit(1)\n})\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774753949198
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01E43y68Y63eAqAjLDEW4S78",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "import { describe, it } from 'node:test'\nimport assert from 'node:assert/strict'\nimport { spawnSync } from 'node:child_process'\nimport path from 'node:path'\nimport { fileURLToPath } from 'node:url'\n\nconst __dirname = path.dirname(fileURLToPath(import.meta.url))\n\nconst TSX = path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'tsx')\nconst RUN = path.join(__dirname, '..', 'run.ts')\n\nfunction run(\n  args: string[] = [],\n  env: Record<string, string> = {},\n): { status: number | null; stdout: string; stderr: string } {\n  return spawnSync(TSX, [RUN, ...args], {\n    encoding: 'utf8',\n    env: { ...process.env, ...env },\n  })\n}\n\ndescribe('status command', () => {\n  it('exits 0 with no token set', () => {\n    const result = run(['status'], { POSTHOG_PERSONAL_API_KEY: '' })\n    assert.strictEqual(result.status, 0, `expected exit 0, got ${result.status}\\n${result.stderr}`)\n  })\n\n  it('stdout contains NOT SET when no token', () => {\n    const result = run(['status'], { POSTHOG_PERSONAL_API_KEY: '' })\n    assert.ok(result.stdout.includes('NOT SET'), `expected \"NOT SET\" in stdout:\\n${result.stdout}`)\n  })\n\n  it('stdout contains masked token when token is set', () => {\n    const result = run(['status'], { POSTHOG_PERSONAL_API_KEY: 'phx_supersecrettoken123' })\n    assert.ok(\n      result.stdout.includes('***'),\n      `expected masked token \"***\" in stdout:\\n${result.stdout}`,\n    )\n    assert.ok(\n      !result.stdout.includes('supersecrettoken123'),\n      'token value must not appear in plaintext',\n    )\n  })\n\n  it('stdout is valid JSON', () => {\n    const result = run(['status'], { POSTHOG_PERSONAL_API_KEY: '' })\n    assert.doesNotThrow(\n      () => JSON.parse(result.stdout),\n      `stdout is not valid JSON:\\n${result.stdout}`,\n    )\n  })\n\n  it('includes project_id in output', () => {\n    const result = run(['status'], { POSTHOG_PERSONAL_API_KEY: '', POSTHOG_PROJECT_ID: '39507' })\n    const parsed = JSON.parse(result.stdout) as { project_id: unknown }\n    assert.ok(parsed.project_id, 'output must include project_id')\n  })\n})\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774753949199
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_013Jkhg6N6TxVoH71MpHrabz",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "import { describe, it } from 'node:test'\nimport assert from 'node:assert/strict'\nimport { spawnSync } from 'node:child_process'\nimport path from 'node:path'\nimport { fileURLToPath } from 'node:url'\n\nconst __dirname = path.dirname(fileURLToPath(import.meta.url))\n\nconst LIVE = Boolean(process.env['POSTHOG_TEST_LIVE'])\n\nconst TSX = path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'tsx')\nconst RUN = path.join(__dirname, '..', 'run.ts')\n\nfunction run(\n  args: string[] = [],\n  env: Record<string, string> = {},\n): { status: number | null; stdout: string; stderr: string } {\n  return spawnSync(TSX, [RUN, ...args], {\n    encoding: 'utf8',\n    env: { ...process.env, ...env },\n  })\n}\n\nconst BRANCH_EVENTS = [\n  'form_page_reached',\n  'soil_donation_selected',\n  'travel_protection_selected',\n  'fcf_amount_selected',\n  'fcf_more_info_clicked',\n  'payment_method_selected',\n  'payment_mode_selected',\n  'payment_completed',\n  'signing_completed',\n]\n\ndescribe('inspect command (no --live)', () => {\n  it('exits 0 without any env vars', () => {\n    const result = run(['inspect'], { POSTHOG_PERSONAL_API_KEY: '' })\n    assert.strictEqual(result.status, 0, `expected exit 0\\n${result.stderr}`)\n  })\n\n  it('stdout is valid JSON', () => {\n    const result = run(['inspect'], { POSTHOG_PERSONAL_API_KEY: '' })\n    assert.doesNotThrow(() => JSON.parse(result.stdout), `not valid JSON:\\n${result.stdout}`)\n  })\n\n  it('output contains all 9 branch event names', () => {\n    const result = run(['inspect'], { POSTHOG_PERSONAL_API_KEY: '' })\n    const text = result.stdout\n    for (const event of BRANCH_EVENTS) {\n      assert.ok(text.includes(event), `missing event \"${event}\" in inspect output`)\n    }\n  })\n\n  it('output events array has length 9', () => {\n    const result = run(['inspect'], { POSTHOG_PERSONAL_API_KEY: '' })\n    const parsed = JSON.parse(result.stdout) as { events: unknown[] }\n    assert.strictEqual(parsed.events.length, 9, 'expected 9 events in output')\n  })\n})\n\ndescribe('inspect --dry-run', () => {\n  it('exits 0', () => {\n    const result = run(['inspect', '--dry-run'], { POSTHOG_PERSONAL_API_KEY: '' })\n    assert.strictEqual(result.status, 0)\n  })\n\n  it('stdout is valid JSON', () => {\n    const result = run(['inspect', '--dry-run'], { POSTHOG_PERSONAL_API_KEY: '' })\n    assert.doesNotThrow(() => JSON.parse(result.stdout))\n  })\n\n  it('dry-run output has events array', () => {\n    const result = run(['inspect', '--dry-run'], { POSTHOG_PERSONAL_API_KEY: '' })\n    const parsed = JSON.parse(result.stdout) as { events: unknown }\n    assert.ok(Array.isArray(parsed.events), 'expected events array')\n  })\n})\n\ndescribe('inspect --live without token', () => {\n  it('exits 1 when POSTHOG_PERSONAL_API_KEY is not set', () => {\n    const result = run(['inspect', '--live'], { POSTHOG_PERSONAL_API_KEY: '' })\n    assert.strictEqual(result.status, 1, `expected exit 1\\n${result.stderr}`)\n  })\n\n  it('stderr mentions POSTHOG_PERSONAL_API_KEY', () => {\n    const result = run(['inspect', '--live'], { POSTHOG_PERSONAL_API_KEY: '' })\n    assert.ok(\n      result.stderr.includes('POSTHOG_PERSONAL_API_KEY'),\n      `expected stderr to mention POSTHOG_PERSONAL_API_KEY:\\n${result.stderr}`,\n    )\n  })\n})\n\nconst BRANCH_EVENTS_LIVE = [\n  'form_page_reached',\n  'soil_donation_selected',\n  'travel_protection_selected',\n  'fcf_amount_selected',\n  'fcf_more_info_clicked',\n  'payment_method_selected',\n  'payment_mode_selected',\n  'payment_completed',\n  'signing_completed',\n]\n\ndescribe('inspect --live (POSTHOG_TEST_LIVE=1)', { skip: !LIVE }, () => {\n  it('exits 0 with valid token', () => {\n    const result = run(['inspect', '--live'])\n    assert.strictEqual(result.status, 0, `expected exit 0\\nstderr: ${result.stderr}`)\n  })\n\n  it('output source equals posthog-live', () => {\n    const result = run(['inspect', '--live'])\n    const parsed = JSON.parse(result.stdout) as { source: string }\n    assert.strictEqual(parsed.source, 'posthog-live')\n  })\n\n  it('output events array has exactly 9 entries', () => {\n    const result = run(['inspect', '--live'])\n    const parsed = JSON.parse(result.stdout) as { events: unknown[] }\n    assert.strictEqual(parsed.events.length, 9, `expected 9 events, got ${parsed.events.length}`)\n  })\n\n  it('each entry has event (string), count_30d (number >= 0), last_seen (string or null)', () => {\n    const result = run(['inspect', '--live'])\n    const parsed = JSON.parse(result.stdout) as {\n      events: Array<{ event: unknown; count_30d: unknown; last_seen: unknown }>\n    }\n    for (const entry of parsed.events) {\n      assert.strictEqual(\n        typeof entry.event,\n        'string',\n        `event must be string: ${JSON.stringify(entry)}`,\n      )\n      assert.ok(\n        typeof entry.count_30d === 'number' && (entry.count_30d as number) >= 0,\n        `count_30d must be number >= 0: ${JSON.stringify(entry)}`,\n      )\n      assert.ok(\n        entry.last_seen === null || typeof entry.last_seen === 'string',\n        `last_seen must be string or null: ${JSON.stringify(entry)}`,\n      )\n    }\n  })\n\n  it('all 9 spec event names appear in output', () => {\n    const result = run(['inspect', '--live'])\n    const parsed = JSON.parse(result.stdout) as { events: Array<{ event: string }> }\n    const outputNames = parsed.events.map((e) => e.event)\n    for (const eventName of BRANCH_EVENTS_LIVE) {\n      assert.ok(outputNames.includes(eventName), `missing event \"${eventName}\" in live output`)\n    }\n  })\n})\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774753949199
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "toolCall",
+            "id": "toolu_01UtSRBcHjTqFGzk9W5QB4Fh",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/posthog-skill/scripts/__tests__/compare.test.ts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01J51GpPFzR9Q3jk1TUW7uk6",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/posthog-skill/scripts/__tests__/create.test.ts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_0164ZJMsj1WAkAMtoce7UbnB",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/posthog-skill/scripts/__tests__/flags.test.ts"
+            }
+          }
+        ],
+        "api": "anthropic-messages",
+        "provider": "anthropic",
+        "model": "claude-opus-4-6",
+        "usage": {
+          "input": 1,
+          "output": 206,
+          "cacheRead": 17133,
+          "cacheWrite": 9979,
+          "totalTokens": 27319,
+          "cost": {
+            "input": 0.000005,
+            "output": 0.00515,
+            "cacheRead": 0.0085665,
+            "cacheWrite": 0.06236875,
+            "total": 0.07609025
+          }
+        },
+        "stopReason": "toolUse",
+        "timestamp": 1774753949200,
+        "responseId": "msg_01SyXw2hhj8kGAB3aGYsQP97"
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01UtSRBcHjTqFGzk9W5QB4Fh",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "import { describe, it } from 'node:test'\nimport assert from 'node:assert/strict'\nimport { spawnSync } from 'node:child_process'\nimport path from 'node:path'\nimport fs from 'node:fs'\nimport { fileURLToPath } from 'node:url'\n\nconst __dirname = path.dirname(fileURLToPath(import.meta.url))\n\nconst LIVE = Boolean(process.env['POSTHOG_TEST_LIVE'])\n\nconst TSX = path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'tsx')\nconst RUN = path.join(__dirname, '..', 'run.ts')\n\nfunction run(\n  args: string[] = [],\n  env: Record<string, string> = {},\n): { status: number | null; stdout: string; stderr: string } {\n  return spawnSync(TSX, [RUN, ...args], {\n    encoding: 'utf8',\n    env: { ...process.env, ...env },\n  })\n}\n\ndescribe('compare --dry-run', () => {\n  it('exits 0', () => {\n    const result = run(['compare', '--dry-run'], { POSTHOG_PERSONAL_API_KEY: '' })\n    assert.strictEqual(result.status, 0, `expected exit 0\\n${result.stderr}`)\n  })\n\n  it('stdout is valid JSON', () => {\n    const result = run(['compare', '--dry-run'], { POSTHOG_PERSONAL_API_KEY: '' })\n    assert.doesNotThrow(() => JSON.parse(result.stdout), `not valid JSON:\\n${result.stdout}`)\n  })\n\n  it('output contains query_kind field', () => {\n    const result = run(['compare', '--dry-run'], { POSTHOG_PERSONAL_API_KEY: '' })\n    const parsed = JSON.parse(result.stdout) as { query_kind: unknown }\n    assert.ok(parsed.query_kind, 'output must have query_kind field')\n  })\n\n  it('output contains required summary fields', () => {\n    const result = run(['compare', '--dry-run'], { POSTHOG_PERSONAL_API_KEY: '' })\n    const parsed = JSON.parse(result.stdout) as Record<string, unknown>\n    const required = ['name', 'query_kind', 'viz_type', 'date_range']\n    for (const field of required) {\n      assert.ok(field in parsed, `output must have field \"${field}\"`)\n    }\n  })\n})\n\ndescribe('compare without token (live)', () => {\n  it('exits 1 when no token set', () => {\n    const result = run(['compare'], { POSTHOG_PERSONAL_API_KEY: '' })\n    assert.strictEqual(result.status, 1, `expected exit 1\\n${result.stderr}`)\n  })\n})\n\nconst SKILL_DIR = path.join(__dirname, '../..')\nconst ACH_SUMMARY_PATH = path.join(SKILL_DIR, 'references/ach-reference-summary.json')\n\ndescribe('compare live (POSTHOG_TEST_LIVE=1)', { skip: !LIVE }, () => {\n  it('exits 0 with valid token', () => {\n    const result = run(['compare'])\n    assert.strictEqual(result.status, 0, `expected exit 0\\nstderr: ${result.stderr}`)\n  })\n\n  it('output id equals drOq2lO5', () => {\n    const result = run(['compare'])\n    const parsed = JSON.parse(result.stdout) as { id: string }\n    assert.strictEqual(parsed.id, 'drOq2lO5')\n  })\n\n  it('output has query_kind, name, viz_type, date_range fields', () => {\n    const result = run(['compare'])\n    const parsed = JSON.parse(result.stdout) as Record<string, unknown>\n    for (const field of ['query_kind', 'name', 'viz_type', 'date_range']) {\n      assert.ok(field in parsed, `output must have field \"${field}\"`)\n    }\n  })\n\n  it('references/ach-reference-summary.json exists after compare runs', () => {\n    run(['compare'])\n    assert.ok(fs.existsSync(ACH_SUMMARY_PATH), `file not found: ${ACH_SUMMARY_PATH}`)\n  })\n\n  it('ach-reference-summary.json contains id drOq2lO5', () => {\n    run(['compare'])\n    const content = JSON.parse(fs.readFileSync(ACH_SUMMARY_PATH, 'utf8')) as { id: string }\n    assert.strictEqual(content.id, 'drOq2lO5')\n  })\n})\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774753953251
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01J51GpPFzR9Q3jk1TUW7uk6",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "import { describe, it } from 'node:test'\nimport assert from 'node:assert/strict'\nimport { spawnSync } from 'node:child_process'\nimport path from 'node:path'\nimport { fileURLToPath } from 'node:url'\n\nconst __dirname = path.dirname(fileURLToPath(import.meta.url))\n\nconst LIVE = Boolean(process.env['POSTHOG_TEST_LIVE'])\n\nconst TSX = path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'tsx')\nconst RUN = path.join(__dirname, '..', 'run.ts')\n\nfunction run(\n  args: string[] = [],\n  env: Record<string, string> = {},\n): { status: number | null; stdout: string; stderr: string } {\n  return spawnSync(TSX, [RUN, ...args], {\n    encoding: 'utf8',\n    env: { ...process.env, ...env },\n  })\n}\n\ndescribe('create --dry-run', () => {\n  it('exits 0', () => {\n    const result = run(['create', '--dry-run'], { POSTHOG_PERSONAL_API_KEY: '' })\n    assert.strictEqual(result.status, 0, `expected exit 0\\n${result.stderr}`)\n  })\n\n  it('stdout is valid JSON', () => {\n    const result = run(['create', '--dry-run'], { POSTHOG_PERSONAL_API_KEY: '' })\n    assert.doesNotThrow(() => JSON.parse(result.stdout), `not valid JSON:\\n${result.stdout}`)\n  })\n\n  it('output contains dashboard_url', () => {\n    const result = run(['create', '--dry-run'], { POSTHOG_PERSONAL_API_KEY: '' })\n    const parsed = JSON.parse(result.stdout) as { dashboard_url: unknown }\n    assert.ok(parsed.dashboard_url, 'output must have dashboard_url')\n  })\n\n  it('output contains tiles array', () => {\n    const result = run(['create', '--dry-run'], { POSTHOG_PERSONAL_API_KEY: '' })\n    const parsed = JSON.parse(result.stdout) as { tiles: unknown }\n    assert.ok(Array.isArray(parsed.tiles), 'output must have tiles array')\n  })\n\n  it('tiles array has exactly 8 entries', () => {\n    const result = run(['create', '--dry-run'], { POSTHOG_PERSONAL_API_KEY: '' })\n    const parsed = JSON.parse(result.stdout) as { tiles: unknown[] }\n    assert.strictEqual(parsed.tiles.length, 8, `expected 8 tiles, got ${parsed.tiles.length}`)\n  })\n\n  it('each tile has name and insight_id', () => {\n    const result = run(['create', '--dry-run'], { POSTHOG_PERSONAL_API_KEY: '' })\n    const parsed = JSON.parse(result.stdout) as {\n      tiles: Array<{ name: unknown; insight_id: unknown }>\n    }\n    for (const tile of parsed.tiles) {\n      assert.ok(tile.name, `tile missing name: ${JSON.stringify(tile)}`)\n      assert.ok(tile.insight_id !== undefined, `tile \"${tile.name}\" missing insight_id`)\n    }\n  })\n\n  it('output contains dashboard_id', () => {\n    const result = run(['create', '--dry-run'], { POSTHOG_PERSONAL_API_KEY: '' })\n    const parsed = JSON.parse(result.stdout) as { dashboard_id: unknown }\n    assert.ok(parsed.dashboard_id !== undefined, 'output must have dashboard_id')\n  })\n})\n\ndescribe('create without token (live)', () => {\n  it('exits 1 when no token set', () => {\n    const result = run(['create'], { POSTHOG_PERSONAL_API_KEY: '' })\n    assert.strictEqual(result.status, 1, `expected exit 1\\n${result.stderr}`)\n  })\n})\n\ndescribe('create live first run (POSTHOG_TEST_LIVE=1)', { skip: !LIVE }, () => {\n  it('exits 0 with valid token', () => {\n    const result = run(['create'])\n    assert.strictEqual(result.status, 0, `expected exit 0\\nstderr: ${result.stderr}`)\n  })\n\n  it('output dashboard_id is a positive integer', () => {\n    const result = run(['create'])\n    const parsed = JSON.parse(result.stdout) as { dashboard_id: unknown }\n    assert.ok(\n      Number.isInteger(parsed.dashboard_id) && (parsed.dashboard_id as number) > 0,\n      `expected positive integer dashboard_id, got: ${parsed.dashboard_id}`,\n    )\n  })\n\n  it('output dashboard_url contains project/39507/dashboard/', () => {\n    const result = run(['create'])\n    const parsed = JSON.parse(result.stdout) as { dashboard_url: string }\n    assert.ok(\n      parsed.dashboard_url.includes('project/39507/dashboard/'),\n      `unexpected dashboard_url: ${parsed.dashboard_url}`,\n    )\n  })\n\n  it('output tiles has exactly 8 entries', () => {\n    const result = run(['create'])\n    const parsed = JSON.parse(result.stdout) as { tiles: unknown[] }\n    assert.strictEqual(parsed.tiles.length, 8, `expected 8 tiles, got ${parsed.tiles.length}`)\n  })\n})\n\ndescribe('create live idempotency (POSTHOG_TEST_LIVE=1)', { skip: !LIVE }, () => {\n  it('second run exits 0', () => {\n    const result = run(['create'])\n    assert.strictEqual(result.status, 0, `expected exit 0\\nstderr: ${result.stderr}`)\n  })\n\n  it('second run: all 8 tiles have status existing', () => {\n    const result = run(['create'])\n    const parsed = JSON.parse(result.stdout) as { tiles: Array<{ status: string }> }\n    const nonExisting = parsed.tiles.filter((t) => t.status !== 'existing')\n    assert.strictEqual(\n      nonExisting.length,\n      0,\n      `expected all tiles to be \"existing\" on second run, but got: ${JSON.stringify(nonExisting)}`,\n    )\n  })\n})\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774753953251
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_0164ZJMsj1WAkAMtoce7UbnB",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "import { describe, it } from 'node:test'\nimport assert from 'node:assert/strict'\nimport { spawnSync } from 'node:child_process'\nimport path from 'node:path'\nimport { fileURLToPath } from 'node:url'\n\nconst __dirname = path.dirname(fileURLToPath(import.meta.url))\n\nconst TSX = path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'tsx')\nconst RUN = path.join(__dirname, '..', 'run.ts')\n\nfunction run(\n  args: string[] = [],\n  env: Record<string, string> = {},\n): { status: number | null; stdout: string; stderr: string } {\n  return spawnSync(TSX, [RUN, ...args], {\n    encoding: 'utf8',\n    env: { ...process.env, ...env },\n  })\n}\n\ndescribe('flags --dry-run (list)', () => {\n  it('exits 0', () => {\n    const result = run(['flags', '--dry-run'], { POSTHOG_PERSONAL_API_KEY: '' })\n    assert.strictEqual(result.status, 0, `expected exit 0\\n${result.stderr}`)\n  })\n\n  it('stdout is valid JSON', () => {\n    const result = run(['flags', '--dry-run'], { POSTHOG_PERSONAL_API_KEY: '' })\n    assert.doesNotThrow(() => JSON.parse(result.stdout), `not valid JSON:\\n${result.stdout}`)\n  })\n\n  it('output has results array', () => {\n    const result = run(['flags', '--dry-run'], { POSTHOG_PERSONAL_API_KEY: '' })\n    const parsed = JSON.parse(result.stdout) as { results: unknown }\n    assert.ok(Array.isArray(parsed.results), 'output must have results array')\n  })\n\n  it('output has count number', () => {\n    const result = run(['flags', '--dry-run'], { POSTHOG_PERSONAL_API_KEY: '' })\n    const parsed = JSON.parse(result.stdout) as { count: unknown }\n    assert.strictEqual(typeof parsed.count, 'number', 'output must have count as a number')\n  })\n\n  it('each result has id, key, name, active fields', () => {\n    const result = run(['flags', '--dry-run'], { POSTHOG_PERSONAL_API_KEY: '' })\n    const parsed = JSON.parse(result.stdout) as {\n      results: Array<{ id: unknown; key: unknown; name: unknown; active: unknown }>\n    }\n    for (const flag of parsed.results) {\n      assert.ok(flag.id !== undefined, `flag missing id: ${JSON.stringify(flag)}`)\n      assert.ok(flag.key !== undefined, `flag missing key: ${JSON.stringify(flag)}`)\n      assert.ok(flag.name !== undefined, `flag missing name: ${JSON.stringify(flag)}`)\n      assert.ok(flag.active !== undefined, `flag missing active: ${JSON.stringify(flag)}`)\n    }\n  })\n})\n\ndescribe('flags get --dry-run', () => {\n  it('exits 0', () => {\n    const result = run(['flags', 'get', '123', '--dry-run'], { POSTHOG_PERSONAL_API_KEY: '' })\n    assert.strictEqual(result.status, 0, `expected exit 0\\n${result.stderr}`)\n  })\n\n  it('stdout is valid JSON', () => {\n    const result = run(['flags', 'get', '123', '--dry-run'], { POSTHOG_PERSONAL_API_KEY: '' })\n    assert.doesNotThrow(() => JSON.parse(result.stdout), `not valid JSON:\\n${result.stdout}`)\n  })\n\n  it('output has id, key, name, active, filters, created_at fields', () => {\n    const result = run(['flags', 'get', '123', '--dry-run'], { POSTHOG_PERSONAL_API_KEY: '' })\n    const parsed = JSON.parse(result.stdout) as Record<string, unknown>\n    assert.ok(parsed['id'] !== undefined, 'output must have id')\n    assert.ok(parsed['key'] !== undefined, 'output must have key')\n    assert.ok(parsed['name'] !== undefined, 'output must have name')\n    assert.ok(parsed['active'] !== undefined, 'output must have active')\n    assert.ok(parsed['filters'] !== undefined, 'output must have filters')\n    assert.ok(parsed['created_at'] !== undefined, 'output must have created_at')\n  })\n})\n\ndescribe('flags toggle --dry-run', () => {\n  it('exits 0', () => {\n    const result = run(['flags', 'toggle', '123', '--dry-run'], { POSTHOG_PERSONAL_API_KEY: '' })\n    assert.strictEqual(result.status, 0, `expected exit 0\\n${result.stderr}`)\n  })\n\n  it('stdout is valid JSON', () => {\n    const result = run(['flags', 'toggle', '123', '--dry-run'], { POSTHOG_PERSONAL_API_KEY: '' })\n    assert.doesNotThrow(() => JSON.parse(result.stdout), `not valid JSON:\\n${result.stdout}`)\n  })\n\n  it('output has id, key, active_before, active_after fields', () => {\n    const result = run(['flags', 'toggle', '123', '--dry-run'], { POSTHOG_PERSONAL_API_KEY: '' })\n    const parsed = JSON.parse(result.stdout) as Record<string, unknown>\n    assert.ok(parsed['id'] !== undefined, 'output must have id')\n    assert.ok(parsed['key'] !== undefined, 'output must have key')\n    assert.ok(parsed['active_before'] !== undefined, 'output must have active_before')\n    assert.ok(parsed['active_after'] !== undefined, 'output must have active_after')\n  })\n\n  it('active_before and active_after are different (boolean flip)', () => {\n    const result = run(['flags', 'toggle', '123', '--dry-run'], { POSTHOG_PERSONAL_API_KEY: '' })\n    const parsed = JSON.parse(result.stdout) as {\n      active_before: boolean\n      active_after: boolean\n    }\n    assert.notStrictEqual(\n      parsed.active_before,\n      parsed.active_after,\n      `active_before (${parsed.active_before}) must differ from active_after (${parsed.active_after})`,\n    )\n  })\n})\n\ndescribe('flags create --dry-run', () => {\n  it('exits 0', () => {\n    const result = run(['flags', 'create', 'my-new-flag', '--dry-run'], {\n      POSTHOG_PERSONAL_API_KEY: '',\n    })\n    assert.strictEqual(result.status, 0, `expected exit 0\\n${result.stderr}`)\n  })\n\n  it('stdout is valid JSON', () => {\n    const result = run(['flags', 'create', 'my-new-flag', '--dry-run'], {\n      POSTHOG_PERSONAL_API_KEY: '',\n    })\n    assert.doesNotThrow(() => JSON.parse(result.stdout), `not valid JSON:\\n${result.stdout}`)\n  })\n\n  it('output has id, key, name, active fields', () => {\n    const result = run(['flags', 'create', 'my-new-flag', '--dry-run'], {\n      POSTHOG_PERSONAL_API_KEY: '',\n    })\n    const parsed = JSON.parse(result.stdout) as Record<string, unknown>\n    assert.ok(parsed['id'] !== undefined, 'output must have id')\n    assert.ok(parsed['key'] !== undefined, 'output must have key')\n    assert.ok(parsed['name'] !== undefined, 'output must have name')\n    assert.ok(parsed['active'] !== undefined, 'output must have active')\n  })\n})\n\ndescribe('flags update --dry-run', () => {\n  it('exits 0', () => {\n    const result = run(['flags', 'update', '123', '--dry-run'], { POSTHOG_PERSONAL_API_KEY: '' })\n    assert.strictEqual(result.status, 0, `expected exit 0\\n${result.stderr}`)\n  })\n\n  it('stdout is valid JSON', () => {\n    const result = run(['flags', 'update', '123', '--dry-run'], { POSTHOG_PERSONAL_API_KEY: '' })\n    assert.doesNotThrow(() => JSON.parse(result.stdout), `not valid JSON:\\n${result.stdout}`)\n  })\n\n  it('output has id, key, name fields', () => {\n    const result = run(['flags', 'update', '123', '--dry-run'], { POSTHOG_PERSONAL_API_KEY: '' })\n    const parsed = JSON.parse(result.stdout) as Record<string, unknown>\n    assert.ok(parsed['id'] !== undefined, 'output must have id')\n    assert.ok(parsed['key'] !== undefined, 'output must have key')\n    assert.ok(parsed['name'] !== undefined, 'output must have name')\n  })\n})\n\ndescribe('flags activity --dry-run', () => {\n  it('exits 0', () => {\n    const result = run(['flags', 'activity', '123', '--dry-run'], {\n      POSTHOG_PERSONAL_API_KEY: '',\n    })\n    assert.strictEqual(result.status, 0, `expected exit 0\\n${result.stderr}`)\n  })\n\n  it('stdout is valid JSON', () => {\n    const result = run(['flags', 'activity', '123', '--dry-run'], {\n      POSTHOG_PERSONAL_API_KEY: '',\n    })\n    assert.doesNotThrow(() => JSON.parse(result.stdout), `not valid JSON:\\n${result.stdout}`)\n  })\n\n  it('output has results array', () => {\n    const result = run(['flags', 'activity', '123', '--dry-run'], {\n      POSTHOG_PERSONAL_API_KEY: '',\n    })\n    const parsed = JSON.parse(result.stdout) as { results: unknown }\n    assert.ok(Array.isArray(parsed.results), 'output must have results array')\n  })\n\n  it('each result has activity and created_at fields', () => {\n    const result = run(['flags', 'activity', '123', '--dry-run'], {\n      POSTHOG_PERSONAL_API_KEY: '',\n    })\n    const parsed = JSON.parse(result.stdout) as {\n      results: Array<{ activity: unknown; created_at: unknown }>\n    }\n    for (const entry of parsed.results) {\n      assert.ok(entry.activity !== undefined, `entry missing activity: ${JSON.stringify(entry)}`)\n      assert.ok(\n        entry.created_at !== undefined,\n        `entry missing created_at: ${JSON.stringify(entry)}`,\n      )\n    }\n  })\n})\n\ndescribe('flags argument validation', () => {\n  it('get with no ID exits 2 and stderr mentions required or missing', () => {\n    const result = run(['flags', 'get'], { POSTHOG_PERSONAL_API_KEY: '' })\n    assert.strictEqual(result.status, 2, `expected exit 2\\n${result.stderr}`)\n    assert.match(\n      result.stderr,\n      /required|missing/i,\n      'stderr should mention \"required\" or \"missing\"',\n    )\n  })\n\n  it('toggle with no ID exits 2', () => {\n    const result = run(['flags', 'toggle'], { POSTHOG_PERSONAL_API_KEY: '' })\n    assert.strictEqual(result.status, 2, `expected exit 2\\n${result.stderr}`)\n    assert.doesNotMatch(result.stderr, /Unknown command/i, 'flags command must be recognised')\n  })\n\n  it('create with no key exits 2', () => {\n    const result = run(['flags', 'create'], { POSTHOG_PERSONAL_API_KEY: '' })\n    assert.strictEqual(result.status, 2, `expected exit 2\\n${result.stderr}`)\n    assert.doesNotMatch(result.stderr, /Unknown command/i, 'flags command must be recognised')\n  })\n\n  it('update with no ID exits 2', () => {\n    const result = run(['flags', 'update'], { POSTHOG_PERSONAL_API_KEY: '' })\n    assert.strictEqual(result.status, 2, `expected exit 2\\n${result.stderr}`)\n    assert.doesNotMatch(result.stderr, /Unknown command/i, 'flags command must be recognised')\n  })\n\n  it('activity with no ID exits 2', () => {\n    const result = run(['flags', 'activity'], { POSTHOG_PERSONAL_API_KEY: '' })\n    assert.strictEqual(result.status, 2, `expected exit 2\\n${result.stderr}`)\n    assert.doesNotMatch(result.stderr, /Unknown command/i, 'flags command must be recognised')\n  })\n\n  it('unknown subcommand exits 2 and stderr mentions unknown', () => {\n    const result = run(['flags', 'nonsense'], { POSTHOG_PERSONAL_API_KEY: '' })\n    assert.strictEqual(result.status, 2, `expected exit 2\\n${result.stderr}`)\n    assert.match(result.stderr, /unknown/i, 'stderr should mention \"unknown\"')\n    assert.doesNotMatch(\n      result.stderr,\n      /Unknown command: flags/i,\n      'flags command must be recognised',\n    )\n  })\n})\n\ndescribe('flags without token (no --dry-run)', () => {\n  it('flags list with no token exits 1 and stderr mentions POSTHOG_PERSONAL_API_KEY', () => {\n    const result = run(['flags'], { POSTHOG_PERSONAL_API_KEY: '' })\n    assert.strictEqual(result.status, 1, `expected exit 1\\n${result.stderr}`)\n    assert.match(\n      result.stderr,\n      /POSTHOG_PERSONAL_API_KEY/i,\n      'stderr should mention POSTHOG_PERSONAL_API_KEY',\n    )\n  })\n\n  it('flags get with no token exits 1', () => {\n    const result = run(['flags', 'get', '123'], { POSTHOG_PERSONAL_API_KEY: '' })\n    assert.strictEqual(result.status, 1, `expected exit 1\\n${result.stderr}`)\n  })\n})\n\ndescribe('flags list with filter options --dry-run', () => {\n  it('--search param is accepted and exits 0', () => {\n    const result = run(['flags', '--search', 'checkout', '--dry-run'], {\n      POSTHOG_PERSONAL_API_KEY: '',\n    })\n    assert.strictEqual(result.status, 0, `expected exit 0\\n${result.stderr}`)\n  })\n\n  it('--active param is accepted and exits 0', () => {\n    const result = run(['flags', '--active', 'true', '--dry-run'], {\n      POSTHOG_PERSONAL_API_KEY: '',\n    })\n    assert.strictEqual(result.status, 0, `expected exit 0\\n${result.stderr}`)\n  })\n\n  it('--type param is accepted and exits 0', () => {\n    const result = run(['flags', '--type', 'boolean', '--dry-run'], {\n      POSTHOG_PERSONAL_API_KEY: '',\n    })\n    assert.strictEqual(result.status, 0, `expected exit 0\\n${result.stderr}`)\n  })\n\n  it('--limit param is accepted and exits 0', () => {\n    const result = run(['flags', '--limit', '5', '--dry-run'], { POSTHOG_PERSONAL_API_KEY: '' })\n    assert.strictEqual(result.status, 0, `expected exit 0\\n${result.stderr}`)\n  })\n})\n\ndescribe('flags create with --name option --dry-run', () => {\n  it('create with key and --name exits 0', () => {\n    const result = run(['flags', 'create', 'my-flag', '--name', 'My Flag', '--dry-run'], {\n      POSTHOG_PERSONAL_API_KEY: '',\n    })\n    assert.strictEqual(result.status, 0, `expected exit 0\\n${result.stderr}`)\n  })\n})\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774753953251
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "toolCall",
+            "id": "toolu_01N5vbpWgA4HNDZ8hrfNLvAa",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/posthog-skill/scripts/__tests__/live.test.ts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01AQGwMx4EkykWJimTDYH5C2",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/posthog-skill/scripts/lib/posthog-client.ts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01DrhkLBUMGRtiVBSwPaUVcf",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/posthog-skill/scripts/lib/dashboard-spec.ts"
+            }
+          }
+        ],
+        "api": "anthropic-messages",
+        "provider": "anthropic",
+        "model": "claude-opus-4-6",
+        "usage": {
+          "input": 1,
+          "output": 206,
+          "cacheRead": 27112,
+          "cacheWrite": 7193,
+          "totalTokens": 34512,
+          "cost": {
+            "input": 0.000005,
+            "output": 0.00515,
+            "cacheRead": 0.013555999999999999,
+            "cacheWrite": 0.04495625,
+            "total": 0.06366725000000001
+          }
+        },
+        "stopReason": "toolUse",
+        "timestamp": 1774753953252,
+        "responseId": "msg_01LYLGgxnVGMoEoFFLQv5dgG"
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01N5vbpWgA4HNDZ8hrfNLvAa",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "/**\n * Integration sequence — runs the full safe verification in order.\n * Only executes when POSTHOG_TEST_LIVE=1.\n */\n\nimport { describe, it } from 'node:test'\nimport assert from 'node:assert/strict'\nimport { spawnSync } from 'node:child_process'\nimport path from 'node:path'\nimport { fileURLToPath } from 'node:url'\n\nconst __dirname = path.dirname(fileURLToPath(import.meta.url))\n\nconst LIVE = Boolean(process.env['POSTHOG_TEST_LIVE'])\n\nconst TSX = path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'tsx')\nconst RUN = path.join(__dirname, '..', 'run.ts')\n\nfunction run(args: string[] = []): { status: number | null; stdout: string; stderr: string } {\n  return spawnSync(TSX, [RUN, ...args], {\n    encoding: 'utf8',\n    env: { ...process.env },\n    timeout: 30000,\n  })\n}\n\ndescribe('live integration sequence (POSTHOG_TEST_LIVE=1)', { skip: !LIVE }, () => {\n  it('status exits 0 and token_present is true', () => {\n    const result = run(['status'])\n    assert.strictEqual(result.status, 0, `stderr: ${result.stderr}`)\n    const parsed = JSON.parse(result.stdout) as { token_present: boolean }\n    assert.strictEqual(parsed.token_present, true, 'token_present must be true')\n  })\n\n  it('inspect --live exits 0', () => {\n    const result = run(['inspect', '--live'])\n    assert.strictEqual(result.status, 0, `stderr: ${result.stderr}`)\n  })\n\n  it('compare exits 0', () => {\n    const result = run(['compare'])\n    assert.strictEqual(result.status, 0, `stderr: ${result.stderr}`)\n  })\n\n  it('create exits 0', () => {\n    const result = run(['create'])\n    assert.strictEqual(result.status, 0, `stderr: ${result.stderr}`)\n  })\n\n  it('create again exits 0 with all tiles existing (idempotency)', () => {\n    const result = run(['create'])\n    assert.strictEqual(result.status, 0, `stderr: ${result.stderr}`)\n    const parsed = JSON.parse(result.stdout) as { tiles: Array<{ status: string }> }\n    const nonExisting = parsed.tiles.filter((t) => t.status !== 'existing')\n    assert.strictEqual(\n      nonExisting.length,\n      0,\n      `expected all tiles \"existing\" on second run: ${JSON.stringify(nonExisting)}`,\n    )\n  })\n})\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774753959016
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01AQGwMx4EkykWJimTDYH5C2",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "// ---------------------------------------------------------------------------\n// PostHogError — typed error for non-2xx HTTP responses\n// ---------------------------------------------------------------------------\n\nexport class PostHogError extends Error {\n  readonly status: number\n  readonly endpoint: string\n\n  constructor(opts: { status: number; message: string; endpoint: string }) {\n    super(opts.message)\n    this.name = 'PostHogError'\n    this.status = opts.status\n    this.endpoint = opts.endpoint\n  }\n}\n\n// ---------------------------------------------------------------------------\n// Config & client option types\n// ---------------------------------------------------------------------------\n\nexport interface PostHogConfig {\n  host: string\n  projectId: string\n  token: string\n}\n\nexport interface ClientOptions {\n  retryDelayMs?: number\n}\n\n// ---------------------------------------------------------------------------\n// Fetch abstraction (permissive for test mocks)\n// ---------------------------------------------------------------------------\n\nexport interface MinimalResponse {\n  status: number\n  ok: boolean\n  json(): Promise<unknown>\n}\n\nexport type FetchFn = (url: string, options: RequestInit) => Promise<MinimalResponse>\n\n// ---------------------------------------------------------------------------\n// Dashboard types\n// ---------------------------------------------------------------------------\n\nexport interface DashboardSummary {\n  id: number\n  name: string\n  deleted: boolean\n  [key: string]: unknown\n}\n\nexport interface DashboardListResponse {\n  count: number\n  results: DashboardSummary[]\n}\n\nexport interface DashboardTile {\n  insight: { id: number; name: string } | null\n  [key: string]: unknown\n}\n\nexport interface Dashboard {\n  id: number\n  name: string\n  tiles: DashboardTile[]\n  [key: string]: unknown\n}\n\n// ---------------------------------------------------------------------------\n// Insight types\n// ---------------------------------------------------------------------------\n\nexport interface Insight {\n  id: number\n  name: string\n  short_id?: string\n  description?: string | null\n  query?: Record<string, unknown>\n  filters?: Record<string, unknown>\n  [key: string]: unknown\n}\n\nexport interface InsightListResponse {\n  count: number\n  results: Insight[]\n}\n\nexport interface HogQLResult {\n  results: unknown[][]\n  is_cached?: boolean\n  [key: string]: unknown\n}\n\n// ---------------------------------------------------------------------------\n// Feature flag types\n// ---------------------------------------------------------------------------\n\nexport interface FeatureFlagSummary {\n  id: number\n  name: string\n  key: string\n  active: boolean\n  deleted: boolean\n  created_at: string\n  updated_at: string\n  tags: string[]\n  filters: Record<string, unknown>\n  version: number\n  created_by: { id: number; email: string } | null\n  ensure_experience_continuity: boolean\n  is_remote_configuration: boolean\n  evaluation_runtime: string\n  status: string\n}\n\nexport interface FeatureFlagListResponse {\n  count: number\n  next: string | null\n  previous: string | null\n  results: FeatureFlagSummary[]\n}\n\nexport interface FeatureFlagListParams {\n  search?: string\n  active?: string\n  type?: string\n  limit?: number\n  offset?: number\n}\n\nexport interface FeatureFlagActivity {\n  id: string\n  activity: string\n  detail: Record<string, unknown>\n  created_at: string\n  user: Record<string, unknown>\n}\n\nexport interface FeatureFlagActivityResponse {\n  results: FeatureFlagActivity[]\n  next: string | null\n  previous: string | null\n  total_count: number\n}\n\n// ---------------------------------------------------------------------------\n// Client interface\n// ---------------------------------------------------------------------------\n\nexport interface PostHogClient {\n  request(url: string, options: RequestInit): Promise<unknown>\n  listDashboards(limit?: number): Promise<DashboardListResponse>\n  createDashboard(name: string, tags: string[]): Promise<Dashboard>\n  getDashboard(id: number): Promise<Dashboard>\n  patchDashboard(id: number, body: Record<string, unknown>): Promise<Dashboard>\n  createInsight(name: string, query: Record<string, unknown>): Promise<Insight>\n  createInsightOnDashboard(\n    name: string,\n    query: Record<string, unknown>,\n    dashboardId: number,\n  ): Promise<Insight>\n  getInsightByShortId(shortId: string): Promise<InsightListResponse>\n  runQuery(hogql: string): Promise<HogQLResult>\n  listFeatureFlags(params?: FeatureFlagListParams): Promise<FeatureFlagListResponse>\n  getFeatureFlag(id: number | string): Promise<FeatureFlagSummary>\n  patchFeatureFlag(id: number | string, body: Record<string, unknown>): Promise<FeatureFlagSummary>\n  createFeatureFlag(key: string, body?: Record<string, unknown>): Promise<FeatureFlagSummary>\n  getFeatureFlagActivity(id: number | string, limit?: number): Promise<FeatureFlagActivityResponse>\n}\n\n// ---------------------------------------------------------------------------\n// Helpers\n// ---------------------------------------------------------------------------\n\nfunction sleep(ms: number): Promise<void> {\n  return new Promise((resolve) => setTimeout(resolve, ms))\n}\n\n// ---------------------------------------------------------------------------\n// Client factory\n// ---------------------------------------------------------------------------\n\nexport function createClient(\n  config: PostHogConfig,\n  fetchFn?: FetchFn,\n  opts?: ClientOptions,\n): PostHogClient {\n  const fetch: FetchFn = fetchFn ?? (globalThis.fetch as FetchFn)\n  const baseDelayMs = opts?.retryDelayMs ?? 1000\n\n  const { host, projectId, token } = config\n  const envBase = `${host}/api/environments/${projectId}`\n  const projBase = `${host}/api/projects/${projectId}`\n\n  // -------------------------------------------------------------------------\n  // Core request method with 429 retry / error handling\n  // -------------------------------------------------------------------------\n\n  async function request(url: string, options: RequestInit): Promise<unknown> {\n    const endpoint = url.replace(host, '').split('?')[0] ?? url\n\n    const MAX_ATTEMPTS = 3\n    let lastError: PostHogError | undefined\n\n    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {\n      const response = await fetch(url, {\n        ...options,\n        headers: {\n          Authorization: `Bearer ${token}`,\n          ...(options.body ? { 'Content-Type': 'application/json' } : {}),\n          ...(options.headers ?? {}),\n        },\n      })\n\n      if (response.ok) {\n        return response.json()\n      }\n\n      // 429 — rate limited: retry with exponential backoff\n      if (response.status === 429) {\n        const delayMs = baseDelayMs * Math.pow(2, attempt)\n        lastError = new PostHogError({\n          status: 429,\n          message: `PostHog rate limit exceeded (attempt ${attempt + 1} of ${MAX_ATTEMPTS})`,\n          endpoint,\n        })\n        if (attempt < MAX_ATTEMPTS - 1) {\n          await sleep(delayMs)\n          continue\n        }\n        throw lastError\n      }\n\n      // 5xx — server error: throw immediately, no retry\n      if (response.status >= 500) {\n        throw new PostHogError({\n          status: response.status,\n          message: `PostHog server error (${response.status}) on ${endpoint}`,\n          endpoint,\n        })\n      }\n\n      // 4xx (not 429) — client error: throw immediately\n      let detail = ''\n      try {\n        const body = (await response.json()) as { detail?: string; message?: string }\n        detail = body.detail ?? body.message ?? ''\n      } catch (_) {\n        // ignore parse error\n      }\n      throw new PostHogError({\n        status: response.status,\n        message: `PostHog returned ${response.status} on ${endpoint}${detail ? ': ' + detail : ''}`,\n        endpoint,\n      })\n    }\n\n    // Exhausted retries (always set when we reach this point via 429 path)\n    throw lastError!\n  }\n\n  // -------------------------------------------------------------------------\n  // Public API methods\n  // -------------------------------------------------------------------------\n\n  function listDashboards(limit = 100): Promise<DashboardListResponse> {\n    return request(`${envBase}/dashboards/?limit=${limit}`, {\n      method: 'GET',\n    }) as Promise<DashboardListResponse>\n  }\n\n  function createDashboard(name: string, tags: string[]): Promise<Dashboard> {\n    return request(`${envBase}/dashboards/`, {\n      method: 'POST',\n      body: JSON.stringify({ name, tags }),\n    }) as Promise<Dashboard>\n  }\n\n  function getDashboard(id: number): Promise<Dashboard> {\n    return request(`${envBase}/dashboards/${id}/`, {\n      method: 'GET',\n    }) as Promise<Dashboard>\n  }\n\n  function patchDashboard(id: number, body: Record<string, unknown>): Promise<Dashboard> {\n    return request(`${envBase}/dashboards/${id}/`, {\n      method: 'PATCH',\n      body: JSON.stringify(body),\n    }) as Promise<Dashboard>\n  }\n\n  function createInsight(name: string, query: Record<string, unknown>): Promise<Insight> {\n    return request(`${envBase}/insights/`, {\n      method: 'POST',\n      body: JSON.stringify({ name, query }),\n    }) as Promise<Insight>\n  }\n\n  function createInsightOnDashboard(\n    name: string,\n    query: Record<string, unknown>,\n    dashboardId: number,\n  ): Promise<Insight> {\n    return request(`${envBase}/insights/`, {\n      method: 'POST',\n      body: JSON.stringify({ name, query, dashboards: [dashboardId] }),\n    }) as Promise<Insight>\n  }\n\n  function getInsightByShortId(shortId: string): Promise<InsightListResponse> {\n    return request(`${envBase}/insights/?short_id=${encodeURIComponent(shortId)}`, {\n      method: 'GET',\n    }) as Promise<InsightListResponse>\n  }\n\n  function runQuery(hogql: string): Promise<HogQLResult> {\n    return request(`${projBase}/query/`, {\n      method: 'POST',\n      body: JSON.stringify({\n        query: {\n          kind: 'HogQLQuery',\n          query: hogql,\n        },\n        refresh: 'blocking',\n      }),\n    }) as Promise<HogQLResult>\n  }\n\n  function listFeatureFlags(params: FeatureFlagListParams = {}): Promise<FeatureFlagListResponse> {\n    const qs = new URLSearchParams()\n    if (params.search != null && params.search !== '') qs.append('search', params.search)\n    if (params.active != null && params.active !== '') qs.append('active', params.active)\n    if (params.type != null && params.type !== '') qs.append('type', params.type)\n    if (params.limit != null) qs.append('limit', String(params.limit))\n    if (params.offset != null) qs.append('offset', String(params.offset))\n    const query = qs.toString() ? `?${qs.toString()}` : ''\n    return request(`${projBase}/feature_flags/${query}`, {\n      method: 'GET',\n    }) as Promise<FeatureFlagListResponse>\n  }\n\n  function getFeatureFlag(id: number | string): Promise<FeatureFlagSummary> {\n    return request(`${projBase}/feature_flags/${id}/`, {\n      method: 'GET',\n    }) as Promise<FeatureFlagSummary>\n  }\n\n  function patchFeatureFlag(\n    id: number | string,\n    body: Record<string, unknown>,\n  ): Promise<FeatureFlagSummary> {\n    return request(`${projBase}/feature_flags/${id}/`, {\n      method: 'PATCH',\n      body: JSON.stringify(body),\n    }) as Promise<FeatureFlagSummary>\n  }\n\n  function createFeatureFlag(\n    key: string,\n    body: Record<string, unknown> = {},\n  ): Promise<FeatureFlagSummary> {\n    return request(`${projBase}/feature_flags/`, {\n      method: 'POST',\n      body: JSON.stringify({ key, ...body }),\n    }) as Promise<FeatureFlagSummary>\n  }\n\n  function getFeatureFlagActivity(\n    id: number | string,\n    limit?: number,\n  ): Promise<FeatureFlagActivityResponse> {\n    return request(`${projBase}/feature_flags/${id}/activity/?limit=${limit ?? 10}`, {\n      method: 'GET',\n    }) as Promise<FeatureFlagActivityResponse>\n  }\n\n  return {\n    request,\n    listDashboards,\n    createDashboard,\n    getDashboard,\n    patchDashboard,\n    createInsight,\n    createInsightOnDashboard,\n    getInsightByShortId,\n    runQuery,\n    listFeatureFlags,\n    getFeatureFlag,\n    patchFeatureFlag,\n    createFeatureFlag,\n    getFeatureFlagActivity,\n  }\n}\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774753959016
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01DrhkLBUMGRtiVBSwPaUVcf",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "export interface BranchEvent {\n  name: string\n  description: string\n  properties: string[]\n}\n\nexport type TileQueryKind = 'FunnelsQuery' | 'TrendsQuery' | 'HogQLQuery'\n\nexport interface TileLayout {\n  x: number\n  y: number\n  w: number\n  h: number\n}\n\nexport interface Tile {\n  name: string\n  description: string\n  type: TileQueryKind\n  query: Record<string, unknown>\n  layout: TileLayout\n}\n\nexport interface DashboardSpec {\n  name: string\n  description: string\n  tags: string[]\n  branchEvents: BranchEvent[]\n  tiles: Tile[]\n}\n\n// Key pages for the purchase funnel tile (curated subset of the 27 pages)\nconst FUNNEL_PAGES = ['quote', 'delivery', 'payment', 'review', 'confirmation'] as const\n\nexport const name = '7361 Purchase & Insurance Flow Metrics'\n\nexport const description =\n  'Branch 7361 metrics dashboard — purchase and insurance flow instrumentation for payment, protection, and signing events.'\n\nexport const tags: string[] = ['7361', 'metrics', 'purchase', 'insurance']\n\nexport const branchEvents: BranchEvent[] = [\n  {\n    name: 'form_page_reached',\n    description: 'Fires on every page load in purchase and insurance flows',\n    properties: ['page', 'product_segment', 'county_id', 'form_type', 'uid'],\n  },\n  {\n    name: 'soil_donation_selected',\n    description: 'User submits the delivery/soil donation page',\n    properties: ['product_segment', 'county_id', 'uid'],\n  },\n  {\n    name: 'travel_protection_selected',\n    description: 'User selects or declines travel protection',\n    properties: ['selected', 'product_segment', 'county_id', 'uid'],\n  },\n  {\n    name: 'fcf_amount_selected',\n    description: 'User clicks a Family Care Fund tier',\n    properties: ['amount', 'product_segment', 'county_id', 'uid'],\n  },\n  {\n    name: 'fcf_more_info_clicked',\n    description: 'User clicks the FCF more-info link',\n    properties: ['product_segment', 'county_id', 'uid'],\n  },\n  {\n    name: 'payment_method_selected',\n    description: 'User selects a payment method (ACH vs card)',\n    properties: ['method', 'product_segment', 'county_id', 'uid'],\n  },\n  {\n    name: 'payment_mode_selected',\n    description: 'User selects single-pay vs multipay',\n    properties: ['mode', 'product_segment', 'county_id', 'uid'],\n  },\n  {\n    name: 'payment_completed',\n    description: 'Payment is successfully processed (replaces legacy Purchased event)',\n    properties: ['product_segment', 'county_id', 'form_type', 'uid'],\n  },\n  {\n    name: 'signing_completed',\n    description: 'Insurance contract is signed successfully',\n    properties: ['form_type', 'product_segment', 'county_id', 'uid'],\n  },\n]\n\n// Grid: 2 columns × 4 rows, each tile w=6, h=5 (PostHog default sizing)\n// Positions: col 0 = x:0, col 1 = x:6; rows at y: 0, 5, 10, 15\nexport const tiles: Tile[] = [\n  {\n    name: 'Page Funnel',\n    description: 'Funnel progression through key purchase flow pages',\n    type: 'FunnelsQuery',\n    query: {\n      kind: 'FunnelsQuery',\n      series: FUNNEL_PAGES.map((page) => ({\n        kind: 'EventsNode',\n        event: 'form_page_reached',\n        name: `Page: ${page}`,\n        properties: [{ key: 'page', value: page, operator: 'exact', type: 'event' }],\n      })),\n      dateRange: { date_from: '-30d' },\n      funnelsFilter: {\n        funnelWindowInterval: 14,\n        funnelWindowIntervalUnit: 'day',\n      },\n    },\n    layout: { x: 0, y: 0, w: 12, h: 5 },\n  },\n  {\n    name: 'Payment Method Preference',\n    description: 'ACH vs card selection broken down by product segment',\n    type: 'TrendsQuery',\n    query: {\n      kind: 'TrendsQuery',\n      series: [\n        { kind: 'EventsNode', event: 'payment_method_selected', name: 'Payment Method Selected' },\n      ],\n      breakdownFilter: { breakdown: 'product_segment', breakdown_type: 'event' },\n      dateRange: { date_from: '-30d' },\n    },\n    layout: { x: 0, y: 5, w: 6, h: 5 },\n  },\n  {\n    name: 'Payment Mode Selection',\n    description: 'Single-pay vs multipay selection by product segment',\n    type: 'TrendsQuery',\n    query: {\n      kind: 'TrendsQuery',\n      series: [\n        { kind: 'EventsNode', event: 'payment_mode_selected', name: 'Payment Mode Selected' },\n      ],\n      breakdownFilter: { breakdown: 'product_segment', breakdown_type: 'event' },\n      dateRange: { date_from: '-30d' },\n    },\n    layout: { x: 6, y: 5, w: 6, h: 5 },\n  },\n  {\n    name: 'FCF Selection Rate',\n    description: 'Family Care Fund tier selections over time',\n    type: 'TrendsQuery',\n    query: {\n      kind: 'TrendsQuery',\n      series: [\n        { kind: 'EventsNode', event: 'fcf_amount_selected', name: 'FCF Amount Selected' },\n        { kind: 'EventsNode', event: 'fcf_more_info_clicked', name: 'FCF More Info Clicked' },\n      ],\n      dateRange: { date_from: '-30d' },\n    },\n    layout: { x: 0, y: 10, w: 6, h: 5 },\n  },\n  {\n    name: 'Travel Protection Selection',\n    description: 'Travel protection opt-in vs decline over time',\n    type: 'TrendsQuery',\n    query: {\n      kind: 'TrendsQuery',\n      series: [\n        {\n          kind: 'EventsNode',\n          event: 'travel_protection_selected',\n          name: 'Travel Protection Selected',\n        },\n      ],\n      dateRange: { date_from: '-30d' },\n    },\n    layout: { x: 6, y: 10, w: 6, h: 5 },\n  },\n  {\n    name: 'Signing Completion',\n    description: 'Insurance contract signing completion by form type',\n    type: 'TrendsQuery',\n    query: {\n      kind: 'TrendsQuery',\n      series: [{ kind: 'EventsNode', event: 'signing_completed', name: 'Signing Completed' }],\n      breakdownFilter: { breakdown: 'form_type', breakdown_type: 'event' },\n      dateRange: { date_from: '-30d' },\n    },\n    layout: { x: 0, y: 15, w: 6, h: 5 },\n  },\n  {\n    name: 'Purchase Completions Over Time',\n    description: 'payment_completed trend broken down by product segment',\n    type: 'TrendsQuery',\n    query: {\n      kind: 'TrendsQuery',\n      series: [{ kind: 'EventsNode', event: 'payment_completed', name: 'Payment Completed' }],\n      breakdownFilter: { breakdown: 'product_segment', breakdown_type: 'event' },\n      dateRange: { date_from: '-30d' },\n    },\n    layout: { x: 6, y: 15, w: 6, h: 5 },\n  },\n  {\n    name: 'Top Counties',\n    description: 'Counties ranked by form_page_reached event count (last 30 days)',\n    type: 'HogQLQuery',\n    query: {\n      kind: 'HogQLQuery',\n      query: [\n        'SELECT',\n        '  properties.county_id AS county_id,',\n        '  count() AS page_views',\n        'FROM events',\n        \"WHERE event = 'form_page_reached'\",\n        '  AND timestamp >= now() - INTERVAL 30 DAY',\n        '  AND properties.county_id IS NOT NULL',\n        'GROUP BY county_id',\n        'ORDER BY page_views DESC',\n        'LIMIT 20',\n      ].join('\\n'),\n    },\n    layout: { x: 0, y: 20, w: 12, h: 5 },\n  },\n]\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774753959016
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "toolCall",
+            "id": "toolu_01JjbSqJo72rndbVD4kwvhrL",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/posthog-skill/scripts/lib/fixtures.ts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_018pTfzUTJBjiYPRUmMv2So9",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/exa-search/scripts/lib/common.ts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01DQTzvg9cwEStydo8UjvEH9",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/exa-search/scripts/contents.ts"
+            }
+          }
+        ],
+        "api": "anthropic-messages",
+        "provider": "anthropic",
+        "model": "claude-opus-4-6",
+        "usage": {
+          "input": 1,
+          "output": 193,
+          "cacheRead": 34305,
+          "cacheWrite": 6588,
+          "totalTokens": 41087,
+          "cost": {
+            "input": 0.000005,
+            "output": 0.004825,
+            "cacheRead": 0.017152499999999998,
+            "cacheWrite": 0.041175,
+            "total": 0.0631575
+          }
+        },
+        "stopReason": "toolUse",
+        "timestamp": 1774753959017,
+        "responseId": "msg_014QGmqMghCiRHwKZhvkAyME"
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01JjbSqJo72rndbVD4kwvhrL",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "import { name as specName, branchEvents, tiles } from './dashboard-spec.js'\n\n// ---------------------------------------------------------------------------\n// Fixture key union — one entry per supported command\n// ---------------------------------------------------------------------------\n\nexport type FixtureKey =\n  | 'status'\n  | 'inspect'\n  | 'inspect-live'\n  | 'compare'\n  | 'flags'\n  | 'flags-get'\n  | 'flags-toggle'\n  | 'flags-create'\n  | 'flags-update'\n  | 'flags-activity'\n  | 'create'\n\n// ---------------------------------------------------------------------------\n// Canned fixture data\n// ---------------------------------------------------------------------------\n\nconst FIXTURES: Record<FixtureKey, unknown> = {\n  status: {\n    host: 'https://us.posthog.com',\n    project_id: '39507',\n    token: 'NOT SET',\n    token_present: false,\n    ach_insight_id: 'NOT SET',\n    dashboard_name: specName,\n  },\n\n  inspect: {\n    source: 'local-spec',\n    events: branchEvents.map((ev) => ({\n      name: ev.name,\n      description: ev.description,\n      properties: ev.properties,\n    })),\n  },\n\n  'inspect-live': {\n    source: 'posthog-live',\n    events: branchEvents.map((ev) => ({\n      event: ev.name,\n      count_30d: 0,\n      last_seen: null,\n    })),\n  },\n\n  compare: {\n    id: 'drOq2lO5',\n    name: 'ACH Payment Reference (dry-run fixture)',\n    description: 'Canned fixture — no live data fetched',\n    query_kind: 'TrendsQuery',\n    series: [{ event: 'payment_method_selected', name: 'Payment Method Selected' }],\n    breakdown: 'product_segment',\n    date_range: '-30d',\n    viz_type: 'ActionsLineGraph',\n  },\n\n  flags: {\n    count: 3,\n    results: [\n      {\n        id: 101,\n        key: 'enable-new-checkout',\n        name: 'Enable New Checkout',\n        active: true,\n        created_at: '2026-03-01T10:00:00Z',\n        tags: ['release'],\n      },\n      {\n        id: 102,\n        key: 'dark-mode',\n        name: 'Dark Mode',\n        active: false,\n        created_at: '2026-02-15T08:30:00Z',\n        tags: [],\n      },\n      {\n        id: 103,\n        key: 'beta-pricing',\n        name: 'Beta Pricing',\n        active: true,\n        created_at: '2026-03-20T14:00:00Z',\n        tags: ['experiment'],\n      },\n    ],\n  },\n\n  'flags-get': {\n    id: 101,\n    key: 'enable-new-checkout',\n    name: 'Enable New Checkout',\n    active: true,\n    deleted: false,\n    created_at: '2026-03-01T10:00:00Z',\n    updated_at: '2026-03-25T09:00:00Z',\n    version: 3,\n    filters: { groups: [{ properties: [], rollout_percentage: 100 }] },\n    tags: ['release'],\n    ensure_experience_continuity: false,\n    is_remote_configuration: false,\n    evaluation_runtime: 'server',\n  },\n\n  'flags-toggle': {\n    id: 101,\n    key: 'enable-new-checkout',\n    active_before: true,\n    active_after: false,\n  },\n\n  'flags-create': {\n    id: 201,\n    key: 'my-new-flag',\n    name: 'My New Flag',\n    active: true,\n    deleted: false,\n    created_at: '2026-03-29T12:00:00Z',\n    filters: { groups: [{ properties: [], rollout_percentage: 0 }] },\n    tags: [],\n  },\n\n  'flags-update': {\n    id: 101,\n    key: 'enable-new-checkout',\n    name: 'Updated Name',\n    active: true,\n    deleted: false,\n    updated_at: '2026-03-29T12:00:00Z',\n    tags: ['release', 'updated'],\n  },\n\n  'flags-activity': {\n    results: [\n      {\n        id: 'a1b2c3',\n        activity: 'updated',\n        detail: {\n          changes: [{ field: 'active', action: 'changed', before: false, after: true }],\n        },\n        created_at: '2026-03-28T16:00:00Z',\n        user: { email: 'dev@example.com' },\n      },\n      {\n        id: 'd4e5f6',\n        activity: 'created',\n        detail: { name: 'enable-new-checkout' },\n        created_at: '2026-03-01T10:00:00Z',\n        user: { email: 'dev@example.com' },\n      },\n    ],\n  },\n\n  create: {\n    dashboard_id: 99901,\n    dashboard_url: 'https://us.posthog.com/project/39507/dashboard/99901',\n    tiles: tiles.map((tile, i) => ({\n      name: tile.name,\n      insight_id: 80000 + i,\n      insight_url: `https://us.posthog.com/project/39507/insights/${80000 + i}`,\n      status: 'created',\n    })),\n  },\n}\n\n// ---------------------------------------------------------------------------\n// Public accessor\n// ---------------------------------------------------------------------------\n\nexport function getFixture(command: FixtureKey): unknown {\n  if (!(command in FIXTURES)) {\n    throw new Error(`No fixture for command: ${command}`)\n  }\n  return FIXTURES[command]\n}\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774753963477
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_018pTfzUTJBjiYPRUmMv2So9",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "import { readFileSync } from 'node:fs'\nimport { Exa } from 'exa-js'\n\n/** Create an Exa client instance. Requires EXA_API_KEY env var. */\nexport function createClient(): Exa {\n  return new Exa()\n}\n\n/** Require a CLI argument, exit with error if missing. */\nexport function requireArg(value: string | undefined, name: string): string {\n  if (!value) {\n    console.error(`Error: ${name} is required`)\n    process.exit(1)\n  }\n  return value\n}\n\n/** Execute an async API call, print JSON result, exit on error. */\nexport async function executeAndPrint<T>(apiCall: () => Promise<T>): Promise<void> {\n  try {\n    const result = await apiCall()\n    console.log(JSON.stringify(result, null, 2))\n  } catch (err) {\n    handleError(err)\n  }\n}\n\n/**\n * Show help text extracted from the JSDoc comment at the top of a script file.\n * Reads lines starting with \" * \" until \" * /\" is found.\n */\nexport function showHelp(scriptUrl: string): void {\n  const lines: string[] = []\n  const src = readFileSync(new URL(scriptUrl), 'utf8')\n  for (const line of src.split('\\n')) {\n    if (line.startsWith(' * ') || line.startsWith(' */')) {\n      if (line.startsWith(' */')) break\n      lines.push(line.slice(3))\n    }\n  }\n  console.log(lines.join('\\n'))\n  process.exit(0)\n}\n\n/**\n * Ensure EXA_API_KEY is set. Exits with an error message if not.\n */\nexport function requireApiKey(): void {\n  if (!process.env.EXA_API_KEY) {\n    console.error('Error: EXA_API_KEY environment variable is required.')\n    console.error('Get one at: https://dashboard.exa.ai/api-keys')\n    process.exit(1)\n  }\n}\n\n/**\n * Parse CLI args: show help if --help or no args, return query and options.\n */\nexport function parseArgs(scriptUrl: string): { query: string; opts: Record<string, unknown> } {\n  const args = process.argv.slice(2)\n\n  if (args.includes('--help') || args.length === 0) {\n    showHelp(scriptUrl)\n  }\n\n  const query = requireArg(args[0], 'query')\n  const opts: Record<string, unknown> = args[1]\n    ? (JSON.parse(args[1]) as Record<string, unknown>)\n    : {}\n\n  return { query, opts }\n}\n\n/**\n * Standardized error handler for all exa scripts.\n */\nexport function handleError(err: unknown): never {\n  console.error(`Error: ${(err as Error).message}`)\n  process.exit(1)\n}\n\n/**\n * Pick allowed keys from an options object, skipping undefined values.\n */\nexport function filterOptions(\n  opts: Record<string, unknown>,\n  keys: readonly string[],\n): Record<string, unknown> {\n  const filtered: Record<string, unknown> = {}\n  for (const key of keys) {\n    if (opts[key] !== undefined) filtered[key] = opts[key]\n  }\n  return filtered\n}\n\n/**\n * Build contents options from text/highlights/summary fields.\n */\nexport function buildContentsOptions(opts: Record<string, unknown>): Record<string, unknown> {\n  let contentsOpts: Record<string, unknown> = {}\n  if (opts.text === true) contentsOpts.text = true\n  else if (typeof opts.text === 'object') contentsOpts.text = opts.text\n  if (opts.highlights === true) contentsOpts.highlights = true\n  else if (typeof opts.highlights === 'object') contentsOpts.highlights = opts.highlights\n  if (opts.summary === true) contentsOpts.summary = true\n  else if (typeof opts.summary === 'object') contentsOpts.summary = opts.summary\n  if (typeof opts.contents === 'object')\n    contentsOpts = { ...contentsOpts, ...(opts.contents as Record<string, unknown>) }\n  return contentsOpts\n}\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774753963477
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01DQTzvg9cwEStydo8UjvEH9",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "#!/usr/bin/env tsx\n/**\n * Exa get contents — retrieve page contents by URL.\n *\n * Usage:\n *   tsx scripts/contents.ts <url-or-urls-json> [options-json]\n *   tsx scripts/contents.ts --help\n *\n * First argument: a single URL string, or a JSON array of URLs.\n *\n * Options JSON (all optional):\n *   {\n *     \"text\": true,                         // or { \"maxCharacters\": 5000, \"includeHtmlTags\": false }\n *     \"highlights\": true,                   // or { \"query\": \"AI\", \"numSentences\": 3 }\n *     \"summary\": true,                      // or { \"query\": \"summarize pricing\" }\n *     \"livecrawl\": \"auto\",                  // \"never\"|\"fallback\"|\"always\"|\"auto\"|\"preferred\"\n *     \"livecrawlTimeout\": 10000,             // timeout in ms for live crawl\n *     \"maxAgeHours\": 168,                   // 0 = always fresh, -1 = cache only\n *     \"filterEmptyResults\": true,\n *     \"subpages\": 3,\n *     \"subpageTarget\": \"pricing\"\n *   }\n *\n * Environment:\n *   EXA_API_KEY — required\n *\n * Examples:\n *   tsx scripts/contents.ts \"https://example.com/article\"\n *   tsx scripts/contents.ts \"https://example.com\" '{\"text\":{\"maxCharacters\":2000}}'\n *   tsx scripts/contents.ts '[\"https://a.com\",\"https://b.com\"]' '{\"text\":true,\"highlights\":true}'\n */\n\nimport {\n  showHelp,\n  requireApiKey,\n  filterOptions,\n  createClient,\n  executeAndPrint,\n} from './lib/common.js'\n\nconst args = process.argv.slice(2)\n\nif (args.includes('--help') || args.length === 0) {\n  showHelp(import.meta.url)\n}\n\nlet urls: string | string[] = args[0]!\ntry {\n  urls = JSON.parse(urls) as string[]\n} catch {\n  // Single URL string — keep as-is\n}\n\nconst opts: Record<string, unknown> = args[1]\n  ? (JSON.parse(args[1]) as Record<string, unknown>)\n  : { text: true }\n\nrequireApiKey()\n\nconst exa = createClient()\n\nconst contentsOpts = filterOptions(opts, [\n  'text',\n  'highlights',\n  'summary',\n  'livecrawl',\n  'livecrawlTimeout',\n  'maxAgeHours',\n  'filterEmptyResults',\n  'subpages',\n  'subpageTarget',\n])\n\nawait executeAndPrint(async () => {\n  return await exa.getContents(urls, contentsOpts)\n})\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774753963477
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "toolCall",
+            "id": "toolu_01CMCTFjNfMrhS3NQKaQyok3",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/exa-search/scripts/research.ts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_017PRFJrDGUz6Sd3YSf6MMYF",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/exa-search/scripts/search.ts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_014vKinuCMt6TuAL5s1AfHiQ",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/exa-search/scripts/answer.ts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01YLztk81bepqg75UeQprvjP",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/exa-search/scripts/find-similar.ts"
+            }
+          }
+        ],
+        "api": "anthropic-messages",
+        "provider": "anthropic",
+        "model": "claude-opus-4-6",
+        "usage": {
+          "input": 1,
+          "output": 247,
+          "cacheRead": 40893,
+          "cacheWrite": 3604,
+          "totalTokens": 44745,
+          "cost": {
+            "input": 0.000005,
+            "output": 0.006175,
+            "cacheRead": 0.0204465,
+            "cacheWrite": 0.022525,
+            "total": 0.0491515
+          }
+        },
+        "stopReason": "toolUse",
+        "timestamp": 1774753963477,
+        "responseId": "msg_01FH4zRHrQb3CLkqhYNZHCye"
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01CMCTFjNfMrhS3NQKaQyok3",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "#!/usr/bin/env tsx\n/**\n * Exa research — create and manage deep research tasks.\n *\n * Usage:\n *   tsx scripts/research.ts create <instructions> [options-json]\n *   tsx scripts/research.ts get <research-id> [options-json]\n *   tsx scripts/research.ts poll <research-id> [options-json]\n *   tsx scripts/research.ts list [options-json]\n *   tsx scripts/research.ts run <instructions> [options-json]\n *   tsx scripts/research.ts --help\n *\n * Subcommands:\n *   create   — Start a new research task (returns immediately with researchId)\n *   get      — Get the current status/result of a research task\n *   poll     — Create and poll until finished (blocks until complete)\n *   list     — List research tasks\n *   run      — Create + poll in one step (convenience)\n *\n * Options JSON for create/run:\n *   {\n *     \"model\": \"exa-research-fast\",   // \"exa-research-fast\"|\"exa-research\"|\"exa-research-pro\"\n *     \"outputSchema\": {}              // JSON Schema for structured output\n *   }\n *\n * Options JSON for get:\n *   {\n *     \"stream\": false,                // stream SSE events\n *     \"events\": false                 // include event log\n *   }\n *\n * Options JSON for poll:\n *   {\n *     \"pollInterval\": 1000,           // ms between polls (default 1000)\n *     \"timeoutMs\": 600000,            // max wait time (default 10 min)\n *     \"events\": false\n *   }\n *\n * Options JSON for list:\n *   {\n *     \"limit\": 10,\n *     \"cursor\": \"...\"\n *   }\n *\n * Environment:\n *   EXA_API_KEY — required\n *\n * Examples:\n *   tsx scripts/research.ts create \"Research the latest AI developments\"\n *   tsx scripts/research.ts get \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\"\n *   tsx scripts/research.ts run \"What is SpaceX's latest valuation?\" '{\"model\":\"exa-research-pro\"}'\n *   tsx scripts/research.ts list '{\"limit\":5}'\n */\n\nimport { showHelp, requireApiKey, handleError, requireArg, createClient } from './lib/common.js'\n\nconst args = process.argv.slice(2)\n\nif (args.includes('--help') || args.length === 0) {\n  showHelp(import.meta.url)\n}\n\nconst subcommand = args[0]\nconst arg1 = args[1]\n\nrequireApiKey()\n\nconst exa = createClient()\n\ntry {\n  switch (subcommand) {\n    case 'create': {\n      const instructions = requireArg(arg1, 'instructions')\n      const opts: Record<string, unknown> = args[2]\n        ? (JSON.parse(args[2]) as Record<string, unknown>)\n        : {}\n      const result = await exa.research.create({\n        instructions,\n        model:\n          (opts.model as 'exa-research-fast' | 'exa-research' | 'exa-research-pro') ?? undefined,\n        outputSchema: (opts.outputSchema as Record<string, unknown>) ?? undefined,\n      })\n      console.log(JSON.stringify(result, null, 2))\n      break\n    }\n\n    case 'get': {\n      const researchId = requireArg(arg1, 'research-id')\n      const opts: Record<string, unknown> = args[2]\n        ? (JSON.parse(args[2]) as Record<string, unknown>)\n        : {}\n      if (opts.stream) {\n        const streamResult = await exa.research.get(researchId, { stream: true, ...opts })\n        for await (const event of streamResult) {\n          console.log(JSON.stringify(event))\n        }\n      } else {\n        const result = await exa.research.get(researchId, opts)\n        console.log(JSON.stringify(result, null, 2))\n      }\n      break\n    }\n\n    case 'poll': {\n      const researchId = requireArg(arg1, 'research-id')\n      const opts: Record<string, unknown> = args[2]\n        ? (JSON.parse(args[2]) as Record<string, unknown>)\n        : {}\n      const result = await exa.research.pollUntilFinished(researchId, opts)\n      console.log(JSON.stringify(result, null, 2))\n      break\n    }\n\n    case 'run': {\n      const instructions = requireArg(arg1, 'instructions')\n      const opts: Record<string, unknown> = args[2]\n        ? (JSON.parse(args[2]) as Record<string, unknown>)\n        : {}\n      const created = await exa.research.create({\n        instructions,\n        model:\n          (opts.model as 'exa-research-fast' | 'exa-research' | 'exa-research-pro') ?? undefined,\n        outputSchema: (opts.outputSchema as Record<string, unknown>) ?? undefined,\n      })\n      const createdTyped = created as { researchId: string }\n      console.error(`Research task created: ${createdTyped.researchId} — polling...`)\n      const result = await exa.research.pollUntilFinished(createdTyped.researchId, {\n        pollInterval: (opts.pollInterval as number) || 2000,\n        timeoutMs: (opts.timeoutMs as number) || 600000,\n        events: opts.events as boolean | undefined,\n      })\n      console.log(JSON.stringify(result, null, 2))\n      break\n    }\n\n    case 'list': {\n      const opts: Record<string, unknown> = arg1\n        ? (JSON.parse(arg1) as Record<string, unknown>)\n        : {}\n      const result = await exa.research.list(opts)\n      console.log(JSON.stringify(result, null, 2))\n      break\n    }\n\n    default:\n      console.error(`Error: Unknown subcommand \"${subcommand}\".`)\n      console.error('Valid subcommands: create, get, poll, list, run')\n      process.exit(1)\n  }\n} catch (err) {\n  handleError(err)\n}\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774753967468
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_017PRFJrDGUz6Sd3YSf6MMYF",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "#!/usr/bin/env tsx\n/**\n * Exa search — semantic search and search with contents.\n *\n * Usage:\n *   tsx scripts/search.ts <query> [options-json]\n *   tsx scripts/search.ts --help\n *\n * Options JSON (all optional):\n *   {\n *     \"numResults\": 10,\n *     \"type\": \"auto\",                  // \"auto\"|\"fast\"|\"deep\"|\"deep-reasoning\"|\"deep-max\"|\"instant\"\n *     \"contents\": true,                // true = text+highlights, or object for fine control\n *     \"text\": true,                    // shorthand: include text in results\n *     \"highlights\": true,              // shorthand: include highlights\n *     \"summary\": true,                 // shorthand: include summary\n *     \"includeDomains\": [\"example.com\"],\n *     \"excludeDomains\": [\"spam.com\"],\n *     \"startPublishedDate\": \"2024-01-01T00:00:00.000Z\",\n *     \"endPublishedDate\": \"2025-01-01T00:00:00.000Z\",\n *     \"startCrawlDate\": \"2024-01-01T00:00:00.000Z\",\n *     \"endCrawlDate\": \"2025-01-01T00:00:00.000Z\",\n *     \"category\": \"news\",             // \"company\"|\"research paper\"|\"news\"|\"pdf\"|\"tweet\"|\"personal site\"|\"financial report\"|\"people\"\n *     \"includeText\": [\"must contain\"],\n *     \"excludeText\": [\"must not contain\"],\n *     \"useAutoprompt\": true,\n *     \"moderation\": false,\n *     \"userLocation\": \"US\",\n *     \"additionalQueries\": [\"alt query 1\"],  // deep search only, max 5\n *     \"outputSchema\": {},              // deep search structured output\n *     \"subpages\": 0,\n *     \"subpageTarget\": \"pricing\",\n *     \"livecrawl\": \"auto\",              // \"never\"|\"fallback\"|\"always\"|\"auto\"|\"preferred\" - live-crawl pages for fresh data\n *     \"livecrawlTimeout\": 10000,         // timeout in ms for live crawl\n *     \"maxAgeHours\": 168\n *   }\n *\n * Environment:\n *   EXA_API_KEY — required\n *\n * Examples:\n *   tsx scripts/search.ts \"latest AI research\"\n *   tsx scripts/search.ts \"AI startups\" '{\"numResults\":5,\"type\":\"deep\",\"contents\":true}'\n *   tsx scripts/search.ts \"React best practices\" '{\"text\":true,\"highlights\":true,\"includeDomains\":[\"react.dev\"]}'\n */\n\nimport {\n  parseArgs,\n  requireApiKey,\n  filterOptions,\n  buildContentsOptions,\n  createClient,\n  executeAndPrint,\n} from './lib/common.js'\n\nconst { query, opts } = parseArgs(import.meta.url)\nrequireApiKey()\n\nconst exa = createClient()\n\n// Determine if we need contents\nconst wantContents = opts.contents || opts.text || opts.highlights || opts.summary\n\n// Build contents options\nconst contentsOpts = buildContentsOptions(opts)\n\n// Build search options\nconst searchKeys = [\n  'numResults',\n  'type',\n  'includeDomains',\n  'excludeDomains',\n  'startCrawlDate',\n  'endCrawlDate',\n  'startPublishedDate',\n  'endPublishedDate',\n  'category',\n  'includeText',\n  'excludeText',\n  'useAutoprompt',\n  'moderation',\n  'userLocation',\n  'additionalQueries',\n  'outputSchema',\n  'subpages',\n  'subpageTarget',\n  'livecrawl',\n  'livecrawlTimeout',\n  'maxAgeHours',\n  'filterEmptyResults',\n] as const\n\nconst searchOpts = filterOptions(opts, searchKeys)\n\nawait executeAndPrint(async () => {\n  if (wantContents) {\n    return await exa.searchAndContents(query, { ...searchOpts, ...contentsOpts })\n  } else {\n    return await exa.search(query, searchOpts)\n  }\n})\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774753967469
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_014vKinuCMt6TuAL5s1AfHiQ",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "#!/usr/bin/env tsx\n/**\n * Exa answer — get AI-generated answers with citations.\n *\n * Usage:\n *   tsx scripts/answer.ts <query> [options-json]\n *   tsx scripts/answer.ts --help\n *\n * Options JSON (all optional):\n *   {\n *     \"text\": true,              // include full text in citation results\n *     \"model\": \"exa\",            // \"exa\" (default)\n *     \"systemPrompt\": \"...\",     // guide the LLM behavior\n *     \"outputSchema\": {},        // JSON Schema for structured output\n *     \"stream\": false,           // stream chunks to stdout\n *     \"userLocation\": \"US\"\n *   }\n *\n * Environment:\n *   EXA_API_KEY — required\n *\n * Examples:\n *   tsx scripts/answer.ts \"What is the latest Next.js version?\"\n *   tsx scripts/answer.ts \"Compare React and Vue\" '{\"text\":true}'\n *   tsx scripts/answer.ts \"SpaceX valuation\" '{\"model\":\"exa\",\"stream\":true}'\n *   tsx scripts/answer.ts \"List top 3 ORMs\" '{\"outputSchema\":{\"type\":\"object\",\"properties\":{\"items\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}}}}}'\n */\n\nimport { parseArgs, requireApiKey, handleError, filterOptions, createClient } from './lib/common.js'\n\nconst { query, opts } = parseArgs(import.meta.url)\nrequireApiKey()\n\nconst exa = createClient()\n\nconst answerOpts = filterOptions(opts, [\n  'text',\n  'model',\n  'systemPrompt',\n  'outputSchema',\n  'userLocation',\n])\n\ntry {\n  if (opts.stream) {\n    // Streaming mode — write chunks as they arrive\n    for await (const chunk of exa.streamAnswer(query, answerOpts)) {\n      const typedChunk = chunk as { content?: string; citations?: unknown }\n      if (typedChunk.content) process.stdout.write(typedChunk.content)\n      if (typedChunk.citations) {\n        process.stdout.write('\\n')\n        console.log(JSON.stringify({ citations: typedChunk.citations }, null, 2))\n      }\n    }\n    process.stdout.write('\\n')\n  } else {\n    const result = await exa.answer(query, answerOpts)\n    console.log(JSON.stringify(result, null, 2))\n  }\n} catch (err) {\n  handleError(err)\n}\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774753967469
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01YLztk81bepqg75UeQprvjP",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "#!/usr/bin/env tsx\n/**\n * Exa find similar — find pages similar to a given URL.\n *\n * Usage:\n *   tsx scripts/find-similar.ts <url> [options-json]\n *   tsx scripts/find-similar.ts --help\n *\n * Options JSON (all optional):\n *   {\n *     \"numResults\": 10,\n *     \"contents\": true,               // true = text+highlights, or object for fine control\n *     \"text\": true,                    // shorthand: include text in results\n *     \"highlights\": true,              // shorthand: include highlights\n *     \"summary\": true,                 // shorthand: include summary\n *     \"excludeSourceDomain\": true,     // exclude the source domain from results\n *     \"includeDomains\": [\"example.com\"],\n *     \"excludeDomains\": [\"spam.com\"],\n *     \"startPublishedDate\": \"2024-01-01T00:00:00.000Z\",\n *     \"endPublishedDate\": \"2025-01-01T00:00:00.000Z\",\n *     \"startCrawlDate\": \"2024-01-01T00:00:00.000Z\",\n *     \"endCrawlDate\": \"2025-01-01T00:00:00.000Z\",\n *     \"category\": \"news\",\n *     \"includeText\": [\"must contain\"],\n *     \"excludeText\": [\"must not contain\"]\n *   }\n *\n * Environment:\n *   EXA_API_KEY — required\n *\n * Examples:\n *   tsx scripts/find-similar.ts \"https://react.dev\"\n *   tsx scripts/find-similar.ts \"https://react.dev\" '{\"numResults\":5,\"text\":true,\"excludeSourceDomain\":true}'\n */\n\nimport {\n  parseArgs,\n  requireApiKey,\n  filterOptions,\n  buildContentsOptions,\n  createClient,\n  executeAndPrint,\n} from './lib/common.js'\n\nconst { query: url, opts } = parseArgs(import.meta.url)\nrequireApiKey()\n\nconst exa = createClient()\n\nconst wantContents = opts.contents || opts.text || opts.highlights || opts.summary\n\nconst contentsOpts = buildContentsOptions(opts)\n\nconst findSimilarKeys = [\n  'numResults',\n  'excludeSourceDomain',\n  'includeDomains',\n  'excludeDomains',\n  'startCrawlDate',\n  'endCrawlDate',\n  'startPublishedDate',\n  'endPublishedDate',\n  'category',\n  'includeText',\n  'excludeText',\n] as const\n\nconst searchOpts = filterOptions(opts, findSimilarKeys)\n\nawait executeAndPrint(async () => {\n  if (wantContents) {\n    return await exa.findSimilarAndContents(url, { ...searchOpts, ...contentsOpts })\n  } else {\n    return await exa.findSimilar(url, searchOpts)\n  }\n})\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774753967470
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "text",
+            "text": "Now let me check the package.json test script and tsconfig:"
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01F78n221WJBGqLgucdjHsSq",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/package.json"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01FuzGz9oTDCUE34NGqsR5cz",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/tsconfig.json"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01J38LvqyRRKwewkYw8wL1vS",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/posthog-skill/scripts/__tests__/dashboard-spec.test.ts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01WwzQDUNqnt7Na3JwdgdTjp",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/posthog-skill/scripts/__tests__/posthog-client.test.ts"
+            }
+          }
+        ],
+        "api": "anthropic-messages",
+        "provider": "anthropic",
+        "model": "claude-opus-4-6",
+        "usage": {
+          "input": 1,
+          "output": 261,
+          "cacheRead": 44497,
+          "cacheWrite": 4513,
+          "totalTokens": 49272,
+          "cost": {
+            "input": 0.000005,
+            "output": 0.006525,
+            "cacheRead": 0.022248499999999997,
+            "cacheWrite": 0.028206250000000002,
+            "total": 0.05698475
+          }
+        },
+        "stopReason": "toolUse",
+        "timestamp": 1774753967470,
+        "responseId": "msg_01Mx9xidakZRTNt2qApUqjn2"
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01F78n221WJBGqLgucdjHsSq",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"name\": \"pi-skills\",\n  \"version\": \"1.0.0\",\n  \"description\": \"Personal pi skills collection\",\n  \"scripts\": {\n    \"test\": \"tsx --test skills/posthog-skill/scripts/__tests__/*.test.ts\",\n    \"test:live\": \"POSTHOG_TEST_LIVE=1 tsx --test skills/posthog-skill/scripts/__tests__/*.test.ts\",\n    \"lint\": \"eslint skills/\",\n    \"format\": \"prettier --write skills/\",\n    \"format:check\": \"prettier --check skills/\"\n  },\n  \"keywords\": [\n    \"pi-package\"\n  ],\n  \"author\": \"\",\n  \"license\": \"ISC\",\n  \"packageManager\": \"pnpm@10.30.1\",\n  \"private\": \"true\",\n  \"pi\": {\n    \"skills\": [\n      \"./skills\"\n    ]\n  },\n  \"type\": \"module\",\n  \"dependencies\": {\n    \"exa-js\": \"^2.10.0\"\n  },\n  \"devDependencies\": {\n    \"@eslint/js\": \"^10.0.1\",\n    \"@types/node\": \"^25.5.0\",\n    \"eslint\": \"^10.1.0\",\n    \"prettier\": \"^3.8.1\",\n    \"tsx\": \"^4.21.0\",\n    \"typescript\": \"^6.0.2\",\n    \"typescript-eslint\": \"^8.57.2\"\n  }\n}\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774753972792
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01FuzGz9oTDCUE34NGqsR5cz",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"compilerOptions\": {\n    \"target\": \"ES2022\",\n    \"module\": \"ES2022\",\n    \"moduleResolution\": \"bundler\",\n    \"esModuleInterop\": true,\n    \"strict\": true,\n    \"noEmit\": true,\n    \"skipLibCheck\": true,\n    \"noUnusedLocals\": true,\n    \"noUnusedParameters\": true,\n    \"noUncheckedIndexedAccess\": true,\n    \"resolveJsonModule\": true,\n    \"forceConsistentCasingInFileNames\": true,\n    \"types\": [\"node\"]\n  },\n  \"include\": [\"skills/**/*.ts\"]\n}\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774753972792
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01J38LvqyRRKwewkYw8wL1vS",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "import { describe, it } from 'node:test'\nimport assert from 'node:assert/strict'\n\nimport * as spec from '../lib/dashboard-spec.js'\n\ndescribe('dashboard-spec', () => {\n  it('exports a spec object with a name', () => {\n    assert.ok(spec.name, 'spec must have a name')\n  })\n\n  it('exports exactly 8 tiles', () => {\n    assert.strictEqual(spec.tiles.length, 8, 'must have exactly 8 tiles')\n  })\n\n  it('every tile has name, type, query, and layout', () => {\n    for (const tile of spec.tiles) {\n      assert.ok(tile.name, `tile missing name: ${JSON.stringify(tile)}`)\n      assert.ok(tile.type, `tile \"${tile.name}\" missing type`)\n      assert.ok(tile.query, `tile \"${tile.name}\" missing query`)\n      assert.ok(tile.layout, `tile \"${tile.name}\" missing layout`)\n    }\n  })\n\n  it('every tile layout has x, y, w, h', () => {\n    for (const tile of spec.tiles) {\n      const { layout } = tile\n      assert.ok(typeof layout.x === 'number', `tile \"${tile.name}\" layout.x must be number`)\n      assert.ok(typeof layout.y === 'number', `tile \"${tile.name}\" layout.y must be number`)\n      assert.ok(typeof layout.w === 'number', `tile \"${tile.name}\" layout.w must be number`)\n      assert.ok(typeof layout.h === 'number', `tile \"${tile.name}\" layout.h must be number`)\n    }\n  })\n\n  it('tile types are valid PostHog query kinds', () => {\n    const validTypes = new Set(['TrendsQuery', 'FunnelsQuery', 'HogQLQuery'])\n    for (const tile of spec.tiles) {\n      assert.ok(validTypes.has(tile.type), `tile \"${tile.name}\" has invalid type \"${tile.type}\"`)\n    }\n  })\n\n  it('all tile-featured events are referenced in the tile queries', () => {\n    const allTileText = JSON.stringify(spec.tiles)\n    const tileEvents = [\n      'form_page_reached',\n      'travel_protection_selected',\n      'fcf_amount_selected',\n      'fcf_more_info_clicked',\n      'payment_method_selected',\n      'payment_mode_selected',\n      'payment_completed',\n      'signing_completed',\n    ]\n    for (const event of tileEvents) {\n      assert.ok(\n        allTileText.includes(event),\n        `tile-featured event \"${event}\" not referenced in any tile`,\n      )\n    }\n  })\n\n  it('exports a branchEvents array with 9 entries', () => {\n    assert.ok(Array.isArray(spec.branchEvents), 'must export branchEvents array')\n    assert.strictEqual(spec.branchEvents.length, 9, 'must have exactly 9 branch events')\n  })\n\n  it('every branchEvent has name and properties fields', () => {\n    for (const ev of spec.branchEvents) {\n      assert.ok(ev.name, `branchEvent missing name`)\n      assert.ok(Array.isArray(ev.properties), `branchEvent \"${ev.name}\" missing properties array`)\n    }\n  })\n})\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774753972792
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01WwzQDUNqnt7Na3JwdgdTjp",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "import { describe, it } from 'node:test'\nimport assert from 'node:assert/strict'\n\nimport { createClient, PostHogError } from '../lib/posthog-client.js'\n\nconst CONFIG = {\n  host: 'https://us.posthog.com',\n  projectId: '39507',\n  token: 'phx_test_token_abc123',\n}\n\ninterface MockCall {\n  url: string\n  options: RequestInit\n}\n\ninterface MockResponse {\n  status?: number\n  body?: Record<string, unknown>\n}\n\ninterface MockFetchFn {\n  (\n    url: string,\n    options: RequestInit,\n  ): Promise<{ status: number; ok: boolean; json: () => Promise<unknown> }>\n  calls: MockCall[]\n}\n\nfunction makeFetch(...responses: MockResponse[]): MockFetchFn {\n  let call = 0\n  const calls: MockCall[] = []\n  const mockFetch = async (url: string, options: RequestInit) => {\n    calls.push({ url, options })\n    const resp = responses[call] ?? responses[responses.length - 1] ?? {}\n    call++\n    const { status = 200, body = {} } = resp\n    return {\n      status,\n      ok: status >= 200 && status < 300,\n      json: async (): Promise<unknown> => body,\n    }\n  }\n  ;(mockFetch as MockFetchFn).calls = calls\n  return mockFetch as MockFetchFn\n}\n\ndescribe('posthog-client: Authorization header', () => {\n  it('sets Authorization: Bearer <token> on GET requests', async () => {\n    const fetch = makeFetch({ status: 200, body: { results: [] } })\n    const client = createClient(CONFIG, fetch)\n    await client.listDashboards()\n    assert.strictEqual(\n      (fetch.calls[0]!.options.headers as Record<string, string>)['Authorization'],\n      `Bearer ${CONFIG.token}`,\n      'Authorization header must be set',\n    )\n  })\n\n  it('sets Authorization: Bearer <token> on POST requests', async () => {\n    const fetch = makeFetch({ status: 201, body: { id: 1 } })\n    const client = createClient(CONFIG, fetch)\n    await client.createDashboard('Test', [])\n    assert.strictEqual(\n      (fetch.calls[0]!.options.headers as Record<string, string>)['Authorization'],\n      `Bearer ${CONFIG.token}`,\n    )\n  })\n})\n\ndescribe('posthog-client: Content-Type header', () => {\n  it('sets Content-Type: application/json on POST requests', async () => {\n    const fetch = makeFetch({ status: 201, body: { id: 1 } })\n    const client = createClient(CONFIG, fetch)\n    await client.createDashboard('Test', [])\n    assert.strictEqual(\n      (fetch.calls[0]!.options.headers as Record<string, string>)['Content-Type'],\n      'application/json',\n    )\n  })\n\n  it('sets Content-Type: application/json on PATCH requests', async () => {\n    const fetch = makeFetch({ status: 200, body: { id: 1 } })\n    const client = createClient(CONFIG, fetch)\n    await client.patchDashboard(1, { deleted: true })\n    assert.strictEqual(\n      (fetch.calls[0]!.options.headers as Record<string, string>)['Content-Type'],\n      'application/json',\n    )\n  })\n})\n\ndescribe('posthog-client: success responses', () => {\n  it('returns parsed JSON body on 200', async () => {\n    const fetch = makeFetch({ status: 200, body: { count: 5, results: [] } })\n    const client = createClient(CONFIG, fetch)\n    const result = await client.listDashboards()\n    assert.deepStrictEqual(result, { count: 5, results: [] })\n  })\n\n  it('returns parsed JSON body on 201', async () => {\n    const fetch = makeFetch({ status: 201, body: { id: 42, name: 'Test' } })\n    const client = createClient(CONFIG, fetch)\n    const result = await client.createDashboard('Test', [])\n    assert.deepStrictEqual(result, { id: 42, name: 'Test' })\n  })\n})\n\ndescribe('posthog-client: 429 retry logic', () => {\n  it('retries on 429 and eventually succeeds', async () => {\n    const fetch = makeFetch(\n      { status: 429, body: {} },\n      { status: 429, body: {} },\n      { status: 200, body: { results: [] } },\n    )\n    const client = createClient(CONFIG, fetch, { retryDelayMs: 0 })\n    const result = await client.listDashboards()\n    assert.strictEqual(fetch.calls.length, 3, 'should call fetch 3 times')\n    assert.deepStrictEqual(result, { results: [] })\n  })\n\n  it('throws PostHogError after 3 attempts when all return 429', async () => {\n    const fetch = makeFetch(\n      { status: 429, body: {} },\n      { status: 429, body: {} },\n      { status: 429, body: {} },\n    )\n    const client = createClient(CONFIG, fetch, { retryDelayMs: 0 })\n    await assert.rejects(\n      () => client.listDashboards(),\n      (err) => {\n        const e = err as PostHogError\n        assert.strictEqual(e.name, 'PostHogError', 'error must be PostHogError')\n        assert.strictEqual(e.status, 429)\n        return true\n      },\n    )\n    assert.strictEqual(fetch.calls.length, 3, 'should call fetch exactly 3 times')\n  })\n\n  it('does not retry more than 3 times', async () => {\n    const fetch = makeFetch(\n      { status: 429, body: {} },\n      { status: 429, body: {} },\n      { status: 429, body: {} },\n      { status: 429, body: {} },\n    )\n    const client = createClient(CONFIG, fetch, { retryDelayMs: 0 })\n    await assert.rejects(() => client.listDashboards())\n    assert.strictEqual(fetch.calls.length, 3, 'must not exceed 3 attempts')\n  })\n})\n\ndescribe('posthog-client: PostHogError on 4xx', () => {\n  it('throws PostHogError with name \"PostHogError\" on 401', async () => {\n    const fetch = makeFetch({ status: 401, body: { detail: 'Unauthorized' } })\n    const client = createClient(CONFIG, fetch)\n    await assert.rejects(\n      () => client.listDashboards(),\n      (err) => {\n        const e = err as PostHogError\n        assert.strictEqual(e.name, 'PostHogError')\n        assert.strictEqual(e.status, 401)\n        return true\n      },\n    )\n  })\n\n  it('throws PostHogError with status 403', async () => {\n    const fetch = makeFetch({ status: 403, body: { detail: 'Forbidden' } })\n    const client = createClient(CONFIG, fetch)\n    await assert.rejects(\n      () => client.listDashboards(),\n      (err) => {\n        const e = err as PostHogError\n        assert.strictEqual(e.status, 403)\n        return true\n      },\n    )\n  })\n\n  it('token does not appear in PostHogError.message', async () => {\n    const fetch = makeFetch({ status: 401, body: { detail: 'bad token' } })\n    const client = createClient(CONFIG, fetch)\n    await assert.rejects(\n      () => client.listDashboards(),\n      (err) => {\n        const e = err as PostHogError\n        assert.ok(\n          !e.message.includes(CONFIG.token),\n          `token must not appear in error message: ${e.message}`,\n        )\n        return true\n      },\n    )\n  })\n\n  it('PostHogError has an endpoint property (path only, no token)', async () => {\n    const fetch = makeFetch({ status: 404, body: {} })\n    const client = createClient(CONFIG, fetch)\n    await assert.rejects(\n      () => client.getDashboard(999),\n      (err) => {\n        const e = err as PostHogError\n        assert.ok(typeof e.endpoint === 'string', 'endpoint must be a string')\n        assert.ok(!e.endpoint.includes(CONFIG.token), 'endpoint must not contain token')\n        return true\n      },\n    )\n  })\n})\n\ndescribe('posthog-client: 5xx does not retry', () => {\n  it('throws PostHogError immediately on 500 without retry', async () => {\n    const fetch = makeFetch(\n      { status: 500, body: { detail: 'server error' } },\n      { status: 200, body: {} },\n    )\n    const client = createClient(CONFIG, fetch, { retryDelayMs: 0 })\n    await assert.rejects(\n      () => client.listDashboards(),\n      (err) => {\n        const e = err as PostHogError\n        assert.strictEqual(e.status, 500)\n        return true\n      },\n    )\n    assert.strictEqual(fetch.calls.length, 1, 'must not retry on 5xx')\n  })\n})\n\ndescribe('posthog-client: runQuery body shape', () => {\n  it('sends correct HogQL query body with refresh:blocking', async () => {\n    const sql = 'SELECT event, count() FROM events GROUP BY event'\n    const fetch = makeFetch({ status: 200, body: { results: [] } })\n    const client = createClient(CONFIG, fetch)\n    await client.runQuery(sql)\n    const body = JSON.parse(fetch.calls[0]!.options.body as string) as {\n      query: { kind: string; query: string }\n      refresh: string\n    }\n    assert.deepStrictEqual(body, {\n      query: {\n        kind: 'HogQLQuery',\n        query: sql,\n      },\n      refresh: 'blocking',\n    })\n  })\n})\n\ndescribe('posthog-client: getInsightByShortId URL', () => {\n  it('uses /insights/?short_id= in the request URL', async () => {\n    const fetch = makeFetch({ status: 200, body: { count: 1, results: [{ id: 1 }] } })\n    const client = createClient(CONFIG, fetch)\n    await client.getInsightByShortId('drOq2lO5')\n    const url = fetch.calls[0]!.url\n    assert.ok(url.includes('/insights/'), `URL must include /insights/: ${url}`)\n    assert.ok(url.includes('short_id=drOq2lO5'), `URL must include short_id=drOq2lO5: ${url}`)\n  })\n})\n\ndescribe('posthog-client: createInsight body shape', () => {\n  it('POSTs name and query to /insights/', async () => {\n    const query = { kind: 'TrendsQuery', series: [] }\n    const fetch = makeFetch({ status: 201, body: { id: 10, name: 'My Insight' } })\n    const client = createClient(CONFIG, fetch)\n    await client.createInsight('My Insight', query)\n    const url = fetch.calls[0]!.url\n    const body = JSON.parse(fetch.calls[0]!.options.body as string) as {\n      name: string\n      query: Record<string, unknown>\n    }\n    assert.ok(url.includes('/insights/'), `URL must include /insights/: ${url}`)\n    assert.strictEqual(body.name, 'My Insight')\n    assert.deepStrictEqual(body.query, query)\n  })\n})\n\ndescribe('posthog-client: listFeatureFlags URL and auth', () => {\n  it('sends GET to /api/projects/:id/feature_flags/', async () => {\n    const fetch = makeFetch({ status: 200, body: { count: 0, results: [] } })\n    const client = createClient(CONFIG, fetch)\n    await client.listFeatureFlags({})\n    const url = fetch.calls[0]!.url\n    assert.ok(url.includes('/api/projects/'), `must use projects base URL: ${url}`)\n    assert.ok(!url.includes('/api/environments/'), `must NOT use environments base URL: ${url}`)\n    assert.ok(url.includes('/feature_flags/'), `must include /feature_flags/: ${url}`)\n  })\n\n  it('sets Authorization Bearer header', async () => {\n    const fetch = makeFetch({ status: 200, body: { count: 0, results: [] } })\n    const client = createClient(CONFIG, fetch)\n    await client.listFeatureFlags({})\n    assert.strictEqual(\n      (fetch.calls[0]!.options.headers as Record<string, string>)['Authorization'],\n      `Bearer ${CONFIG.token}`,\n    )\n  })\n\n  it('returns parsed JSON body', async () => {\n    const body = { count: 2, results: [{ id: 1 }, { id: 2 }] }\n    const fetch = makeFetch({ status: 200, body })\n    const client = createClient(CONFIG, fetch)\n    const result = await client.listFeatureFlags({})\n    assert.deepStrictEqual(result, body)\n  })\n})\n\ndescribe('posthog-client: listFeatureFlags query params', () => {\n  it('passes search, active, type, and limit as query params when provided', async () => {\n    const fetch = makeFetch({ status: 200, body: { count: 0, results: [] } })\n    const client = createClient(CONFIG, fetch)\n    await client.listFeatureFlags({\n      search: 'checkout',\n      active: 'true',\n      type: 'boolean',\n      limit: 25,\n    })\n    const url = fetch.calls[0]!.url\n    assert.ok(url.includes('search=checkout'), `URL must include search=checkout: ${url}`)\n    assert.ok(url.includes('active=true'), `URL must include active=true: ${url}`)\n    assert.ok(url.includes('type=boolean'), `URL must include type=boolean: ${url}`)\n    assert.ok(url.includes('limit=25'), `URL must include limit=25: ${url}`)\n  })\n\n  it('omits query params when not provided (no ?search=undefined)', async () => {\n    const fetch = makeFetch({ status: 200, body: { count: 0, results: [] } })\n    const client = createClient(CONFIG, fetch)\n    await client.listFeatureFlags({})\n    const url = fetch.calls[0]!.url\n    assert.ok(!url.includes('undefined'), `URL must not contain \"undefined\": ${url}`)\n    assert.ok(!url.includes('null'), `URL must not contain \"null\": ${url}`)\n  })\n\n  it('passes offset as query param when provided', async () => {\n    const fetch = makeFetch({ status: 200, body: { count: 0, results: [] } })\n    const client = createClient(CONFIG, fetch)\n    await client.listFeatureFlags({ offset: 50, limit: 25 })\n    const url = fetch.calls[0]!.url\n    assert.ok(url.includes('offset=50'), `URL must include offset=50: ${url}`)\n  })\n})\n\ndescribe('posthog-client: getFeatureFlag', () => {\n  it('sends GET to /api/projects/:id/feature_flags/123/', async () => {\n    const fetch = makeFetch({ status: 200, body: { id: 123, key: 'my-flag', active: true } })\n    const client = createClient(CONFIG, fetch)\n    await client.getFeatureFlag(123)\n    const url = fetch.calls[0]!.url\n    assert.ok(url.includes('/api/projects/'), `must use projects base URL: ${url}`)\n    assert.ok(!url.includes('/api/environments/'), `must NOT use environments base URL: ${url}`)\n    assert.ok(url.includes('/feature_flags/123/'), `must include /feature_flags/123/: ${url}`)\n  })\n\n  it('returns parsed JSON body (single flag object)', async () => {\n    const flag = { id: 123, key: 'my-flag', active: true, name: 'My Flag' }\n    const fetch = makeFetch({ status: 200, body: flag })\n    const client = createClient(CONFIG, fetch)\n    const result = await client.getFeatureFlag(123)\n    assert.deepStrictEqual(result, flag)\n  })\n\n  it('sets Authorization Bearer header', async () => {\n    const fetch = makeFetch({ status: 200, body: { id: 1 } })\n    const client = createClient(CONFIG, fetch)\n    await client.getFeatureFlag(1)\n    assert.strictEqual(\n      (fetch.calls[0]!.options.headers as Record<string, string>)['Authorization'],\n      `Bearer ${CONFIG.token}`,\n    )\n  })\n})\n\ndescribe('posthog-client: patchFeatureFlag', () => {\n  it('sends PATCH to /api/projects/:id/feature_flags/123/', async () => {\n    const fetch = makeFetch({ status: 200, body: { id: 123, active: false } })\n    const client = createClient(CONFIG, fetch)\n    await client.patchFeatureFlag(123, { active: false })\n    const url = fetch.calls[0]!.url\n    assert.ok(url.includes('/api/projects/'), `must use projects base URL: ${url}`)\n    assert.ok(!url.includes('/api/environments/'), `must NOT use environments base URL: ${url}`)\n    assert.ok(url.includes('/feature_flags/123/'), `must include /feature_flags/123/: ${url}`)\n    assert.strictEqual(fetch.calls[0]!.options.method, 'PATCH')\n  })\n\n  it('includes JSON body with provided fields', async () => {\n    const fetch = makeFetch({ status: 200, body: { id: 123, active: false } })\n    const client = createClient(CONFIG, fetch)\n    await client.patchFeatureFlag(123, { active: false })\n    const body = JSON.parse(fetch.calls[0]!.options.body as string) as { active: boolean }\n    assert.deepStrictEqual(body, { active: false })\n  })\n\n  it('sets Content-Type: application/json', async () => {\n    const fetch = makeFetch({ status: 200, body: { id: 1 } })\n    const client = createClient(CONFIG, fetch)\n    await client.patchFeatureFlag(1, { name: 'Updated' })\n    assert.strictEqual(\n      (fetch.calls[0]!.options.headers as Record<string, string>)['Content-Type'],\n      'application/json',\n    )\n  })\n\n  it('sets Authorization Bearer header', async () => {\n    const fetch = makeFetch({ status: 200, body: { id: 1 } })\n    const client = createClient(CONFIG, fetch)\n    await client.patchFeatureFlag(1, { active: true })\n    assert.strictEqual(\n      (fetch.calls[0]!.options.headers as Record<string, string>)['Authorization'],\n      `Bearer ${CONFIG.token}`,\n    )\n  })\n})\n\ndescribe('posthog-client: createFeatureFlag', () => {\n  it('sends POST to /api/projects/:id/feature_flags/', async () => {\n    const fetch = makeFetch({ status: 201, body: { id: 5, key: 'new-flag', active: false } })\n    const client = createClient(CONFIG, fetch)\n    await client.createFeatureFlag('new-flag', { name: 'New Flag' })\n    const url = fetch.calls[0]!.url\n    assert.ok(url.includes('/api/projects/'), `must use projects base URL: ${url}`)\n    assert.ok(!url.includes('/api/environments/'), `must NOT use environments base URL: ${url}`)\n    assert.ok(url.includes('/feature_flags/'), `must include /feature_flags/: ${url}`)\n    assert.strictEqual(fetch.calls[0]!.options.method, 'POST')\n  })\n\n  it('body includes key and additional fields from body param', async () => {\n    const fetch = makeFetch({ status: 201, body: { id: 5, key: 'my-flag' } })\n    const client = createClient(CONFIG, fetch)\n    await client.createFeatureFlag('my-flag', { name: 'My Flag', active: true })\n    const body = JSON.parse(fetch.calls[0]!.options.body as string) as {\n      key: string\n      name: string\n      active: boolean\n    }\n    assert.strictEqual(body.key, 'my-flag')\n    assert.strictEqual(body.name, 'My Flag')\n    assert.strictEqual(body.active, true)\n  })\n\n  it('sets Content-Type: application/json', async () => {\n    const fetch = makeFetch({ status: 201, body: { id: 5 } })\n    const client = createClient(CONFIG, fetch)\n    await client.createFeatureFlag('flag-key', {})\n    assert.strictEqual(\n      (fetch.calls[0]!.options.headers as Record<string, string>)['Content-Type'],\n      'application/json',\n    )\n  })\n\n  it('sets Authorization Bearer header', async () => {\n    const fetch = makeFetch({ status: 201, body: { id: 5 } })\n    const client = createClient(CONFIG, fetch)\n    await client.createFeatureFlag('flag-key', {})\n    assert.strictEqual(\n      (fetch.calls[0]!.options.headers as Record<string, string>)['Authorization'],\n      `Bearer ${CONFIG.token}`,\n    )\n  })\n})\n\ndescribe('posthog-client: getFeatureFlagActivity', () => {\n  it('sends GET to /api/projects/:id/feature_flags/123/activity/?limit=10', async () => {\n    const fetch = makeFetch({ status: 200, body: { results: [] } })\n    const client = createClient(CONFIG, fetch)\n    await client.getFeatureFlagActivity(123, 10)\n    const url = fetch.calls[0]!.url\n    assert.ok(url.includes('/api/projects/'), `must use projects base URL: ${url}`)\n    assert.ok(!url.includes('/api/environments/'), `must NOT use environments base URL: ${url}`)\n    assert.ok(url.includes('/feature_flags/123/'), `must include /feature_flags/123/: ${url}`)\n    assert.ok(url.includes('/activity/'), `must include /activity/: ${url}`)\n    assert.ok(url.includes('limit=10'), `must include limit=10: ${url}`)\n  })\n\n  it('returns parsed JSON body', async () => {\n    const body = { results: [{ id: 1, activity: 'created' }] }\n    const fetch = makeFetch({ status: 200, body })\n    const client = createClient(CONFIG, fetch)\n    const result = await client.getFeatureFlagActivity(123, 10)\n    assert.deepStrictEqual(result, body)\n  })\n\n  it('applies default limit when not provided', async () => {\n    const fetch = makeFetch({ status: 200, body: { results: [] } })\n    const client = createClient(CONFIG, fetch)\n    await client.getFeatureFlagActivity(123)\n    const url = fetch.calls[0]!.url\n    assert.ok(url.includes('limit='), `URL must include a limit param: ${url}`)\n    assert.ok(!url.includes('limit=undefined'), `limit must not be undefined: ${url}`)\n  })\n\n  it('sets Authorization Bearer header', async () => {\n    const fetch = makeFetch({ status: 200, body: { results: [] } })\n    const client = createClient(CONFIG, fetch)\n    await client.getFeatureFlagActivity(123, 10)\n    assert.strictEqual(\n      (fetch.calls[0]!.options.headers as Record<string, string>)['Authorization'],\n      `Bearer ${CONFIG.token}`,\n    )\n  })\n})\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774753972794
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "Now I have a thorough understanding of the codebase. Let me also verify the `DashboardSpec` usage and `patchDashboard` usage to confirm the dead exports:",
+            "thinkingSignature": "EtUCClkIDBgCKkD2oEpg1KnSWfBMImNe2zn3ClRC8ON3SST/K46m7RZsCwnJsVijFF83MJFYWt1tJ2GpNVvCaE4aIks+UT4T8fYmMg9jbGF1ZGUtb3B1cy00LTY4ABIMcv5N5FXPjB7ww9i5GgwFT2QqbYrI3ohqDUMiMMu0HrSv5V/ZBm6HnrlJvDSMlDkZSgkWNIbbRyX530We3OHSl/BL8TZyNMvNGnkXyiqpAfRgZF9HfOMeAbVBSa9PZg74TfyeeVuIUaml5/o7P/5h5kYlaM3CFN1f/pNEY/tirX8rZO35LHwgG9cuQbQyqwIJ1EtzZzipdpt0+lCBPU2leHchg624mrfm4pGdkNpt4UJ/O9tXdjxCnoEcN/UUjqxLhzZ141vh9DYJDD/bcjDVCvBAduyhIzUyjHxq+uzTspPRQRhpk+G9HGBjUym/nWtYv91WYKCQvkwYAQ=="
+          },
+          {
+            "type": "text",
+            "text": "Let me verify the dead exports:"
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01A1DWJkb6HWheDo5ZkhTfQk",
+            "name": "grep",
+            "arguments": {
+              "pattern": "DashboardSpec",
+              "path": "/Users/josorio/Code/pi-skills/skills"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_015H3JFqYtZKKKGfxaW2hmnp",
+            "name": "grep",
+            "arguments": {
+              "pattern": "patchDashboard",
+              "path": "/Users/josorio/Code/pi-skills/skills"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01CPnvALz6t2ncqRUy2qhtY2",
+            "name": "grep",
+            "arguments": {
+              "pattern": "getFixture\\(",
+              "path": "/Users/josorio/Code/pi-skills/skills/posthog-skill/scripts/run.ts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01KyBa7ATmsaSwqgfUowMRZD",
+            "name": "grep",
+            "arguments": {
+              "pattern": "'status'|'inspect-live'",
+              "path": "/Users/josorio/Code/pi-skills/skills/posthog-skill/scripts/run.ts"
+            }
+          }
+        ],
+        "api": "anthropic-messages",
+        "provider": "anthropic",
+        "model": "claude-opus-4-6",
+        "usage": {
+          "input": 1,
+          "output": 379,
+          "cacheRead": 49010,
+          "cacheWrite": 7932,
+          "totalTokens": 57322,
+          "cost": {
+            "input": 0.000005,
+            "output": 0.009475,
+            "cacheRead": 0.024505,
+            "cacheWrite": 0.049575,
+            "total": 0.08356
+          }
+        },
+        "stopReason": "toolUse",
+        "timestamp": 1774753972794,
+        "responseId": "msg_01TFc45QnKar2o3odZRZvHNe"
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01A1DWJkb6HWheDo5ZkhTfQk",
+        "toolName": "grep",
+        "content": [
+          {
+            "type": "text",
+            "text": "posthog-skill/scripts/lib/dashboard-spec.ts:24: export interface DashboardSpec {"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774753979784
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_015H3JFqYtZKKKGfxaW2hmnp",
+        "toolName": "grep",
+        "content": [
+          {
+            "type": "text",
+            "text": "posthog-skill/scripts/lib/posthog-client.ts:157:   patchDashboard(id: number, body: Record<string, unknown>): Promise<Dashboard>\nposthog-skill/scripts/lib/posthog-client.ts:287:   function patchDashboard(id: number, body: Record<string, unknown>): Promise<Dashboard> {\nposthog-skill/scripts/lib/posthog-client.ts:384:     patchDashboard,\nposthog-skill/scripts/__tests__/posthog-client.test.ts:85:     await client.patchDashboard(1, { deleted: true })"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774753979785
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01CPnvALz6t2ncqRUy2qhtY2",
+        "toolName": "grep",
+        "content": [
+          {
+            "type": "text",
+            "text": "run.ts:104:     out(getFixture('inspect'))\nrun.ts:184:     out(getFixture('compare'))\nrun.ts:306:     out(getFixture('create'))\nrun.ts:528:         out(getFixture('flags'))\nrun.ts:553:         out(getFixture('flags-get'))\nrun.ts:573:         out(getFixture('flags-toggle'))\nrun.ts:599:         out(getFixture('flags-create'))\nrun.ts:623:         out(getFixture('flags-update'))\nrun.ts:647:         out(getFixture('flags-activity'))"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774753979785
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01KyBa7ATmsaSwqgfUowMRZD",
+        "toolName": "grep",
+        "content": [
+          {
+            "type": "text",
+            "text": "run.ts:744:     case 'status':"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774753979785
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "toolCall",
+            "id": "toolu_01Ny2T6o1vR5Sbwwt1risCDi",
+            "name": "grep",
+            "arguments": {
+              "pattern": "getFixture\\('status'\\)|getFixture\\('inspect-live'\\)",
+              "path": "/Users/josorio/Code/pi-skills/skills"
+            }
+          }
+        ],
+        "api": "anthropic-messages",
+        "provider": "anthropic",
+        "model": "claude-opus-4-6",
+        "usage": {
+          "input": 1,
+          "output": 97,
+          "cacheRead": 56942,
+          "cacheWrite": 838,
+          "totalTokens": 57878,
+          "cost": {
+            "input": 0.000005,
+            "output": 0.002425,
+            "cacheRead": 0.028471,
+            "cacheWrite": 0.0052375,
+            "total": 0.0361385
+          }
+        },
+        "stopReason": "toolUse",
+        "timestamp": 1774753979785,
+        "responseId": "msg_01WyWMcNrBY3EgNLgxtyWrL2"
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01Ny2T6o1vR5Sbwwt1risCDi",
+        "toolName": "grep",
+        "content": [
+          {
+            "type": "text",
+            "text": "No matches found"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774753983267
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "text",
+            "text": "Good — confirmed: `'status'` and `'inspect-live'` fixtures are never requested. Now I have complete understanding. Let me map the data flow and create the task plan.\n\n## Data Flow Mapping\n\n**Issue 2 (Dead exports):** No data flow — pure deletion. `DashboardSpec` interface exported but never imported. `patchDashboard` called only from tests (removing from client interface means removing test too). `'status'` and `'inspect-live'` fixture keys never called by `getFixture()` in run.ts.\n\n**Issue 1 (Test helper extraction):** Data flows from 6 test files → duplicated `run()` helper → `spawnSync`. Extract to shared helpers.ts → all 6 files import from it.\n\n**Issue 3 (exa-search common.ts):** Data flows: CLI args → `parseArgs` → `executeAndPrint`. `contents.ts` manually parses args instead of using `parseArgs`. `research.ts` manually calls `console.log(JSON.stringify(...))` instead of `executeAndPrint`.\n\n**Issue 5 (Type insight response):** Data flows: PostHog API → untyped `Record<string, unknown>` → many casts in `cmdCompareLive`. Define typed interfaces → use them.\n\n**Issue 4 (Split run.ts):** Data flows: CLI args → `main()` switch → command functions. Split into modules with imports.\n\n**Issue 6 (exa-search tests):** Data flows: unit test → common.ts pure functions.\n\n## Tasks for code-organization-cleanup\n\n### 1a. Write tests for dead export removal in posthog-skill (RED)\n**Agent:** test-writer\n**Scope:** skills/posthog-skill/scripts/__tests__/dead-exports.test.ts\n**Test criteria:**\n- test_dashboard_spec_does_not_export_DashboardSpec_interface → MUST FAIL (verify by importing and checking exported keys — currently DashboardSpec IS exported)\n- test_fixtures_type_does_not_include_status_key → MUST FAIL (the FixtureKey union currently includes 'status')\n- test_fixtures_type_does_not_include_inspect_live_key → MUST FAIL (the FixtureKey union currently includes 'inspect-live')\n**Note:** Testing `patchDashboard` removal is tricky since it's a method on the client interface. The existing `posthog-client.test.ts` has tests for `patchDashboard` — the GREEN task should remove those tests along with the dead method. The RED test here should verify the client interface does NOT expose `patchDashboard` (e.g., assert `!('patchDashboard' in client)`).\n**Test tier:** unit\n**Depends on:** none\n\n### 1b. Remove dead exports in posthog-skill (GREEN)\n**Agent:** builder\n**Scope:** skills/posthog-skill/scripts/lib/dashboard-spec.ts, skills/posthog-skill/scripts/lib/posthog-client.ts, skills/posthog-skill/scripts/lib/fixtures.ts, skills/posthog-skill/scripts/__tests__/posthog-client.test.ts\n**Test criteria:**\n- test_dashboard_spec_does_not_export_DashboardSpec_interface → MUST PASS\n- test_fixtures_type_does_not_include_status_key → MUST PASS\n- test_fixtures_type_does_not_include_inspect_live_key → MUST PASS\n- All existing tests still pass (`pnpm test`)\n- `tsc --noEmit` passes\n- `pnpm run lint` passes\n**Changes:**\n- Remove `DashboardSpec` interface from dashboard-spec.ts\n- Remove `patchDashboard` from the `PostHogClient` interface, the implementation function, and the return object in posthog-client.ts\n- Remove `patchDashboard` tests from posthog-client.test.ts (2 tests in \"Content-Type header\" describe + the PATCH test in \"patchFeatureFlag\" describe — careful: only remove the `patchDashboard`-specific tests)\n- Remove `'status'` and `'inspect-live'` entries from the `FixtureKey` type union and the `FIXTURES` record in fixtures.ts\n**Depends on:** 1a\n\n### 2a. Write tests for shared test helper in posthog-skill (RED)\n**Agent:** test-writer\n**Scope:** skills/posthog-skill/scripts/__tests__/helpers.test.ts\n**Test criteria:**\n- test_run_helper_returns_status_stdout_stderr → MUST FAIL (helpers.ts doesn't exist yet)\n- test_run_helper_passes_env_override → MUST FAIL\n- test_run_helper_accepts_timeout_option → MUST FAIL\n- test_TSX_constant_points_to_tsx_binary → MUST FAIL\n- test_RUN_constant_points_to_run_ts → MUST FAIL\n- test_LIVE_constant_reads_POSTHOG_TEST_LIVE_env → MUST FAIL\n**Test tier:** unit\n**Depends on:** none\n\n### 2b. Extract shared test helper and refactor test files (GREEN)\n**Agent:** builder\n**Scope:** skills/posthog-skill/scripts/__tests__/helpers.ts, skills/posthog-skill/scripts/__tests__/status.test.ts, skills/posthog-skill/scripts/__tests__/inspect.test.ts, skills/posthog-skill/scripts/__tests__/compare.test.ts, skills/posthog-skill/scripts/__tests__/create.test.ts, skills/posthog-skill/scripts/__tests__/flags.test.ts, skills/posthog-skill/scripts/__tests__/live.test.ts\n**Test criteria:**\n- test_run_helper_returns_status_stdout_stderr → MUST PASS\n- test_run_helper_passes_env_override → MUST PASS\n- test_run_helper_accepts_timeout_option → MUST PASS\n- test_TSX_constant_points_to_tsx_binary → MUST PASS\n- test_RUN_constant_points_to_run_ts → MUST PASS\n- test_LIVE_constant_reads_POSTHOG_TEST_LIVE_env → MUST PASS\n- All existing tests still pass (`pnpm test`)\n- `tsc --noEmit` passes\n- `pnpm run lint` passes\n**Changes:**\n- Create helpers.ts exporting: `TSX`, `RUN`, `LIVE` constants and `run(args, env?, options?)` function\n- `run()` supports optional `options` param with `timeout` (for live.test.ts variant)\n- Refactor all 6 test files to import from `./helpers.js` and remove duplicated `run()`, `TSX`, `RUN`, `LIVE`, `__dirname`\n- Each test file should only retain its own `describe`/`it` blocks\n**Depends on:** 2a\n\n### 3a. Write tests for exa-search contents.ts and research.ts using common.ts (RED)\n**Agent:** test-writer\n**Scope:** skills/exa-search/scripts/__tests__/refactor-validation.test.ts\n**Test criteria:**\n- test_contents_ts_imports_parseArgs_from_common → MUST FAIL (contents.ts currently manually re-implements parseArgs)\n- test_research_ts_imports_executeAndPrint_from_common → MUST FAIL (research.ts uses inline console.log)\n- test_research_ts_does_not_contain_raw_JSON_stringify_console_log → MUST FAIL (research.ts has 5 occurrences of `console.log(JSON.stringify(result, null, 2))`)\n**Note:** These are static analysis tests — they read the source files and check import statements / string patterns. This is appropriate because the behavior (CLI output format) doesn't change; only the implementation pattern does.\n**Test tier:** unit\n**Depends on:** none\n\n### 3b. Refactor contents.ts and research.ts to use common.ts helpers (GREEN)\n**Agent:** builder\n**Scope:** skills/exa-search/scripts/contents.ts, skills/exa-search/scripts/research.ts\n**Test criteria:**\n- test_contents_ts_imports_parseArgs_from_common → MUST PASS\n- test_research_ts_imports_executeAndPrint_from_common → MUST PASS\n- test_research_ts_does_not_contain_raw_JSON_stringify_console_log → MUST PASS\n- `tsc --noEmit` passes\n- `pnpm run lint` passes\n**Changes:**\n- Refactor contents.ts to use `parseArgs(import.meta.url)` from common.ts instead of manual arg parsing. Handle the special case where contents.ts first arg is a URL (not a query) — `parseArgs` returns `{ query, opts }` which maps to `{ url, opts }` by destructuring with rename.\n- Refactor research.ts to use `executeAndPrint` for all `console.log(JSON.stringify(result, null, 2))` calls. The streaming case in `get` subcommand can stay manual since it writes individual chunks. The `run` subcommand's `console.error` for progress stays manual.\n**Depends on:** 3a\n\n### 4a. Write tests for PostHog insight response types (RED)\n**Agent:** test-writer\n**Scope:** skills/posthog-skill/scripts/__tests__/insight-types.test.ts\n**Test criteria:**\n- test_InsightVizNode_type_is_exported_from_posthog_client → MUST FAIL (type doesn't exist yet)\n- test_InsightQuerySource_type_is_exported_from_posthog_client → MUST FAIL\n- test_InsightSummary_type_is_exported_from_posthog_client → MUST FAIL\n**Note:** TypeScript type exports can be verified by importing them and using `satisfies` or constructing objects that conform to the type — if the import fails at compile time, the test fails. These tests import the new types and construct sample objects to verify the shape compiles.\n**Test tier:** unit\n**Depends on:** 1b (depends on dead export cleanup being done first so posthog-client.ts is clean)\n\n### 4b. Define typed interfaces for PostHog insight response (GREEN)\n**Agent:** builder\n**Scope:** skills/posthog-skill/scripts/lib/posthog-client.ts\n**Test criteria:**\n- test_InsightVizNode_type_is_exported_from_posthog_client → MUST PASS\n- test_InsightQuerySource_type_is_exported_from_posthog_client → MUST PASS\n- test_InsightSummary_type_is_exported_from_posthog_client → MUST PASS\n- `tsc --noEmit` passes\n- `pnpm run lint` passes\n**Changes:**\n- Add `InsightQuerySource` interface with typed fields: `kind`, `series`, `breakdownFilter`, `dateRange`, `funnelsFilter`, `trendsFilter`\n- Add `InsightVizNode` interface wrapping `kind: 'InsightVizNode'` + `source: InsightQuerySource`\n- Add `InsightSummary` interface for the summary output shape of `cmdCompareLive`\n- Extend existing `Insight` interface's `query` field to be `InsightVizNode | InsightQuerySource | Record<string, unknown>` (or keep as `Record<string, unknown>` and have the command module narrow it)\n- Export all new types\n**Depends on:** 4a\n\n### 5a. Write tests for run.ts split into command modules (RED)\n**Agent:** test-writer\n**Scope:** skills/posthog-skill/scripts/__tests__/cmd-modules.test.ts\n**Test criteria:**\n- test_lib_config_ts_exports_resolveConfig → MUST FAIL (file doesn't exist yet)\n- test_lib_config_ts_exports_AppConfig_type → MUST FAIL\n- test_lib_config_ts_exports_out_and_info_helpers → MUST FAIL\n- test_lib_cmd_status_ts_exports_cmdStatus → MUST FAIL\n- test_lib_cmd_inspect_ts_exports_cmdInspect → MUST FAIL\n- test_lib_cmd_compare_ts_exports_cmdCompare → MUST FAIL\n- test_lib_cmd_create_ts_exports_cmdCreate → MUST FAIL\n- test_lib_cmd_flags_ts_exports_cmdFlags → MUST FAIL\n- test_run_ts_is_under_80_lines → MUST FAIL (currently 502 lines)\n**Note:** These tests verify the module structure exists and exports the expected functions. All existing CLI tests (status, inspect, compare, create, flags, live) must continue to pass — they test via subprocess so they're unaffected by internal restructuring.\n**Test tier:** unit\n**Depends on:** 4b (types must be defined before splitting, since cmd-compare.ts will use them)\n\n### 5b. Split run.ts into command modules (GREEN)\n**Agent:** builder\n**Scope:** skills/posthog-skill/scripts/run.ts, skills/posthog-skill/scripts/lib/config.ts, skills/posthog-skill/scripts/lib/cmd-status.ts, skills/posthog-skill/scripts/lib/cmd-inspect.ts, skills/posthog-skill/scripts/lib/cmd-compare.ts, skills/posthog-skill/scripts/lib/cmd-create.ts, skills/posthog-skill/scripts/lib/cmd-flags.ts\n**Test criteria:**\n- test_lib_config_ts_exports_resolveConfig → MUST PASS\n- test_lib_config_ts_exports_AppConfig_type → MUST PASS\n- test_lib_config_ts_exports_out_and_info_helpers → MUST PASS\n- test_lib_cmd_status_ts_exports_cmdStatus → MUST PASS\n- test_lib_cmd_inspect_ts_exports_cmdInspect → MUST PASS\n- test_lib_cmd_compare_ts_exports_cmdCompare → MUST PASS\n- test_lib_cmd_create_ts_exports_cmdCreate → MUST PASS\n- test_lib_cmd_flags_ts_exports_cmdFlags → MUST PASS\n- test_run_ts_is_under_80_lines → MUST PASS\n- All existing CLI tests pass (`pnpm test`)\n- `tsc --noEmit` passes\n- `pnpm run lint` passes\n**Changes:**\n- Create lib/config.ts: move `AppConfig` interface (extends `PostHogConfig`), `resolveConfig()`, `requireToken()`, `out()`, `info()`, `handleApiError()` from run.ts\n- Create lib/cmd-status.ts: move `cmdStatus()`, import config helpers\n- Create lib/cmd-inspect.ts: move `cmdInspect()`, `cmdInspectLive()`, import config helpers + fixtures + dashboard-spec + posthog-client\n- Create lib/cmd-compare.ts: move `cmdCompare()`, `cmdCompareLive()`, use the new typed interfaces from 4b instead of `Record<string, unknown>` casts. Import config helpers + fixtures + posthog-client\n- Create lib/cmd-create.ts: move `cmdCreate()`, `cmdCreateLive()`, import config helpers + fixtures + dashboard-spec + posthog-client\n- Create lib/cmd-flags.ts: move `FlagsOptions`, `parseFlagsOptions()`, `cmdFlags()`, import config helpers + fixtures + posthog-client\n- Slim run.ts to: imports + `cmdHelp()` + `main()` with switch dispatching to imported command functions. Target: under 80 lines.\n**Depends on:** 5a\n\n### 6a. Write tests for exa-search common.ts utilities (RED)\n**Agent:** test-writer\n**Scope:** skills/exa-search/scripts/__tests__/common.test.ts\n**Test criteria:**\n- test_requireArg_returns_value_when_present → MUST FAIL (test file doesn't exist yet)\n- test_requireArg_exits_when_undefined → MUST FAIL\n- test_filterOptions_picks_specified_keys → MUST FAIL\n- test_filterOptions_skips_undefined_values → MUST FAIL\n- test_filterOptions_returns_empty_when_no_keys_match → MUST FAIL\n- test_buildContentsOptions_text_true → MUST FAIL\n- test_buildContentsOptions_text_object → MUST FAIL\n- test_buildContentsOptions_highlights_true → MUST FAIL\n- test_buildContentsOptions_summary_true → MUST FAIL\n- test_buildContentsOptions_contents_object_merges → MUST FAIL\n- test_buildContentsOptions_empty_opts → MUST FAIL\n- test_handleError_exits_with_code_1 → MUST FAIL\n- test_createClient_returns_Exa_instance → MUST FAIL (requires EXA_API_KEY mock)\n**Test tier:** unit\n**Depends on:** none\n\n### 6b. Implement exa-search test infrastructure and pass tests (GREEN)\n**Agent:** builder\n**Scope:** skills/exa-search/scripts/__tests__/common.test.ts (adjust if needed), package.json (via `npm pkg set`)\n**Test criteria:**\n- All tests from 6a → MUST PASS\n- `pnpm test` passes (now includes exa-search tests)\n- `tsc --noEmit` passes\n- `pnpm run lint` passes\n**Changes:**\n- Update root package.json test script via `npm pkg set` to include exa-search tests: `tsx --test skills/posthog-skill/scripts/__tests__/*.test.ts skills/exa-search/scripts/__tests__/*.test.ts`\n- Adjust test implementations if needed to handle `process.exit` mocking (use `node:test` mock utilities or test via subprocess like posthog tests do)\n- No production code changes — common.ts already works, we're just adding test coverage\n**Depends on:** 6a, 3b (exa-search refactoring should be done before adding tests to avoid testing stale code)"
+          }
+        ],
+        "api": "anthropic-messages",
+        "provider": "anthropic",
+        "model": "claude-opus-4-6",
+        "usage": {
+          "input": 1,
+          "output": 4472,
+          "cacheRead": 56942,
+          "cacheWrite": 950,
+          "totalTokens": 62365,
+          "cost": {
+            "input": 0.000005,
+            "output": 0.11180000000000001,
+            "cacheRead": 0.028471,
+            "cacheWrite": 0.0059375,
+            "total": 0.14621350000000002
+          }
+        },
+        "stopReason": "stop",
+        "timestamp": 1774753983267,
+        "responseId": "msg_01813UeS33D9odzPRHzU8Gpe"
+      }
+    ],
+    "stderr": "",
+    "usage": {
+      "input": 12,
+      "output": 6533,
+      "cacheRead": 343436,
+      "cacheWrite": 58730,
+      "cost": 0.7021655,
+      "contextTokens": 62365,
+      "turns": 10
+    },
+    "model": "claude-opus-4-6",
+    "stopReason": "stop"
+  }
+]

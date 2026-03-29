@@ -1,13 +1,11 @@
-import { name as specName, branchEvents, tiles } from './dashboard-spec.js'
+import { branchEvents, tiles } from './dashboard-spec.js'
 
 // ---------------------------------------------------------------------------
 // Fixture key union — one entry per supported command
 // ---------------------------------------------------------------------------
 
 export type FixtureKey =
-  | 'status'
   | 'inspect'
-  | 'inspect-live'
   | 'compare'
   | 'flags'
   | 'flags-get'
@@ -22,30 +20,12 @@ export type FixtureKey =
 // ---------------------------------------------------------------------------
 
 const FIXTURES: Record<FixtureKey, unknown> = {
-  status: {
-    host: 'https://us.posthog.com',
-    project_id: '39507',
-    token: 'NOT SET',
-    token_present: false,
-    ach_insight_id: 'NOT SET',
-    dashboard_name: specName,
-  },
-
   inspect: {
     source: 'local-spec',
     events: branchEvents.map((ev) => ({
       name: ev.name,
       description: ev.description,
       properties: ev.properties,
-    })),
-  },
-
-  'inspect-live': {
-    source: 'posthog-live',
-    events: branchEvents.map((ev) => ({
-      event: ev.name,
-      count_30d: 0,
-      last_seen: null,
     })),
   },
 

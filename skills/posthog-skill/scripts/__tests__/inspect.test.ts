@@ -1,25 +1,6 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
-import { spawnSync } from 'node:child_process'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-
-const LIVE = Boolean(process.env['POSTHOG_TEST_LIVE'])
-
-const TSX = path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'tsx')
-const RUN = path.join(__dirname, '..', 'run.ts')
-
-function run(
-  args: string[] = [],
-  env: Record<string, string> = {},
-): { status: number | null; stdout: string; stderr: string } {
-  return spawnSync(TSX, [RUN, ...args], {
-    encoding: 'utf8',
-    env: { ...process.env, ...env },
-  })
-}
+import { LIVE, run } from './helpers.js'
 
 const BRANCH_EVENTS = [
   'form_page_reached',

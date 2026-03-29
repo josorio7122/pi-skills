@@ -1731,47 +1731,384 @@ All green. Here's a summary of everything that was set up:
 
 > **Note on peer warning:** `typescript-eslint@8` declares a peer of `typescript <6`, but the project uses `typescript@6.0.2`. This is a stale peer declaration — it works fine in practice. When `typescript-eslint@9` drops, this warning will go away.
 
-## Scout: Resolve the merge conflict in /Users/josorio/Code/pi-skills/skills/interface-design/SKILL.md
+## Scout: Analyze the TypeScript code in /Users/josorio/Code/pi-skills/skills/exa-search/scripts/ thoroughly. Read EVERY .ts file completely (answer.ts, contents.ts, find-similar.ts, research.ts, search.ts, and lib/common.ts). For each file report:
+1. Full list of imports and where they come from
+2. Exported functions/types
+3. Duplicated patterns across files (boilerplate, arg parsing, output formatting, error handling)
+4. Shared logic that could be extracted
+5. Code smells (long functions, repeated blocks, inconsistent patterns)
+6. How lib/common.ts is used by each script
 
-This is a rebase conflict during the 'prettier formatting' commit. The conflict is between upstream changes and our local prettier formatting + content changes.
+Be exhaustive — read every line of every file.
 
-Steps:
-1. Read the file to see the conflict markers
-2. For each conflict: keep OUR version (the prettier-formatted version with our structural changes like added frontmatter, section headers, etc.). If upstream added new content that we don't have, merge it in.
-3. Remove all conflict markers
-4. Run `git add skills/interface-design/SKILL.md`
+**No test files exist for any script.** Zero test coverage across the entire `exa-search/scripts/` directory.
 
-Do NOT run `git rebase --continue` yet.
+---
 
-Done. The conflict is fully resolved and staged. Here's what I did:
+### Findings Summary
 
-**Conflict 1** (the big one — `# Craft Foundations` section):
-- Kept our prettier-formatted section header: `# Craft Foundations & Design Principles`
-- Kept our intro bullet list pointing to `references/craft-foundations.md`
-- **Merged in** all the upstream inline content (Subtle Layering, Infinite Expression, Color Lives Somewhere, Before Writing Each Component, Design Principles, Avoid) — this was new content upstream added that we didn't have
+- **`lib/common.ts` exports 8 utilities; all 5 scripts use `createClient` and `requireApiKey` but no other utility is universally adopted** — adoption is inconsistent and ad-hoc.
 
-**Conflict 2** (Deep Dives section):
-- Kept our line: `references/craft-foundations.md — Layering, expression, color, design principles, anti-patterns`
-- Upstream had removed it (since content was inlined), but we keep the reference since `craft-foundations.md` still exists and provides additional detail
+- **`contents.ts` and `research.ts` both manually re-implement the `parseArgs` / `showHelp` / arg-slicing boilerplate** already centralized in `common.ts`, without any justification in `contents.ts`'s case.
 
-The file is now staged and git confirms "all conflicts fixed: run `git rebase --continue`" when you're ready.
+- **`research.ts` has the most internal duplication**: the `opts` JSON parse pattern appears 4× verbatim in different `case` blocks, `exa.research.create(...)` is copy-pasted between `create` and `run`, and `console.log(JSON.stringify(result, null, 2))` appears 5 times instead of using `executeAndPrint`.
 
-## Scout: Resolve the merge conflict in /Users/josorio/Code/pi-skills/skills/render-deploy/SKILL.md
+- **`search.ts` and `find-similar.ts` share two identical lines** (`wantContents` detection + `buildContentsOptions` call) and an identical conditional dispatch pattern — this is the clearest candidate for a shared helper.
 
-This is a rebase conflict during the 'prettier formatting' commit. The conflict is between upstream changes and our local prettier formatting + content changes.
+- **`contents.ts` has a silent default**: when no second arg is passed, `opts` defaults to `{ text: true }` — behavior not documented in help text and inconsistent with all other scripts, which default to `{}`.
 
-Steps:
-1. Read the file to see the conflict markers
-2. For each conflict: keep OUR version (the prettier-formatted version with our structural changes like added frontmatter, MCP section moved to references, etc.). If upstream added genuinely new content that we don't have, merge it in.
-3. Remove all conflict markers
-4. Run `git add skills/render-deploy/SKILL.md`
+- **Zero test coverage** — no `.test.ts` or spec files exist for any script or `lib/common.ts`.
 
-Do NOT run `git rebase --continue` yet.
+## Scout: Analyze the TypeScript code in /Users/josorio/Code/pi-skills/skills/posthog-skill/scripts/ thoroughly. Read EVERY .ts file completely:
+- run.ts
+- lib/posthog-client.ts
+- lib/dashboard-spec.ts
+- lib/fixtures.ts
+- All 8 test files in __tests__/
 
-No remaining conflict markers. The file is staged. Here's what was resolved:
+For each file report:
+1. Full list of imports and where they come from
+2. Exported functions/types/interfaces
+3. File length and complexity
+4. Code organization patterns (how is run.ts structured as a CLI entry point?)
+5. Duplicated patterns across files
+6. Code smells (long functions, god files, tight coupling)
+7. How the lib/ files relate to each other and to run.ts
+8. Test file patterns — are they consistent? Do they share helpers?
 
-- **Kept our version:** `If \`list_services()\` fails, read \`references/mcp-setup.md\` for per-tool setup instructions (Cursor, Claude Code, Codex, etc.).`
-- **Discarded upstream:** The inline MCP setup blocks for Cursor, Claude Code, Codex, Other Tools, and Workspace Selection — these were intentionally moved to `references/mcp-setup.md` in our branch.
+Be exhaustive — read every line of every file.
 
-Ready for `git rebase --continue` whenever you are.
+## Domain: TypeScript code in `/Users/josorio/Code/pi-skills/skills/posthog-skill/scripts/`
+
+---
+
+### File Inventory & Line Counts
+
+| File | Lines | Role |
+|------|-------|------|
+| `run.ts` | 502 | CLI entry point |
+| `lib/posthog-client.ts` | 368 | HTTP client library |
+| `lib/dashboard-spec.ts` | 165 | Static data / spec definitions |
+| `lib/fixtures.ts` | 130 | Canned dry-run responses |
+| `__tests__/posthog-client.test.ts` | 393 | Unit tests (mock fetch) |
+| `__tests__/flags.test.ts` | 290 | CLI integration tests |
+| `__tests__/inspect.test.ts` | 130 | CLI integration tests |
+| `__tests__/compare.test.ts` | 94 | CLI integration tests |
+| `__tests__/create.test.ts` | 116 | CLI integration tests |
+| `__tests__/dashboard-spec.test.ts` | 67 | Unit tests for spec data |
+| `__tests__/status.test.ts` | 41 | CLI integration tests |
+| `__tests__/live.test.ts` | 57 | Integration sequence (LIVE=1) |
+
+---
+
+### 1. Imports Per File
+
+**`run.ts`**
+- `node:path` → `path` (stdlib)
+- `node:fs` → `fs` (stdlib)
+- `node:url` → `fileURLToPath` (stdlib)
+- `./lib/fixtures.js` → `getFixture`
+- `./lib/dashboard-spec.js` → `* as spec` (entire module)
+- `./lib/posthog-client.js` → `createClient`, `PostHogError`
+- `type { PostHogConfig }` from `./lib/posthog-client.js`
+
+**`lib/posthog-client.ts`**
+- No external imports. Pure stdlib-free TypeScript. All HTTP done via injected `FetchFn` or `globalThis.fetch`.
+
+**`lib/dashboard-spec.ts`**
+- No imports. Pure data/type definitions file.
+
+**`lib/fixtures.ts`**
+- `./dashboard-spec.js` → `name as specName`, `branchEvents`, `tiles`
+
+**All 7 CLI integration test files** (`compare`, `create`, `flags`, `inspect`, `live`, `status`) share an identical import set:
+- `node:test` → `describe`, `it`
+- `node:assert/strict` → `assert`
+- `node:child_process` → `spawnSync`
+- `node:path` → `path`
+- `node:url` → `fileURLToPath`
+- (`compare.test.ts` and `live.test.ts` additionally import `node:fs`)
+
+**`__tests__/posthog-client.test.ts`**
+- `node:test` → `describe`, `it`
+- `node:assert/strict` → `assert`
+- `../lib/posthog-client.js` → `createClient`, `PostHogError`
+
+**`__tests__/dashboard-spec.test.ts`**
+- `node:test` → `describe`, `it`
+- `node:assert/strict` → `assert`
+- `../lib/dashboard-spec.js` → `* as spec`
+
+---
+
+### 2. Exported Functions / Types / Interfaces
+
+**`lib/posthog-client.ts`** — 18 exports:
+- Classes: `PostHogError`
+- Interfaces: `PostHogConfig`, `ClientOptions`, `MinimalResponse`, `FetchFn` (type alias), `DashboardSummary`, `DashboardListResponse`, `DashboardTile`, `Dashboard`, `Insight`, `InsightListResponse`, `HogQLResult`, `FeatureFlagSummary`, `FeatureFlagListResponse`, `FeatureFlagListParams`, `FeatureFlagActivity`, `FeatureFlagActivityResponse`, `PostHogClient`
+- Functions: `createClient(config, fetchFn?, opts?): PostHogClient`
+
+**`lib/dashboard-spec.ts`** — 11 exports:
+- Interfaces: `BranchEvent`, `TileQueryKind` (type alias), `TileLayout`, `Tile`, `DashboardSpec`
+- Constants: `name` (string), `description` (string), `tags` (string[]), `branchEvents` (9-item array), `tiles` (8-item array)
+- Const: `FUNNEL_PAGES` is **not exported** (module-private)
+
+**`lib/fixtures.ts`** — 2 exports:
+- Type alias: `FixtureKey` (union of 11 string literals)
+- Function: `getFixture(command: FixtureKey): unknown`
+
+**`run.ts`** — No exports. All functions are file-private. Entry point only.
+
+---
+
+### 3. CLI Entry Point Structure (`run.ts`)
+
+Organized in 5 clearly-delimited sections (marked with comment banners):
+
+1. **Config resolution** — `resolveConfig()` reads env vars and returns `AppConfig`; `requireToken()` guards live commands
+2. **Output helpers** — `out()` (JSON to stdout), `info()` (message to stderr), `handleApiError()` (maps PostHogError statuses to human messages + exits)
+3. **Commands** — One function per command:
+   - `cmdStatus(config)` — sync, no HTTP
+   - `cmdInspect(flags, config)` → delegates to `cmdInspectLive(config)` for `--live`
+   - `cmdCompare(flags, config)` → delegates to `cmdCompareLive(config)`
+   - `cmdCreate(flags, config)` → delegates to `cmdCreateLive(config)`
+   - `cmdFlags(args, config)` — large switch on subcommand (list/get/toggle/create/update/activity)
+4. **Flags command** — `parseFlagsOptions(args)` arg parser + `cmdFlags()`
+5. **Entry point** — `main()` reads `process.argv`, routes to command via switch, `.catch()` handler
+
+The `--dry-run` guard pattern repeats in every live command:
+```ts
+if (isDryRun) { out(getFixture('key')); return }
+requireToken(config)
+await cmdXxxLive(config)
+```
+
+---
+
+### 4. How lib/ Files Relate to Each Other and to run.ts
+
+```
+dashboard-spec.ts  ←── fixtures.ts  (imports name, branchEvents, tiles)
+       ↑                    ↑
+       └──── run.ts ────────┘  (also imports posthog-client.ts)
+       
+posthog-client.ts  ←── run.ts  (imports createClient, PostHogError, PostHogConfig)
+```
+
+- `dashboard-spec.ts` is a leaf — no dependencies, consumed by `fixtures.ts` and `run.ts`
+- `posthog-client.ts` is a leaf — no dependencies, consumed only by `run.ts`
+- `fixtures.ts` depends on `dashboard-spec.ts` to build the `inspect` and `create` fixtures dynamically (instead of duplicating event/tile data)
+- `run.ts` is the only orchestrator; it directly calls all three lib files
+
+---
+
+### 5. Pattern Inventory
+
+**Dry-run guard** — 5 instances in run.ts (inspect, compare, create, plus get/toggle/create/update/activity/list inside cmdFlags — 10 total in cmdFlags, but the guard is repeated inline in each switch case)
+
+**`handleApiError()` call sites** — 11 instances in run.ts:
+- `cmdInspectLive`: 1
+- `cmdCompareLive`: 1
+- `cmdCreateLive`: 3 (listDashboards, listDashboards #2, createDashboard, getDashboard)
+- `cmdFlags`: 6 (one per subcommand)
+
+**`requireToken(config)` call sites** — 8 instances in run.ts (inspect --live, compare, create, and 6 flags subcommands)
+
+**`createClient(config)` call sites** — 7 instances in run.ts — one new client created per subcommand invocation inside cmdFlags, plus one each in cmdInspectLive, cmdCompareLive, cmdCreateLive. **No client is reused across commands.**
+
+**`spawnSync(TSX, [RUN, ...args], ...)` / `run()` helper** — defined identically in **7 test files** (status, inspect, compare, create, flags, posthog-client omits it, dashboard-spec omits it, live has a variant). The `run()` function is copy-pasted with identical implementation in 6 of the 7 CLI test files. The `live.test.ts` variant differs only in adding `timeout: 30000` and omitting the `env` parameter.
+
+**`LIVE` gate pattern** — `const LIVE = Boolean(process.env['POSTHOG_TEST_LIVE'])` appears in 5 test files (compare, create, inspect, live, and flags does NOT use it). All live-only `describe` blocks use `{ skip: !LIVE }`.
+
+**`BRANCH_EVENTS` array hardcoded in test** — `inspect.test.ts` defines a local `BRANCH_EVENTS` array listing all 9 event names, then a second `BRANCH_EVENTS_LIVE` with the same 9 names. This duplicates what `spec.branchEvents` already provides and creates 2 copies in the same file.
+
+---
+
+### 6. Code Smells
+
+**`run.ts` is a god file (502 lines, all commands in one file):**
+- `cmdCreateLive` alone is ~100 lines (steps 1–7 comment-annotated internally)
+- `cmdCompareLive` is ~80 lines
+- `cmdFlags` is ~130 lines including the `parseFlagsOptions` helper
+- All business logic, output formatting, error handling, and arg parsing lives in a single file with no separation
+
+**`cmdCompareLive` has deeply nested type coercion chains:**
+- Multiple `typeof x === 'object' && x !== null ? (x as Record<string, unknown>)['key'] : null` one-liners, 7+ occurrences, extracting fields from the PostHog API response by casting to `Record<string, unknown>`. No typed response shape is defined for the insight query structure — raw `unknown`-casting throughout.
+
+**`createClient` returns new client per command invocation in cmdFlags:**
+- In `cmdFlags`, `createClient(config)` is called inside each switch case — 6 separate instantiation points for effectively the same config. No shared client object.
+
+**`handleApiError` returns `never` but is not the only error path:**
+- `cmdCreateLive` has a parallel, inline error handler block for the auth smoke-test (Step 1) that doesn't use `handleApiError`, duplicating the 401/403 message logic already in `handleApiError`.
+
+**`BRANCH_EVENTS` duplicated in `inspect.test.ts`:**
+- Lines 33–44: `BRANCH_EVENTS` array with 9 entries
+- Lines 71–83: `BRANCH_EVENTS_LIVE` array with the same 9 entries — identical, never merged
+
+**`fixtures.ts` `'status'` fixture is not used by `run.ts`:**
+- `FixtureKey` includes `'status'` and `'inspect-live'`, but `run.ts` never calls `getFixture('status')` or `getFixture('inspect-live')`. `cmdStatus` builds its output inline from config. These fixtures exist in the map but are dead from the CLI perspective.
+
+**`DashboardSpec` interface defined but never used:**
+- `lib/dashboard-spec.ts` exports `DashboardSpec` but it is not applied to any variable in the file or imported anywhere.
+
+**`patchDashboard` method on `PostHogClient` is exposed but never called:**
+- `posthog-client.ts` exports `patchDashboard`, `run.ts` imports it via the `PostHogClient` interface but does not call it anywhere (the code comment "no PATCH needed" was left after an architectural decision to attach insights via `dashboards:[]` on creation).
+
+---
+
+### 7. Test File Patterns — Consistency
+
+**Framework:** All 8 test files use Node.js native `node:test` (`describe`/`it`) + `node:assert/strict`. No Vitest, Jest, or third-party test runner.
+
+**CLI integration tests (6 files: status, inspect, compare, create, flags, live):**
+- All spawn the CLI via `spawnSync(TSX, [RUN, ...args], ...)` through a local `run()` helper
+- The `run()` helper is copy-pasted identically in 6 files — not extracted to a shared module
+- All follow the pattern: run CLI → check exit code → parse JSON from stdout → assert field values
+- All use `{ POSTHOG_PERSONAL_API_KEY: '' }` to override the token in dry-run tests
+- `live.test.ts` omits the `env` parameter from `run()` — passes env through implicitly
+- No shared test fixtures, helpers, or setup files across files
+
+**Unit tests (2 files: posthog-client.test.ts, dashboard-spec.test.ts):**
+- `posthog-client.test.ts`: uses the `makeFetch()` factory to create mock fetch implementations with call recording. This is the only file with non-trivial test infrastructure.
+- `dashboard-spec.test.ts`: purely structural — asserts array lengths, field presence, and valid type values. No mocks needed.
+
+**Test consistency issues:**
+- `compare.test.ts` and `create.test.ts` have identically structured describe blocks (`--dry-run`, `without token`, `live POSTHOG_TEST_LIVE=1`) but are not consistent about including a `live idempotency` suite — only `create.test.ts` has it
+- `live.test.ts` is an integration sequence meant to be run as a whole; it partially duplicates assertions already in individual test files (`create` twice, `compare` once, `inspect --live` once)
+- No `beforeEach`/`afterEach` hooks used anywhere
+
+---
+
+### Blast Radius
+
+**Files that must change if a new command is added:**
+- `run.ts` — add case in `main()` switch + new `cmdXxx` function
+- `lib/fixtures.ts` — add new `FixtureKey` variant + fixture entry in `FIXTURES`
+- `__tests__/` — new test file (following existing CLI test pattern)
+
+**Files at risk of regression:**
+- `run.ts` — `cmdCompareLive` is tightly coupled to PostHog's specific JSON response shape (InsightVizNode wrapper detection)
+- `lib/posthog-client.ts` — the `request()` function is shared by all methods; changes to retry/header logic affect every API call
+- `lib/fixtures.ts` — the `create` fixture dynamically maps `tiles` from the spec, so adding/removing tiles in `dashboard-spec.ts` silently changes fixture output
+
+---
+
+### Findings Summary
+
+1. **`run.ts` is a 502-line god file** with all commands, output helpers, error handlers, and arg parsing co-located. The largest functions (`cmdCreateLive` ~100 lines, `cmdFlags` ~130 lines) have internal step-comment structure suggesting they want to be extracted.
+
+2. **The `run()` test helper is copy-pasted across 6 CLI test files** with identical implementation (only `live.test.ts` adds `timeout: 30000`). There is no shared test utility module.
+
+3. **`posthog-client.ts` is clean and well-isolated**: no imports, fully injectable fetch, typed interfaces for every API response, retry logic with configurable delay — the best-designed file in the codebase.
+
+4. **Three dead exports exist**: `DashboardSpec` interface (never applied), `patchDashboard` client method (never called from run.ts after architecture change), and the `'status'`/`'inspect-live'` fixture keys (never requested by run.ts).
+
+5. **`cmdCompareLive` in run.ts contains the most complex inline logic**: 7+ levels of `Record<string, unknown>` casting to extract query fields from the PostHog insight response, with no typed schema for the InsightVizNode wrapper — the most fragile code in the codebase.
+
+## Scout: Analyze the overall project structure of /Users/josorio/Code/pi-skills for TypeScript organization opportunities:
+1. Read the root package.json, tsconfig.json, eslint.config.js, and .prettierrc
+2. Read the .gitignore file
+3. Check if there's a src/ or shared/ directory at root level
+4. Look at how skills reference each other (do any skills import from other skills?)
+5. Check if there are shared types, utilities, or constants that could be extracted to a common location
+6. Check the SKILL.md files for exa-search and posthog-skill to understand how scripts are invoked (what's the entry point pattern?)
+7. Report on whether the current flat structure under skills/ makes sense or if there's a better organization
+8. Check for any type definitions (.d.ts files) anywhere in the repo
+
+Now I have a comprehensive picture. Let me compile the findings.
+
+---
+
+## Domain: TypeScript Organization — `/Users/josorio/Code/pi-skills`
+
+### Blast Radius
+
+**Files that must change (if extracting shared utilities):**
+- `skills/exa-search/scripts/lib/common.ts` — the only shared utility library; would move or be referenced by a root-level shared module
+- `skills/posthog-skill/scripts/lib/posthog-client.ts` — self-contained client; no current sharing candidates
+- `tsconfig.json` — `include` glob would need to cover a new `shared/` or `src/` path
+- `package.json` — test script currently hardcoded to posthog path; lint/format scripts scoped to `skills/`
+
+**Files that may change:**
+- All 5 `exa-search/scripts/*.ts` entrypoints — they import from `./lib/common.js`
+- `posthog-skill/scripts/run.ts` — imports from `./lib/posthog-client.js`
+
+**Regression risk:**
+- `skills/posthog-skill/scripts/__tests__/*.test.ts` — 8 test files; any restructuring of `posthog-client.ts` or `dashboard-spec.ts` paths would break imports
+
+**Tests covering affected code:**
+- `posthog-skill/scripts/__tests__/compare.test.ts`
+- `posthog-skill/scripts/__tests__/create.test.ts`
+- `posthog-skill/scripts/__tests__/dashboard-spec.test.ts`
+- `posthog-skill/scripts/__tests__/flags.test.ts`
+- `posthog-skill/scripts/__tests__/inspect.test.ts`
+- `posthog-skill/scripts/__tests__/live.test.ts`
+- `posthog-skill/scripts/__tests__/posthog-client.test.ts`
+- `posthog-skill/scripts/__tests__/status.test.ts`
+
+---
+
+### Dependencies
+
+**`exa-search/scripts/answer.ts` (entry point)**
+- Level 1: `./lib/common.js` (local), `exa-js` (external ^2.10.0)
+- Level 2: `common.ts` → `node:fs`, `exa-js` (Exa class)
+
+**`exa-search/scripts/search.ts`, `contents.ts`, `find-similar.ts`, `research.ts`** follow the same pattern — all import from `./lib/common.js` and `exa-js`.
+
+**`posthog-skill/scripts/run.ts` (single entry point)**
+- Level 1: `./lib/fixtures.js`, `./lib/dashboard-spec.js`, `./lib/posthog-client.js` (all local), `node:path`, `node:fs`, `node:url`
+- Level 2: `posthog-client.ts` → `node:` built-ins only (no external packages). `dashboard-spec.ts` → no imports (pure data). `fixtures.ts` → no imports found at Level 1 scan.
+
+**No cross-skill imports exist anywhere.** Every `from '../../…'` pattern search returned zero results — imports never escape a skill's own directory.
+
+---
+
+### Pattern Inventory
+
+**TypeScript files total:** 18 files across 2 skills (`exa-search`: 6, `posthog-skill`: 12)
+
+**Skills with TypeScript scripts:** 2 of 13 skills (`exa-search`, `posthog-skill`). The other 11 skills (`agents-md`, `docker-model-runner`, `frontend-design`, `gh`, `glab`, `interface-design`, `pdf`, `playwright`, `render-deploy`, `skill-scanner`, `skill-writer`) contain no `.ts` files — they are documentation-only skills.
+
+**Entry point pattern:**
+- `exa-search`: 5 separate entrypoint scripts (`answer.ts`, `search.ts`, `contents.ts`, `find-similar.ts`, `research.ts`), each invoked directly as `tsx scripts/<name>.ts <args>`
+- `posthog-skill`: 1 unified dispatcher (`run.ts`), invoked as `tsx scripts/run.ts <subcommand> [args]`
+
+**Shared utility pattern in `exa-search/scripts/lib/common.ts`:** 8 exported functions — `createClient`, `requireArg`, `executeAndPrint`, `showHelp`, `requireApiKey`, `parseArgs`, `handleError`, `filterOptions`, `buildContentsOptions`. All 5 entrypoint scripts import from it. Pattern count: 5 import sites.
+
+**`lib/` subdirectory pattern:** Used by both skills — `exa-search/scripts/lib/` (1 file) and `posthog-skill/scripts/lib/` (3 files). No `lib/` at root level.
+
+**`.d.ts` files:** Zero in the entire repo.
+
+**`src/` or `shared/` directories at root level:** Neither exists.
+
+---
+
+### Constraints
+
+**`tsconfig.json`:** `"include": ["skills/**/*.ts"]` — scoped to the `skills/` subtree. `moduleResolution: "bundler"`, `noEmit: true`, strict mode + `noUnusedLocals` + `noUnusedParameters` + `noUncheckedIndexedAccess` all enabled.
+
+**`package.json` test script:** `"test": "tsx --test skills/posthog-skill/scripts/__tests__/*.test.ts"` — hardcoded glob for posthog only. No test runner for exa-search scripts (they have no tests).
+
+**`eslint.config.js`:** Lint scope is `files: ['skills/**/*.ts']` only. An `unused-vars` override allows bare `_` as catch placeholder.
+
+**`exa-js` dependency:** The only runtime dependency (`^2.10.0`). It is used exclusively by `exa-search`. `posthog-skill` uses only Node.js built-ins and `globalThis.fetch`.
+
+**Import style:** All cross-file imports use `.js` extensions (e.g., `'./lib/common.js'`), required for ESM (`"type": "module"` in `package.json`). Any shared module would need this same convention.
+
+**Skill isolation requirement:** Per `posthog-skill/SKILL.md`, skills resolve their own `$SKILL_DIR` at runtime — path portability is important. `exa-search` SKILL.md says `npm install` from the skill directory itself. A shared root-level library would require cross-directory imports, which currently don't exist and would break the skill-as-portable-unit model.
+
+---
+
+### Findings Summary
+
+- **Only 2 of 13 skills have TypeScript code** — the other 11 are pure markdown documentation. TypeScript organization is entirely a concern of `exa-search` and `posthog-skill`.
+
+- **Zero cross-skill imports exist.** Each skill is fully self-contained. The `lib/` pattern is used internally within each skill but never across skill boundaries.
+
+- **The flat `skills/<name>/` structure is appropriate.** Skills are designed to be self-contained portable units (SKILL.md uses `$SKILL_DIR` for path resolution). A root-level `shared/` library would couple skills together and break that portability contract.
+
+- **`exa-search/scripts/lib/common.ts` is the only candidate for shared extraction**, but it is Exa-specific (creates an Exa client, requires `EXA_API_KEY`, imports `exa-js`). It has no value to `posthog-skill` or any other skill — sharing it would be premature abstraction.
+
+- **No `.d.ts` files, no `src/` directory, no root-level `shared/` directory exist.** The current organization — skill-level `lib/` for internal helpers, `scripts/` for entrypoints, `__tests__/` nested inside scripts — is consistent between the two TypeScript skills and fits the project's scope.
 

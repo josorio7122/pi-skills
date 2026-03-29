@@ -72,12 +72,28 @@ export interface Dashboard {
 // Insight types
 // ---------------------------------------------------------------------------
 
+export interface InsightQuerySource {
+  kind: string
+  series?: unknown[]
+  breakdownFilter?: Record<string, unknown>
+  dateRange?: Record<string, unknown>
+  funnelsFilter?: Record<string, unknown>
+  trendsFilter?: Record<string, unknown>
+  [key: string]: unknown
+}
+
+export interface InsightVizNode {
+  kind: 'InsightVizNode'
+  source: InsightQuerySource
+  [key: string]: unknown
+}
+
 export interface Insight {
   id: number
   name: string
   short_id?: string
   description?: string | null
-  query?: Record<string, unknown>
+  query?: InsightVizNode | InsightQuerySource | Record<string, unknown>
   filters?: Record<string, unknown>
   [key: string]: unknown
 }
@@ -154,7 +170,6 @@ export interface PostHogClient {
   listDashboards(limit?: number): Promise<DashboardListResponse>
   createDashboard(name: string, tags: string[]): Promise<Dashboard>
   getDashboard(id: number): Promise<Dashboard>
-  patchDashboard(id: number, body: Record<string, unknown>): Promise<Dashboard>
   createInsight(name: string, query: Record<string, unknown>): Promise<Insight>
   createInsightOnDashboard(
     name: string,
@@ -284,13 +299,6 @@ export function createClient(
     }) as Promise<Dashboard>
   }
 
-  function patchDashboard(id: number, body: Record<string, unknown>): Promise<Dashboard> {
-    return request(`${envBase}/dashboards/${id}/`, {
-      method: 'PATCH',
-      body: JSON.stringify(body),
-    }) as Promise<Dashboard>
-  }
-
   function createInsight(name: string, query: Record<string, unknown>): Promise<Insight> {
     return request(`${envBase}/insights/`, {
       method: 'POST',
@@ -381,7 +389,6 @@ export function createClient(
     listDashboards,
     createDashboard,
     getDashboard,
-    patchDashboard,
     createInsight,
     createInsightOnDashboard,
     getInsightByShortId,
