@@ -7,7 +7,7 @@ import * as spec from './dashboard-spec.js'
 // ---------------------------------------------------------------------------
 
 export interface AppConfig extends PostHogConfig {
-  achInsightId: string
+  achInsightId: string | undefined
   dashboardName: string
 }
 
@@ -16,11 +16,16 @@ export interface AppConfig extends PostHogConfig {
 // ---------------------------------------------------------------------------
 
 export function resolveConfig(): AppConfig {
+  const projectId = process.env['POSTHOG_PROJECT_ID']
+  if (!projectId) {
+    process.stderr.write('Error: POSTHOG_PROJECT_ID environment variable is required\n')
+    process.exit(1)
+  }
   return {
     host: process.env['POSTHOG_HOST'] ?? 'https://us.posthog.com',
-    projectId: process.env['POSTHOG_PROJECT_ID'] ?? '39507',
+    projectId,
     token: process.env['POSTHOG_PERSONAL_API_KEY'] ?? '',
-    achInsightId: process.env['POSTHOG_ACH_INSIGHT_ID'] ?? 'drOq2lO5',
+    achInsightId: process.env['POSTHOG_ACH_INSIGHT_ID'] ?? undefined,
     dashboardName: process.env['POSTHOG_DASHBOARD_NAME'] ?? spec.name,
   }
 }

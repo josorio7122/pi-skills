@@ -113,6 +113,8 @@ When you already have the URL and need its content.
 ```bash
 tsx scripts/contents.ts "https://nextjs.org/docs/app/building-your-application/routing" '{"text":true}'
 
+If no options are provided, defaults to `{text: true}`.
+
 # Multiple URLs at once
 tsx scripts/contents.ts '["https://a.com","https://b.com"]' '{"text":true}'
 
@@ -146,47 +148,15 @@ tsx scripts/research.ts run "Comprehensive analysis of AI chip market 2025" '{"m
 
 ### Documentation Lookup
 
-When you need to check current docs for a framework or library — the most common use case.
-
-```bash
-# Option A: Direct answer (faster, good for specific questions)
-tsx scripts/answer.ts "How do I configure drizzle ORM with PostgreSQL?"
-
-# Option B: Search official docs (better for browsing/exploring)
-tsx scripts/search.ts "drizzle ORM migrations" '{"includeDomains":["orm.drizzle.team"],"text":true,"numResults":3}'
-
-# Option C: Fetch a specific docs page you already know
-tsx scripts/contents.ts "https://orm.drizzle.team/docs/migrations" '{"text":true}'
-```
+When you need to check current docs for a framework or library — the most common use case. Pick `answer.ts` for specific questions, `search.ts` with `includeDomains` for browsing, or `contents.ts` when you already have the URL.
 
 ### Verify Before You Assume
 
-When your training data might be stale — API options, config formats, CLI flags — search before using a value.
-
-```bash
-tsx scripts/answer.ts "What are the valid values for fields.billingDetails.name in Stripe PaymentElement?"
-```
+When your training data might be stale — API options, config formats, CLI flags — use `answer.ts` to verify before using a value.
 
 ### Company Research
 
-Use query variation for better coverage — Exa returns different results for different phrasings.
-
-```bash
-# Discover companies in a space
-tsx scripts/search.ts "AI developer tools startups" '{"category":"company","numResults":20}'
-
-# Deep dive on a specific company (no category — use domain/date filters freely)
-tsx scripts/search.ts "Anthropic funding rounds valuation 2024" '{"type":"deep","includeDomains":["techcrunch.com","crunchbase.com","bloomberg.com"],"numResults":10,"text":true}'
-
-# Find LinkedIn profiles for people at a company
-tsx scripts/search.ts "Anthropic engineering team" '{"category":"people","numResults":15}'
-```
-
-### Find Alternatives to a Tool
-
-```bash
-tsx scripts/find-similar.ts "https://tailwindcss.com" '{"text":true,"excludeSourceDomain":true,"numResults":5}'
-```
+Use query variation for better coverage — Exa returns different results for different phrasings. Use `category:"company"` for discovery, no category for deep dives (so domain/date filters can be applied freely), and `category:"people"` for LinkedIn profiles.
 
 ---
 
@@ -219,6 +189,8 @@ Prices may change. Verify at https://exa.ai/pricing.
 - **Empty results** — broaden the query, or try `answer.ts` instead
 - **`research.ts` timeout** — use `create` + `poll` separately; the default timeout is 5 minutes
 - **`EXA_API_KEY` not set** — export it: `export EXA_API_KEY=your-key`
+- **Malformed JSON options** — verify the options string is valid JSON (keys must be quoted)
+- **429 / rate limit** — reduce `numResults`, add a pause between calls, or check your Exa plan
 
 ---
 

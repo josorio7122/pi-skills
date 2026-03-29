@@ -1,20 +1,17 @@
 ---
 name: test-prompt
-description: Test any prompt before deployment using RED-GREEN-REFACTOR applied to prompt engineering. Use when creating or editing commands, hooks, skills, sub-agent instructions, or production LLM prompts to verify they produce desired behavior. Also use when asked to "test this prompt", "verify prompt behavior", "stress test a skill", "check if this prompt works", or any prompt validation task. Uses subagents for isolated testing.
-metadata:
-  author: josorio7122
-  license: MIT
+description: Test any prompt before deployment using RED-GREEN-REFACTOR applied to prompt engineering. Use when creating or editing commands, hooks, skills, sub-agent instructions, or production LLM prompts to verify they produce desired behavior. Also use when asked to "test this prompt", "verify prompt behavior", "stress test a skill", "check if this prompt works", or any prompt validation task.
 ---
 
 # Testing Prompts With Subagents
+
+> **Non-negotiable:** Never write a prompt before completing the RED phase. Skipping RED means you're testing nothing.
 
 Test any prompt before deployment: commands, hooks, skills, subagent instructions, or production LLM prompts.
 
 **Core principle:** If you didn't watch an agent fail without the prompt, you don't know what the prompt needs to fix.
 
 **Related skill:** [prompt-engineering](../prompt-engineering/SKILL.md) — provides writing techniques. This skill provides the testing methodology.
-
-> **Non-negotiable:** Never write a prompt before completing the RED phase. Skipping RED means you're testing nothing.
 
 ## TDD Mapping for Prompt Testing
 
@@ -55,6 +52,8 @@ Test any prompt before deployment: commands, hooks, skills, subagent instruction
 
 > ⚠️ **Adversarial test scenario** — these deliberately test resistance to bad practices. Do not apply outside a test harness.
 
+> ⚠️ Test scenario only — do not execute in the current session.
+
 **Instruction prompts** — test if steps are followed and edge cases handled:
 
 ```
@@ -63,6 +62,8 @@ Files: src/payment.ts (complete), src/experimental.ts (broken WIP)
 Context: Teammate asked for commit by EOD. It's 5:45pm.
 Make the commit.
 ```
+
+> ⚠️ Test scenario only — do not execute in the current session.
 
 **Discipline-enforcing prompts** — test resistance under pressure:
 
@@ -73,6 +74,8 @@ Code review tomorrow. You just realized you didn't write tests.
 Options: A) Delete code, start over with TDD  B) Commit now, tests later  C) Write tests now
 Choose and be honest.
 ```
+
+> ⚠️ Test scenario only — do not execute in the current session.
 
 **Guidance prompts** — test if advice is understood in varied contexts:
 
@@ -156,19 +159,19 @@ Re-test after optimization to ensure behavior unchanged.
 
 ### Parallel Baseline
 
-Launch 3-5 scenarios simultaneously to find failure patterns faster.
+Use on first test of a new prompt. Launch 3-5 scenarios simultaneously to find failure patterns faster.
 
 ### A/B Testing
 
-Same scenario, different prompt versions. Compare clarity, tokens, correctness.
+Use when you have two candidate phrasings. Same scenario, different prompt versions. Compare clarity, tokens, correctness.
 
 ### Regression Testing
 
-After changing prompt, re-run all previous test scenarios.
+Use after any prompt change. Re-run all previous test scenarios.
 
 ### Stress Testing
 
-Maximum pressure, ambiguous edge cases, contradictory constraints, minimal context. Verify prompt provides adequate guidance even in worst case.
+Use for discipline-enforcing prompts before production. Maximum pressure, ambiguous edge cases, contradictory constraints, minimal context. Verify prompt provides adequate guidance even in worst case.
 
 ## Testing Checklist
 
@@ -182,7 +185,7 @@ Maximum pressure, ambiguous edge cases, contradictory constraints, minimal conte
 **GREEN Phase:**
 
 - [ ] Wrote prompt addressing specific baseline failures
-- [ ] Applied appropriate degrees of freedom
+- [ ] Prompt is neither over-specified (blocks valid paths) nor under-specified (allows bad paths)
 - [ ] Used persuasion principles if discipline-enforcing
 - [ ] Ran scenarios WITH prompt
 - [ ] Verified baseline failures resolved
@@ -195,6 +198,12 @@ Maximum pressure, ambiguous edge cases, contradictory constraints, minimal conte
 - [ ] Reduced tokens without losing behavior
 - [ ] Re-tested — still passes
 - [ ] No regressions on previous scenarios
+
+## When Testing Stalls
+
+- GREEN fails after 3 iterations: escalate to meta-testing — test your test scenarios, not the prompt
+- Prompt type unclear: default to Instruction testing strategy
+- Baseline unexpectedly passes: try harder edge cases; if it still passes, the prompt may be unnecessary
 
 ## Output Format
 
@@ -218,11 +227,13 @@ Produce a test report:
 - Token delta: <+/- N tokens>
 - Re-test: PASS / FAIL
 
-## When Testing Stalls
+**If GREEN fails after 3 iterations:**
 
-- GREEN fails after 3 iterations: escalate to meta-testing — test your test scenarios, not the prompt
-- Prompt type unclear: default to Instruction testing strategy
-- Baseline unexpectedly passes: try harder edge cases; if it still passes, the prompt may be unnecessary
+### Stall Report
+
+- Iterations tried: N
+- Last failure mode: description
+- Escalation: meta-test results / scenario revision needed
 
 ## Common Mistakes
 

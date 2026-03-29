@@ -16,9 +16,9 @@ for arg in "$@"; do
   esac
 done
 
-# Check if @playwright/cli is available
-if ! npx --no-install playwright-cli --version >/dev/null 2>&1; then
-  echo "Error: @playwright/cli is not installed. Run: npm install @playwright/cli" >&2
+# Check if @playwright/cli@1.50.1 is available
+if ! npx --no-install --package @playwright/cli@1.50.1 playwright-cli --version >/dev/null 2>&1; then
+  echo "Error: @playwright/cli@1.50.1 is not installed. Run: npm install @playwright/cli@1.50.1" >&2
   exit 1
 fi
 cmd=(npx --no-install --package @playwright/cli@1.50.1 playwright-cli)

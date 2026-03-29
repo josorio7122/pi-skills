@@ -84,3 +84,28 @@ Every interactive element needs states: default, hover, active, focus, disabled.
 ---
 
 See [principles.md](principles.md) for navigation context and dark mode guidance.
+
+---
+
+## Before Writing Each Component
+
+**Every time** you write a new component or establish a new visual pattern — state:
+
+```
+Intent: [who is this human, what must they do, how should it feel]
+Palette: [colors from your exploration — and WHY they fit this product's world]
+Depth: [borders / shadows / layered — and WHY this fits the intent]
+Surfaces: [your elevation scale — and WHY this color temperature]
+Typography: [your typeface — and WHY it fits the intent]
+Spacing: [your base unit]
+```
+
+This checkpoint is mandatory. It forces you to connect every technical choice back to intent.
+
+If you can't explain WHY for each choice, you're defaulting. Stop and think.
+
+---
+
+## Responsive Design
+
+Establish breakpoints as tokens. Ensure touch targets ≥ 44px. State mobile-first or desktop-first as an explicit design decision before building.

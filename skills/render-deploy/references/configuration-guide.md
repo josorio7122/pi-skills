@@ -191,7 +191,7 @@ In `settings.py`:
 
 ```python
 # Django runs on port specified by environment
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*']  # ⚠️ Do not use ['*'] in production. Set to your Render service hostname.
 ```
 
 Start command in render.yaml:
@@ -372,7 +372,7 @@ const { Pool } = require('pg')
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false, // ⚠️ rejectUnauthorized: false disables TLS verification. For Render-internal connections, use ssl: true instead.
   max: 20, // Maximum pool size
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,

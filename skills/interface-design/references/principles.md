@@ -263,7 +263,7 @@ For every decision, you must be able to explain WHY.
 
 If your answer is "it's common" or "it's clean" or "it works" — you haven't chosen. You've defaulted. Defaults are invisible. Invisible choices compound into generic output.
 
-**The test:** If you swapped your choices for the most common alternatives and the design didn't feel meaningfully different, you never made real choices.
+For the full swap/squint/signature tests, see critique.md.
 
 ### Sameness Is Failure
 

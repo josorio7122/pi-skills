@@ -1,13 +1,16 @@
 ---
 name: posthog-skill
 description: Automate PostHog analytics and feature flags for this project — inspect branch event availability, compare against the ACH reference insight, create or update the 7361 metrics dashboard idempotently, and manage feature flags (list, inspect, toggle, create, update, audit activity log). Use when working on analytics instrumentation, dashboards, PostHog event verification, or feature flag management.
-compatibility: 'Requires Node.js 18+ and tsx. Dependencies are managed at the repository root — run `pnpm install` from the repo root if needed.'
 ---
 
 **IMPORTANT — Path Resolution:**
 This is a project-local skill. `$SKILL_DIR` is the directory containing this SKILL.md file. Resolve it from where you loaded this file — do not hardcode an absolute path.
 
 For brevity, examples below use `$RUN` as shorthand for `npx tsx $SKILL_DIR/scripts/run.ts`.
+
+## Requirements
+
+Requires Node.js 18+ and tsx. Run `pnpm install` from the repo root.
 
 ---
 
@@ -23,6 +26,7 @@ This skill is written in TypeScript and uses `tsx` for execution. All commands u
 | See all 9 branch events (offline)     | `inspect`                          |
 | Verify events are arriving in PostHog | `inspect --live`                   |
 | Fetch the ACH reference funnel        | `compare`                          |
+| Preview ACH reference fetch (no HTTP) | `compare --dry-run`                |
 | Provision the 7361 metrics dashboard  | `create`                           |
 | List all feature flags                | `flags`                            |
 | Inspect one flag in detail            | `flags get <id>`                   |
@@ -30,6 +34,24 @@ This skill is written in TypeScript and uses `tsx` for execution. All commands u
 | Set a flag to a specific state        | `flags update <id> --active false` |
 | Create a new feature flag             | `flags create <key>`               |
 | Check who changed a flag              | `flags activity <id>`              |
+
+---
+
+## Write Safety Rule
+
+**Never run a WRITE command (`create`, `flags toggle`, `flags create`, `flags update`) without:**
+
+1. Announcing `WRITE: <cmd> — reason: [why]` to the user
+2. Running `--dry-run` first and showing the output
+
+These are mandatory pre-conditions. If the user asks to skip them, refuse.
+
+## Recommended Workflow
+
+1. Run `status` to confirm config
+2. Run `inspect --live` to verify events are firing
+3. If events have data, run `compare --dry-run` then `compare`
+4. Run `create --dry-run` then `create`
 
 ---
 
@@ -41,13 +63,13 @@ Zero-dependency Node.js skill for PostHog automation scoped to this project's br
 
 ## Environment Variables
 
-| Variable                   | Required For                                          | Default                                                        |
-| -------------------------- | ----------------------------------------------------- | -------------------------------------------------------------- |
-| `POSTHOG_PERSONAL_API_KEY` | `inspect --live`, `compare`, `create`, `flags` (live) | none                                                           |
-| `POSTHOG_PROJECT_ID`       | all live commands                                     | `39507`                                                        |
-| `POSTHOG_HOST`             | all live commands                                     | `https://us.posthog.com`                                       |
-| `POSTHOG_ACH_INSIGHT_ID`   | `compare`                                             | none — short ID `drOq2lO5` is hardcoded in the dry-run fixture |
-| `POSTHOG_DASHBOARD_NAME`   | `create`                                              | `7361 Purchase & Insurance Flow Metrics`                       |
+| Variable                   | Required For                                          | Default                                  |
+| -------------------------- | ----------------------------------------------------- | ---------------------------------------- |
+| `POSTHOG_PERSONAL_API_KEY` | `inspect --live`, `compare`, `create`, `flags` (live) | none                                     |
+| `POSTHOG_PROJECT_ID`       | all live commands                                     | (required)                               |
+| `POSTHOG_HOST`             | all live commands                                     | `https://us.posthog.com`                 |
+| `POSTHOG_ACH_INSIGHT_ID`   | `compare`                                             | (optional)                               |
+| `POSTHOG_DASHBOARD_NAME`   | `create`                                              | `7361 Purchase & Insurance Flow Metrics` |
 
 All live commands (any command without `--dry-run`) require `POSTHOG_PERSONAL_API_KEY`.
 
@@ -57,7 +79,7 @@ Set these in your shell before running any live command:
 
 ```bash
 export POSTHOG_PERSONAL_API_KEY=phx_...
-export POSTHOG_PROJECT_ID=39507
+export POSTHOG_PROJECT_ID=<your-project-id>
 ```
 
 ---
@@ -81,10 +103,10 @@ Output:
 ```json
 {
   "host": "https://us.posthog.com",
-  "project_id": "39507",
+  "project_id": "<POSTHOG_PROJECT_ID>",
   "token": "NOT SET",
   "token_present": false,
-  "ach_insight_id": "drOq2lO5",
+  "ach_insight_id": "NOT SET",
   "dashboard_name": "7361 Purchase & Insurance Flow Metrics"
 }
 ```
@@ -132,11 +154,11 @@ Output shape:
 
 Events with zero occurrences in the past 30 days are returned with `count_30d: 0, last_seen: null`.
 
-Events with `count_30d: 0` have not fired in 30 days — surface these to the user as a potential instrumentation gap before proceeding with `compare` or `create`.
+If 5 or more events have `count_30d: 0`, stop and ask the user whether to proceed. Do not run `compare` or `create` automatically.
 
 ### `compare`
 
-Fetch the ACH reference insight (`drOq2lO5`) and print a structured summary.
+Fetch the ACH reference insight (set via `POSTHOG_ACH_INSIGHT_ID`) and print a structured summary.
 
 Also writes the summary to `references/ach-reference-summary.json` for spec alignment.
 
@@ -148,7 +170,7 @@ Output shape:
 
 ```json
 {
-  "id": "drOq2lO5",
+  "id": "<insight-short-id>",
   "name": "Purchases by Payment Method - ACH",
   "description": null,
   "query_kind": "InsightVizNode(FunnelsQuery)",
@@ -164,10 +186,6 @@ Output shape:
 
 Idempotently provision the 7361 dashboard + 8 insights in PostHog.
 
-> ⚠️ **WRITE OPERATION.** Before executing live, announce:
-> `WRITE: create — reason: [why]`
-> Run `$RUN create --dry-run` first to preview. Do not add flags or modify the command.
-
 ```bash
 POSTHOG_PERSONAL_API_KEY=phx_... $RUN create
 ```
@@ -177,7 +195,7 @@ Output shape:
 ```json
 {
   "dashboard_id": 1353084,
-  "dashboard_url": "https://us.posthog.com/project/39507/dashboard/1353084",
+  "dashboard_url": "https://us.posthog.com/project/<project-id>/dashboard/1353084",
   "tiles": [
     { "name": "Page Funnel", "insight_id": 7305518, "insight_url": "...", "status": "created" },
     {
@@ -198,7 +216,7 @@ Idempotency: if a dashboard with the same name already exists, it is reused. If 
 # Soft-delete (hard DELETE returns 405 — use PATCH)
 curl -X PATCH -H "Authorization: Bearer $POSTHOG_PERSONAL_API_KEY" \
   -H "Content-Type: application/json" \
-  "https://us.posthog.com/api/environments/39507/dashboards/<id>/" \
+  "https://us.posthog.com/api/environments/$POSTHOG_PROJECT_ID/dashboards/<id>/" \
   -d '{"deleted": true}'
 
 # Re-run
@@ -230,10 +248,6 @@ Output shape: full flag object with `id, key, name, active, deleted, filters, cr
 
 **Toggle active state**
 
-> ⚠️ **WRITE OPERATION.** Before executing live, announce:
-> `WRITE: flags toggle <id> — reason: [why]`
-> Run `$RUN flags toggle <id> --dry-run` first to preview. Do not add flags or modify the command.
-
 ```bash
 $RUN flags toggle 123
 ```
@@ -241,10 +255,6 @@ $RUN flags toggle 123
 Output shape: `{ id, key, active_before, active_after }`. Flips the `active` field via PATCH.
 
 **Create a new flag**
-
-> ⚠️ **WRITE OPERATION.** Before executing live, announce:
-> `WRITE: flags create <key> — reason: [why]`
-> Run `$RUN flags create <key> --dry-run` first to preview. Do not add flags or modify the command.
 
 ```bash
 $RUN flags create my-new-flag
@@ -267,10 +277,6 @@ Output shape:
 ```
 
 **Update a flag**
-
-> ⚠️ **WRITE OPERATION.** Before executing live, announce:
-> `WRITE: flags update <id> — reason: [why]`
-> Run `$RUN flags update <id> --dry-run` first to preview. Do not add flags or modify the command.
 
 ```bash
 $RUN flags update 123 --name 'New Name' --active false --tags release,v2
@@ -350,70 +356,7 @@ All 9 events introduced or changed on branch 7361:
 
 ---
 
-## API Quirks
-
-- PostHog insights are attached to a dashboard by including `dashboards: [dashboard_id]` in the POST body — no separate PATCH tiles step is needed.
-- The `FunnelsQuery` spec uses `funnelsFilter: { funnelWindowInterval, funnelWindowIntervalUnit }` (nested) — these are not top-level fields.
-- The `refresh` parameter for HogQL queries must be top-level in the request body, not inside the `query` object.
-- The ACH reference insight (`drOq2lO5`) uses `InsightVizNode` wrapping a `FunnelsQuery` — the skill drills into `source` to extract the actual query metadata.
-
-**Live dashboard:** The `create` command output includes `dashboard_url`.
-
----
-
-## Exit Codes
-
-| Code | Meaning                                               |
-| ---- | ----------------------------------------------------- |
-| `0`  | Success                                               |
-| `1`  | Auth/API error or token missing                       |
-| `2`  | Bad arguments / unknown command                       |
-| `3`  | Partial failure (some resources created, some failed) |
-
----
-
-## Error Output Examples
-
-**Missing token (exit 1):**
-
-```
-Error: POSTHOG_PERSONAL_API_KEY is required for this command.
-Set it in your environment: export POSTHOG_PERSONAL_API_KEY=phx_...
-```
-
-**Invalid token (exit 1):**
-
-```
-Error: PostHog returned 401 (Unauthorized) on /api/environments/39507/dashboards/
-Verify that POSTHOG_PERSONAL_API_KEY is valid and has not expired.
-```
-
-**Wrong scopes (exit 1):**
-
-```
-Error: PostHog returned 403 (Forbidden) on /api/environments/39507/feature_flags/
-Check that your API key has these scopes: dashboard:read, dashboard:write, insight:read, insight:write, query:read
-```
-
-**Rate limited after retries (exit 1):**
-
-```
-Error: PostHog rate limit exceeded on /api/projects/39507/query/ — tried 3 times.
-```
-
-**Unknown command (exit 2):**
-
-```
-Unknown command: foo
-Run with --help for usage.
-```
-
-**Missing required argument (exit 2):**
-
-```
-Error: flags get requires a flag ID.
-Usage: flags get <id> [--dry-run]
-```
+For API quirks, error patterns, and exit codes, read [references/api-quirks.md](references/api-quirks.md).
 
 ---
 
@@ -421,32 +364,12 @@ Usage: flags get <id> [--dry-run]
 
 ```
 posthog-skill/
-├── SKILL.md                          # This file
-├── package.json
-├── tsconfig.json
+├── SKILL.md
 ├── scripts/
-│   ├── run.ts                        # Subcommand router
+│   ├── run.ts
 │   ├── lib/
-│   │   ├── cmd-compare.ts            # compare command implementation
-│   │   ├── cmd-create.ts             # create command implementation
-│   │   ├── cmd-flags.ts              # flags command implementation
-│   │   ├── cmd-inspect.ts            # inspect command implementation
-│   │   ├── cmd-status.ts             # status command implementation
-│   │   ├── config.ts                 # Env var resolution and config shape
-│   │   ├── dashboard-spec.ts         # Static 8-tile spec + 9 branch events (no token needed)
-│   │   ├── fixtures.ts               # Canned dry-run responses for all commands
-│   │   └── posthog-client.ts         # Fetch wrapper: Bearer auth, 429 retry, PostHogError
-│   └── __tests__/
-│       ├── status.test.ts
-│       ├── inspect.test.ts           # Offline + live tests (--live describe block)
-│       ├── compare.test.ts           # Offline + live tests
-│       ├── create.test.ts            # Offline + live + idempotency tests
-│       ├── flags.test.ts             # Offline + live tests for all flags subcommands
-│       ├── dashboard-spec.test.ts
-│       ├── posthog-client.test.ts    # Unit tests for the client factory (mock fetchFn)
-│       └── live.test.ts              # Integration sequence (POSTHOG_TEST_LIVE=1 only)
+│   └── __tests__/               — unit and integration tests
 └── references/
-    └── ach-reference-summary.json    # Written by `compare` — ACH funnel insight metadata
 ```
 
 **Running live tests:**

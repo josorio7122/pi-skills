@@ -26,18 +26,19 @@ glab auth login --hostname gitlab.example.com # Self-hosted instance
 
 ## Choosing the Right Command
 
-| You need to...                               | Start here                            |
-| -------------------------------------------- | ------------------------------------- |
-| Push your work and get it reviewed           | [Create an MR](#create-an-mr)         |
-| Check if the pipeline passed                 | [Check CI/CD](#check-cicd)            |
-| Review someone else's MR                     | [Review an MR](#review-an-mr)         |
-| Ship an MR to the target branch              | [Merge an MR](#merge-an-mr)           |
-| Track or report a bug/feature                | [Work with Issues](#work-with-issues) |
-| Debug a failed job or retrigger CI           | [Debug CI](#debug-ci)                 |
-| Manage CI/CD variables or schedules          | [CI/CD Config](#cicd-config)          |
-| Cut a new version                            | [Make a Release](#make-a-release)     |
-| Break a large feature into stacked MRs       | [Stacked Diffs](#stacked-diffs)       |
-| Do something glab doesn't have a command for | [Use the API](#use-the-api)           |
+| Goal                                         | Start here                                    |
+| -------------------------------------------- | --------------------------------------------- |
+| Push your work and get it reviewed           | [Create an MR](#create-an-mr)                 |
+| Check if the pipeline passed                 | [Check CI/CD](#check-cicd)                    |
+| Review someone else's MR                     | [Review an MR](#review-an-mr)                 |
+| Ship an MR to the target branch              | [Merge an MR](#merge-an-mr)                   |
+| Track or report a bug/feature                | [Work with Issues](#work-with-issues)         |
+| Debug a failed job or retrigger CI           | [Debug CI](#debug-ci)                         |
+| Manage CI/CD variables or schedules          | [CI/CD Config](#cicd-config)                  |
+| Cut a new version                            | [Make a Release](#make-a-release)             |
+| Break a large feature into stacked MRs       | [Stacked Diffs](#stacked-diffs)               |
+| Do something glab doesn't have a command for | [Use the API](#use-the-api)                   |
+| Work on a different project                  | Use `--repo owner/repo` flag with any command |
 
 ---
 
@@ -63,6 +64,8 @@ glab mr create --fill --reviewer @alice --label bug   # Add reviewer + label
 glab mr create --fill --squash-message-on-merge       # Squash when merged
 glab mr create --title "feat: add X" --description "..." # Manual title/body
 ```
+
+If `--fill` produces a blank title (no commits or WIP message), add `--title 'feat: …'` to override.
 
 ### Check CI/CD
 
@@ -138,8 +141,8 @@ Manage variables and schedules without touching the GitLab UI.
 ```bash
 # Variables
 glab variable list
-# Use a variable or stdin for secrets: echo "$MY_SECRET" | glab variable set API_KEY
-glab variable set API_KEY "$MY_SECRET"
+# Pipe secrets via stdin — never pass secret values as arguments
+printf '%s' "$MY_SECRET" | glab variable set API_KEY
 glab variable get API_KEY
 
 # Schedules
@@ -156,7 +159,9 @@ glab release create v1.0.0 --notes-file CHANGELOG.md  # From file
 glab release upload v1.0.0 ./path/to/artifact          # Attach assets
 ```
 
-### Stacked Diffs
+### Stacked Diffs _(experimental)_
+
+Requires glab v1.45+.
 
 Break large features into small, reviewable MRs that build on each other. Each "entry" in a stack becomes a separate MR, all chained together.
 

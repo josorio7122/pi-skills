@@ -91,6 +91,7 @@ python_version = "3.11"
 - **pip**: Default, uses `requirements.txt`
 - **Poetry**: Auto-detected if `pyproject.toml` exists
 - **Pipenv**: Auto-detected if `Pipfile` exists
+- **uv**: Detected if `uv.lock` exists; `uv sync` / `uv run gunicorn app:app`
 
 **Common Build Commands:**
 

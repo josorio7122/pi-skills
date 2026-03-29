@@ -1,6 +1,6 @@
 # /// script
 # requires-python = ">=3.12"
-# dependencies = ["pyyaml"]
+# dependencies = ["pyyaml>=6.0,<7"]
 # ///
 """
 Quick validation script for Agent Skills.

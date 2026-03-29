@@ -2,6 +2,8 @@
 
 Full command reference for `glab`. For workflows and decision guidance, see the main SKILL.md.
 
+> ⚠️ Commands marked with \* are irreversible. Confirm intent with the user before running.
+
 ## Table of Contents
 
 - [Merge Requests](#merge-requests)
@@ -55,7 +57,7 @@ Full command reference for `glab`. For workflows and decision guidance, see the 
 | Subscribe to MR                      | `glab mr subscribe <id>`                                       |
 | Unsubscribe from MR                  | `glab mr unsubscribe <id>`                                     |
 | Add MR to todo list                  | `glab mr todo <id>`                                            |
-| Delete MR                            | `glab mr delete <id>`                                          |
+| Delete MR \*                         | `glab mr delete <id>`                                          |
 
 ## Issues
 
@@ -76,7 +78,7 @@ Full command reference for `glab`. For workflows and decision guidance, see the 
 | Subscribe to issue        | `glab issue subscribe <id>`                                  |
 | Unsubscribe from issue    | `glab issue unsubscribe <id>`                                |
 | View issue board          | `glab issue board view`                                      |
-| Delete issue              | `glab issue delete <id>`                                     |
+| Delete issue \*           | `glab issue delete <id>`                                     |
 
 ## CI/CD Pipelines
 
@@ -91,7 +93,7 @@ Full command reference for `glab`. For workflows and decision guidance, see the 
 | Run with variables                      | `glab ci run --variables "KEY1:val1,KEY2:val2"`                                                       |
 | Run pipeline trigger                    | `glab ci run-trig --token <pipeline-trigger-token>  # Create in Settings → CI/CD → Pipeline triggers` |
 | Cancel running pipeline                 | `glab ci cancel`                                                                                      |
-| Delete pipeline                         | `glab ci delete <id>`                                                                                 |
+| Delete pipeline \*                      | `glab ci delete <id>`                                                                                 |
 | Retry a job                             | `glab ci retry <job-id>`                                                                              |
 | Trigger a manual job                    | `glab ci trigger <job-id>`                                                                            |
 | Trace job log in real time              | `glab ci trace <job-id>`                                                                              |
@@ -141,7 +143,7 @@ Full command reference for `glab`. For workflows and decision guidance, see the 
 | Configure mirroring      | `glab repo mirror`                                         |
 | Publish to CI/CD catalog | `glab repo publish catalog`                                |
 | Archive repo             | `glab repo archive`                                        |
-| Delete repo              | `glab repo delete <owner/repo>`                            |
+| Delete repo \*           | `glab repo delete <owner/repo>`                            |
 
 ## Releases
 
@@ -153,16 +155,16 @@ Full command reference for `glab`. For workflows and decision guidance, see the 
 | View release             | `glab release view <tag>`                             |
 | Download release assets  | `glab release download <tag>`                         |
 | Upload assets to release | `glab release upload <tag> ./path/to/file`            |
-| Delete release           | `glab release delete <tag>`                           |
+| Delete release \*        | `glab release delete <tag>`                           |
 
 ## Tokens
 
-| Task           | Command                  |
-| -------------- | ------------------------ |
-| List tokens    | `glab token list`        |
-| Create a token | `glab token create`      |
-| Revoke a token | `glab token revoke <id>` |
-| Rotate a token | `glab token rotate <id>` |
+| Task              | Command                  |
+| ----------------- | ------------------------ |
+| List tokens       | `glab token list`        |
+| Create a token    | `glab token create`      |
+| Revoke a token \* | `glab token revoke <id>` |
+| Rotate a token    | `glab token rotate <id>` |
 
 ## Stacked Diffs
 
@@ -202,13 +204,13 @@ Stacked diffs let you break large features into small, reviewable MRs that build
 
 ## Secure Files
 
-| Task                 | Command                         |
-| -------------------- | ------------------------------- |
-| List secure files    | `glab securefile list`          |
-| Get secure file info | `glab securefile get <id>`      |
-| Upload secure file   | `glab securefile create <file>` |
-| Download secure file | `glab securefile download <id>` |
-| Remove secure file   | `glab securefile remove <id>`   |
+| Task                  | Command                         |
+| --------------------- | ------------------------------- |
+| List secure files     | `glab securefile list`          |
+| Get secure file info  | `glab securefile get <id>`      |
+| Upload secure file    | `glab securefile create <file>` |
+| Download secure file  | `glab securefile download <id>` |
+| Remove secure file \* | `glab securefile remove <id>`   |
 
 ## Changelog
 

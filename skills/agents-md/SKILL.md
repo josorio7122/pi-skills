@@ -1,14 +1,11 @@
 ---
 name: agents-md
 description: Create and maintain minimal, high-signal AGENTS.md files. Use when asked to "create AGENTS.md", "update AGENTS.md", "maintain agent docs", "set up agent instructions file", or when agent instructions need to be kept concise.
-metadata:
-  author: josorio7122
-  version: '1.0'
 ---
 
 # Maintaining AGENTS.md
 
-AGENTS.md is the canonical agent-facing documentation. Keep it minimal—agents are capable and don't need hand-holding. Target under 60 lines; never exceed 100. Instruction-following quality degrades as document length increases.
+Keep it minimal—agents are capable and don't need hand-holding. Target under 60 lines; never exceed 100. Instruction-following quality degrades as document length increases.
 
 ## File Setup
 
@@ -26,6 +23,8 @@ Analyze the project to understand what belongs in the file:
 5. **Existing conventions** — Check for existing CONTRIBUTING.md, docs/, or README patterns
 
 ## Writing Rules
+
+> **NEVER** exceed 100 lines.
 
 - **Headers + bullets** — No paragraphs
 - **Code blocks** — For commands and templates
@@ -65,16 +64,8 @@ Per-file commands are faster and cheaper than full project builds. Always includ
 
 Always include this section. Agents should use their own identity:
 
-```markdown
-## Commit Attribution
-
-AI commits MUST include:
 ```
-
 Co-Authored-By: AI Agent <ai@noreply.example.com>
-
-```
-
 ```
 
 ### Key Conventions
@@ -98,8 +89,12 @@ Add only if truly needed:
 - Conflicting conventions: defer to the most recently modified config file
 - No recognizable project structure: create a minimal AGENTS.md with only Package Manager and Commit Attribution, then ask the user what else to include
 
-See [references/example-structure.md](references/example-structure.md) for a complete template and anti-patterns to avoid.
+If you need a full template or anti-pattern examples, read [references/example-structure.md](references/example-structure.md).
 
 ## Output
 
-Present the generated AGENTS.md in a code block. Ask the user to confirm before writing the file.
+**NEVER** write the file without explicit user confirmation.
+
+Present the generated AGENTS.md in a fenced code block. For updates, present the full updated file (not a diff).
+
+If a blocking edge case applies (unknown package manager, missing lock file), ask the clarifying question before generating.

@@ -1,15 +1,14 @@
 ---
 name: frontend-design
-description: Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, artifacts, posters, or applications (examples include websites, landing pages, dashboards, React components, HTML/CSS layouts, or when styling/beautifying any web UI). Generates creative, polished code and UI design that avoids generic AI aesthetics.
-license: Complete terms in LICENSE.txt
-metadata:
-  author: josorio7122
-  version: '1.0'
+description: Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build or style any web UI. Generates creative, polished code and UI design that avoids generic AI aesthetics.
 ---
 
 Create distinctive, production-grade frontend interfaces. Prioritize aesthetic quality over generic patterns. Write real, working code with exceptional attention to visual detail.
 
 ## Design Thinking
+
+**Rule 1 (non-negotiable):** State your aesthetic direction in one sentence before writing any code.
+**Rule 2:** Match implementation complexity to the aesthetic vision.
 
 Before coding, understand the context and commit to a BOLD aesthetic direction:
 
@@ -18,11 +17,11 @@ Before coding, understand the context and commit to a BOLD aesthetic direction:
 - **Constraints**: Technical requirements (framework, performance, accessibility).
 - **Differentiation**: What makes this UNFORGETTABLE? What's the one thing someone will remember?
 
-State your chosen aesthetic direction in one sentence before writing any code.
+Map aesthetic to purpose: productivity tool → minimal/utilitarian. Creative portfolio → editorial/brutalist. Consumer app → playful/soft. Fintech → luxury/refined. When no signal exists, choose the direction least likely to match AI defaults.
 
 If requirements are ambiguous, make a decisive interpretation and state it — do not ask clarifying questions that block output.
 
-**CRITICAL**: Choose a clear conceptual direction and execute it with precision. Bold maximalism and refined minimalism both work - the key is intentionality, not intensity.
+If a technical constraint (accessibility, existing design system, performance budget) conflicts with the chosen aesthetic, prioritize the constraint, name the trade-off explicitly, and adjust the aesthetic accordingly.
 
 Then implement working code (HTML/CSS/JS, React, Vue, etc.) that is:
 
@@ -35,7 +34,7 @@ Then implement working code (HTML/CSS/JS, React, Vue, etc.) that is:
 
 Focus on:
 
-- **Typography**: Choose fonts that are beautiful, unique, and interesting. Avoid generic fonts like Arial and Inter; opt instead for distinctive choices that elevate the frontend's aesthetics; unexpected, characterful font choices. Pair a distinctive display font with a refined body font.
+- **Typography**: Choose fonts that are beautiful, unique, and interesting. Avoid generic fonts like Arial and Inter; opt instead for distinctive choices that elevate the frontend's aesthetics; unexpected, characterful font choices. Pair a distinctive display font with a refined body font. Prefer Google Fonts for web font loading. In network-restricted contexts, use system fonts or self-hosted alternatives.
 - **Color & Theme**: Commit to a cohesive aesthetic. Use CSS variables for consistency. Dominant colors with sharp accents outperform timid, evenly-distributed palettes.
 - **Motion**: Use CSS transitions by default. Use the Motion library only if it is already a declared project dependency.
 - **Motion restraint**: Animate high-impact moments only: page enters, state changes, hover feedback. Static states stay static.
@@ -44,18 +43,18 @@ Focus on:
 
 ## Prohibitions
 
-Never use these as primary display fonts: Inter, Roboto, Arial, system-ui.
-Never use purple gradient on white as a primary color scheme.
-Never use card grids with uniform rounded corners and drop shadows as a default layout.
+Never use these as primary display fonts: Inter, Roboto, Arial, system-ui — use [name your choice] instead.
+Never use purple gradient on white as a primary color scheme — commit to a named alternative palette.
+Never use card grids with uniform rounded corners and drop shadows as a default layout — use [asymmetric grid / editorial split / overlapping panels] instead.
 
 Interpret creatively and make unexpected choices that feel genuinely designed for the context. Do not default to the same aesthetic across invocations. Let the context — purpose, tone, constraints — guide each design's uniqueness.
 
-Always replace avoided patterns with a deliberate alternative — name the choice explicitly.
-
-**IMPORTANT**: Match implementation complexity to the aesthetic vision. Maximalist designs need elaborate code with extensive animations and effects. Minimalist or refined designs need restraint, precision, and careful attention to spacing, typography, and subtle details. Elegance comes from executing the vision well.
-
 ## Output
 
-Produce self-contained, runnable code. For HTML/CSS/JS: single file with embedded styles. For React: single component file unless scaffolding is explicitly requested. Include inline comments only for design decisions that cannot be inferred from the visual output (e.g., why a specific font pairing was chosen, why an unconventional layout was used).
+Produce self-contained, runnable code. Embed all styles in a single HTML file for HTML/CSS/JS output. Use a single React component file unless the user explicitly requests scaffolding.
+
+When scaffolding is requested, produce a file tree first (as a fenced code block), then each file as a separate fenced block labeled with the path.
+
+Include inline comments only for design decisions that cannot be inferred from the visual output (e.g., why a specific font pairing was chosen, why an unconventional layout was used).
 
 Commit fully to the chosen direction — one well-executed detail outweighs ten generic ones.

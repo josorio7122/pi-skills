@@ -37,3 +37,51 @@ Your palette should feel like it came FROM somewhere — not like it was applied
 **Beyond Warm and Cold:** Temperature is one axis. Is this quiet or loud? Dense or spacious? Serious or playful? Geometric or organic? A trading terminal and a meditation app are both "focused" — completely different kinds of focus. Find the specific quality, not the generic label.
 
 **Color Carries Meaning:** Gray builds structure. Color communicates — status, action, emphasis, identity. Unmotivated color is noise. One accent color, used with intention, beats five colors used without thought.
+
+---
+
+## Product Domain Exploration
+
+This is where defaults get caught — or don't.
+
+Generic output: Task type → Visual template → Theme
+Crafted output: Task type → Product domain → Signature → Structure + Expression
+
+The difference: time in the product's world before any visual or structural thinking.
+
+### Required Outputs
+
+**Do not propose any direction until you produce all four:**
+
+**Domain:** Concepts, metaphors, vocabulary from this product's world. Not features — territory. Minimum 5.
+
+**Color world:** What colors exist naturally in this product's domain? Not "warm" or "cool" — go to the actual world. If this product were a physical space, what would you see? What colors belong there that don't belong elsewhere? List 5+.
+
+**Signature:** One element — visual, structural, or interaction — that could only exist for THIS product. If you can't name one, keep exploring.
+
+**Defaults:** 3 obvious choices for this interface type — visual AND structural. You can't avoid patterns you haven't named.
+
+### Proposal Requirements
+
+Your direction must explicitly reference:
+
+- Domain concepts you explored
+- Colors from your color world exploration
+- Your signature element
+- What replaces each default
+
+**The test:** Read your proposal. Remove the product name. Could someone identify what this is for? If not, it's generic. Explore deeper.
+
+---
+
+## The Mandate
+
+**Before showing the user, look at what you made.**
+
+Ask yourself: "If they said this lacks craft, what would they mean?"
+
+That thing you just thought of — fix it first.
+
+Your first output is probably generic. That's normal. The work is catching it before the user has to.
+
+Run the mandate checks before presenting — see [critique.md](critique.md) for the full swap/squint/signature/token tests.

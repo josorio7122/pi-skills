@@ -10,7 +10,7 @@ services:
     region: oregon
     branch: main
     autoDeploy: true
-    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --no-input && python manage.py migrate
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --no-input && python manage.py migrate # ⚠️ Running migrate in buildCommand risks race conditions on multi-instance deploys
     startCommand: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2
     healthCheckPath: /health/
     envVars:

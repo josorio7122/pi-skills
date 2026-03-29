@@ -1,9 +1,6 @@
 ---
 name: gh
 description: Interact with GitHub from the command line using the gh CLI. Use when working with pull requests, issues, releases, Actions workflows and runs, repository management, code review, or GitHub API calls. Also use when the user says "open a PR," "create an issue," "check CI," "merge this," "make a release," or any GitHub-related task — even if they don't mention gh explicitly. Requires gh CLI installed and authenticated.
-metadata:
-  author: josorio7122
-  version: '2.0'
 ---
 
 # GitHub CLI (gh)
@@ -21,7 +18,10 @@ If not authenticated:
 
 ```bash
 gh auth login                          # Interactive (browser OAuth — recommended)
-gh auth login --with-token <<< "<pat>" # With personal access token — Note: token appears in shell history. Prefer 'gh auth login' (browser) for interactive sessions.
+# Preferred: pipe from env var so the token never appears in history
+echo "$GITHUB_TOKEN" | gh auth login --with-token
+# Or use the interactive browser flow:
+gh auth login
 ```
 
 If `gh` is not installed:
@@ -36,7 +36,7 @@ If `gh` is not installed:
 
 Most GitHub work falls into a few categories. Pick the right one and you avoid wasting time.
 
-| You need to...                             | Start here                            |
+| Goal                                       | Start here                            |
 | ------------------------------------------ | ------------------------------------- |
 | Push your work and get it reviewed         | [Create a PR](#create-a-pr)           |
 | Check if CI passed before merging          | [Check CI](#check-ci)                 |
@@ -55,13 +55,26 @@ Most GitHub work falls into a few categories. Pick the right one and you avoid w
 
 ---
 
+## Destructive Operations
+
+**Never execute these commands without explicit user confirmation in the current message:**
+
+- `gh repo delete`
+- `gh release delete`
+- `gh cache delete --all`
+- `gh issue delete`
+
+If the user asks to run any of these, state what will be destroyed and wait for confirmation.
+
+---
+
 ## Workflows
 
 These are the sequences you'll use most. Each one is a complete flow — follow it top to bottom.
 
 ### Create a PR
 
-The most common operation. `--fill` pulls title and body from your commit messages — always use it rather than writing PR descriptions from scratch.
+The most common operation. Prefer `--fill` to auto-populate from commits; override with `--title`/`--body` if the user provides a specific description.
 
 ```bash
 git push -u origin HEAD
@@ -89,6 +102,7 @@ gh pr checks <number> --watch # Block until checks complete
 If a check failed:
 
 ```bash
+gh run list --limit 5          # Find the run-id for the failing run
 gh run view <run-id> --log    # Read the full log
 gh run rerun <run-id> --failed # Retry only failed jobs
 ```
@@ -148,6 +162,8 @@ gh run watch <run-id>                   # Live-stream a run
 gh workflow run deploy.yml --ref main   # Trigger a workflow manually
 ```
 
+Confirm with the user before triggering any workflow on a production branch (main, master, release/\*).
+
 ---
 
 ## Use the API
@@ -178,13 +194,16 @@ Most commands infer the repo from git remotes — use `--repo` only for cross-re
 ## When Things Fail
 
 - **`HTTP 403` or rate limiting** — check `gh auth status`; token may be expired or lack required scopes
+- **Expired or missing token** — run `gh auth refresh` to renew without re-authenticating
+- **SAML/SSO enforcement** — run `gh auth refresh --scopes read:org` and authorize via org SSO page
 - **Merge conflict on `gh pr merge`** — run `gh pr update-branch` to rebase, then retry
 - **`gh pr checks` returns nothing** — CI may not be configured for this repo; proceed with manual review
 - **Permission denied on merge** — you may not be a maintainer; open a review request instead
 - **Wrong repo detected** — use `--repo owner/repo` to specify explicitly
+- **Unrecognized error** — run `gh <command> --help` or check https://cli.github.com/manual/
 
 ---
 
 ## Reference
 
-For the complete command table (every PR, issue, repo, release, Actions, search, cache, and config command), see [references/commands.md](references/commands.md).
+If the user needs a command not shown above, read [references/commands.md](references/commands.md) for the full table.

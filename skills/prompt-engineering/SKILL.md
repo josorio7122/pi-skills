@@ -1,9 +1,6 @@
 ---
 name: prompt-engineering
 description: Advanced prompt engineering patterns for maximizing LLM performance. Use when writing commands, hooks, skills, sub-agent prompts, system prompts, or any LLM interaction. Also use when asked to "improve this prompt", "optimize a prompt", "write a system prompt", "make this prompt more effective", or any prompt engineering task.
-metadata:
-  author: josorio7122
-  license: MIT
 ---
 
 # Prompt Engineering Patterns
@@ -31,6 +28,16 @@ Build reusable prompt structures with variables and conditional sections. Reduce
 ### 5. System Prompt Design
 
 Define the model's role, expertise level, output format, and constraints in the system prompt. These persist across the conversation.
+
+## Output Format
+
+For every prompt improvement, deliver:
+
+1. **Rewritten prompt** — in a fenced code block
+2. **Change log** — one sentence per change explaining _why_
+3. **Token delta** — `Original: ~N tokens → Revised: ~M tokens`
+
+If the user asks a question (not for a rewrite), answer directly without this structure.
 
 ## Key Patterns
 
@@ -80,6 +87,7 @@ def generate_report(data, format="markdown", include_charts=True):
 **Low freedom** — Operations are fragile, consistency is critical:
 
 ```bash
+# Example only — illustrative
 python scripts/migrate.py --verify --backup
 # Do not modify the command or add additional flags.
 ```
@@ -128,7 +136,7 @@ To extract text, you'll need a library. There are many available...
 
 ## Persuasion Principles for Agent Prompts
 
-LLMs respond to the same persuasion principles as humans. Persuasion research shows these techniques significantly increase compliance rates.
+LLMs respond to the same persuasion principles as humans. Apply these patterns to increase instruction compliance.
 
 ### Authority
 
@@ -188,7 +196,7 @@ Shared identity for collaborative workflows.
 
 ## Common Pitfalls
 
-- **Over-engineering**: Do not start complex — try the simplest prompt first.
+- **Over-engineering**: Start with the simplest prompt. Add complexity only if it fails.
 - **Example pollution**: Do not use examples from unrelated tasks.
 - **Context overflow**: Do not exceed token limits with excessive examples.
 - **Ambiguous instructions**: Eliminate room for multiple interpretations.
@@ -198,16 +206,13 @@ Shared identity for collaborative workflows.
 
 If no prompt is provided, ask: "Share the prompt you want to improve." Do not generate a generic example.
 If the task is unclear, ask one clarifying question — not multiple.
+If the goal of the rewrite is unstated, ask: "What's the problem with the current prompt — reliability, token cost, output format, or something else?"
 
 ## Error Recovery
 
-Build prompts that handle failures gracefully:
+When a rewrite fails to improve outcomes:
 
-- Include fallback instructions
-- Request confidence scores
-- Ask for alternative interpretations when uncertain
-- Specify how to indicate missing information
-
-## Output
-
-Deliver: (1) the rewritten prompt in a fenced code block, (2) a one-sentence rationale per change, (3) estimated token delta.
+- Revert to a simpler version and add one constraint at a time
+- If output format keeps breaking, switch from prose instructions to a labeled example
+- If the model refuses, audit for authority conflicts in the system prompt
+- If results are inconsistent, reduce degrees of freedom (add output format or few-shot examples)

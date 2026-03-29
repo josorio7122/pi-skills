@@ -1,6 +1,6 @@
 ---
 name: docker-model-runner
-description: Run AI models locally using Docker Model Runner with an OpenAI-compatible API. Use when the user wants to run a local LLM, use local inference, pull or manage AI models with Docker, set up a local model endpoint, or integrate local models into code via the OpenAI SDK. Also use when they mention "docker model," "local LLM," "run a model locally," or need an alternative to cloud AI APIs. Covers installation, model management, CLI usage, and OpenAI-compatible API integration.
+description: Run AI models locally using Docker Model Runner with an OpenAI-compatible API. Use when the user wants to run a local LLM, use local inference, pull or manage AI models with Docker, set up a local model endpoint, or integrate local models into code via the OpenAI SDK. Also use when they mention "docker model," "local LLM," "run a model locally," or need an alternative to cloud AI APIs.
 ---
 
 # Docker Model Runner
@@ -16,6 +16,8 @@ When helping users with local LLM inference using Docker Model Runner:
    If `docker model version` fails, verify Docker Desktop ≥ 4.40 is running. Direct the user to https://docs.docker.com/desktop/features/model-runner/.
 
    Always verify Docker Model Runner is available before proceeding — never assume it is running.
+
+   If on Linux without Docker Desktop, load the reference guide for Docker Engine installation. Do not proceed until `docker model version` succeeds.
 
 2. **List available models** with `docker model list` to see what's already pulled
 
@@ -38,57 +40,14 @@ When helping users with local LLM inference using Docker Model Runner:
 
 > **Output rule:** Display the model's response content directly — not the raw JSON wrapper.
 
-## API Usage
+## Reference
 
-Docker Model Runner exposes an OpenAI-compatible REST API:
+Load [references/docker-model-guide.md](references/docker-model-guide.md) when:
 
-```bash
-# Chat completions
-curl http://localhost:12434/engines/llama.cpp/v1/chat/completions \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "ai/smollm2",
-    "messages": [
-      {"role": "system", "content": "You are a helpful assistant."},
-      {"role": "user", "content": "Hello!"}
-    ]
-  }'
-```
-
-For Python with the OpenAI library:
-
-```python
-from openai import OpenAI
-
-client = OpenAI(
-    base_url="http://localhost:12434/engines/llama.cpp/v1",
-    api_key="not-needed"  # Local inference only — do NOT use this pattern with cloud APIs
-)
-
-response = client.chat.completions.create(
-    model="ai/smollm2",
-    messages=[{"role": "user", "content": "Hello!"}]
-)
-```
-
-## Key Commands
-
-| Command                             | Description                      |
-| ----------------------------------- | -------------------------------- |
-| `docker model run <model> [prompt]` | Run a model with optional prompt |
-| `docker model pull <model>`         | Pull a model from registry       |
-| `docker model list`                 | List downloaded models           |
-| `docker model search <query>`       | Search for models                |
-| `docker model ps`                   | Show running models              |
-| `docker model rm <model>`           | Remove a model                   |
-| `docker model inspect <model>`      | Show model details               |
-
-## Best Practices
-
-- Use smaller models (like `ai/smollm2`) for faster responses during development
-- Pre-load models with `--detach` for better performance in scripts
-- Models stay loaded until another model is requested or timeout (5 min)
-- Use the OpenAI-compatible API for integration with existing tools
+- User asks for SDK examples in a specific language
+- Full CLI command reference needed
+- Installation instructions for Linux/Docker Engine
+- Configuration options (env vars, ctx-size)
 
 ## Troubleshooting
 

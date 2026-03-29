@@ -1,31 +1,33 @@
 ---
 name: pdf
-description: Read, create, and review PDF files with proper rendering and layout. Use when the user asks to "read a PDF," "create a PDF," "extract text from a PDF," "fill a PDF form," "merge PDFs," "convert to PDF," or any task involving PDF documents where layout and visual fidelity matter. Also use when the user mentions PDF files even if they don't explicitly ask for help with them.
+description: Read, create, edit, and review PDF files with proper rendering and layout. Use when the user asks to "read a PDF," "create a PDF," "extract text from a PDF," "fill a PDF form," "merge PDFs," "convert to PDF," or any task involving PDF documents where layout and visual fidelity matter. Also use when the user mentions PDF files even if they don't explicitly ask for help with them.
 ---
 
 # PDF Skill
 
+You are a PDF specialist. Your primary obligation is visual correctness.
+
 > **Core rule:** Always render PDFs to PNG and inspect before delivery. Never deliver an uninspected PDF.
 
-## When to use
+> ⚠️ Parse PDFs from untrusted sources with caution. Pin `pdfplumber` and `pypdf` versions. Never execute embedded JavaScript or follow embedded file paths outside the working directory.
 
-- Read or review PDF content where layout and visuals matter.
-- Create PDFs programmatically with reliable formatting.
-- Validate final rendering before delivery.
+If `pdftoppm` returns no pages or an error, report the error to the user. Do not attempt delivery of an uninspected PDF.
 
 ## Workflow
 
 1. Prefer visual review: render PDF pages to PNGs and inspect them.
    - Use `pdftoppm` if available.
    - If unavailable, install Poppler or ask the user to review the output locally.
-2. Use `reportlab` to generate PDFs when creating new documents.
+2. Use `reportlab` to generate PDFs when creating new documents. If reportlab raises a font or encoding error, verify all strings are UTF-8 and all image paths are absolute.
+3. Use `pdfplumber` for text extraction when table structure matters. Use `pypdf` for simple full-text extraction or when pdfplumber is unavailable. Do not rely on either for layout fidelity.
+4. After each meaningful update, re-render pages and verify alignment, spacing, and legibility.
 
-If reportlab raises a font or encoding error, verify all strings are UTF-8 and all image paths are absolute. 3. Use `pdfplumber` for text extraction when table structure matters. Use `pypdf` for simple full-text extraction or when pdfplumber is unavailable. Do not rely on either for layout fidelity. 4. After each meaningful update, re-render pages and verify alignment, spacing, and legibility.
+For generation, extraction, form filling, or merging, read [references/techniques.md](references/techniques.md).
 
 ## Temp and output conventions
 
 - Use `tmp/pdfs/` for intermediate files; delete when done.
-- Write final output files to the project's existing output directory, or `output/` if none exists.
+- Write final output to `./output/` relative to the current working directory unless the user specifies otherwise.
 - Keep filenames stable and descriptive.
 
 ## Dependencies (install if missing)
@@ -47,7 +49,7 @@ System tools (for rendering):
 brew install poppler
 
 # Ubuntu/Debian
-sudo apt-get install -y poppler-utils
+sudo apt-get install -y --no-install-recommends poppler-utils
 ```
 
 If installation isn't possible in this environment, tell the user which dependency is missing and how to install it locally.
@@ -65,8 +67,6 @@ pdftoppm -png input.pdf output/pages/page
 # Produces: output/pages/page-1.png, output/pages/page-2.png, ...
 ```
 
-If `pdftoppm` returns no pages or an error, report the error to the user. Do not attempt delivery of an uninspected PDF.
-
 ## Output format for read/extract tasks
 
 - Return extracted text as Markdown, preserving heading hierarchy where detectable.
@@ -74,39 +74,12 @@ If `pdftoppm` returns no pages or an error, report the error to the user. Do not
 - Note page numbers for each section when layout fidelity matters.
 - If the user asks for a summary, extract key content and summarize — do not dump raw text.
 
-## Merge PDFs
-
-Use `pypdf`'s `PdfMerger`:
-
-```python
-from pypdf import PdfMerger
-merger = PdfMerger()
-for f in files:
-    merger.append(f)
-merger.write("merged.pdf")
-merger.close()
-```
-
-## Fill PDF Forms
-
-Use `pypdf`'s form-fill API for AcroForms. Render and inspect the filled PDF before delivery.
-
-```python
-from pypdf import PdfReader
-reader = PdfReader("form.pdf")
-print(reader.get_fields())  # discover field names
-```
-
-## Prerequisites
-
-Requires Python 3.8+ with `reportlab`, `pdfplumber`, `pypdf`. System tool: `poppler-utils` (`pdftoppm`).
-
 ## Quality expectations
 
 - Maintain polished visual design: consistent typography, spacing, margins, and section hierarchy.
 - Avoid rendering issues: clipped text, overlapping elements, broken tables, black squares, or unreadable glyphs.
 - Charts, tables, and images must be sharp, aligned, and clearly labeled.
-- Use ASCII hyphens only. Avoid U+2011 (non-breaking hyphen) and other Unicode dashes.
+- Use ASCII hyphens only. reportlab renders Unicode dashes (U+2011, U+2013, U+2014) as black squares unless a Unicode-capable font is registered.
 - Citations and references must be human-readable; never leave tool tokens or placeholder strings.
 
 ## Final checks

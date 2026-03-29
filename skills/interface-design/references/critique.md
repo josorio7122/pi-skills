@@ -4,6 +4,24 @@ Your first build shipped the structure. Now look at it the way a design lead rev
 
 ---
 
+## The Checks
+
+Run these against your output before presenting:
+
+- **The swap test:** If you swapped the typeface for your usual one, would anyone notice? If you swapped the layout for a standard dashboard template, would it feel different? The places where swapping wouldn't matter are the places you defaulted.
+
+- **The squint test:** Blur your eyes. Can you still perceive hierarchy? Is anything jumping out harshly? Craft whispers.
+
+- **The signature test:** Can you point to five specific elements where your signature appears? Not "the overall feel" — actual components. A signature you can't locate doesn't exist.
+
+- **The token test:** Read your CSS variables out loud. Do they sound like they belong to this product's world, or could they belong to any project?
+
+If any check fails, iterate before showing.
+
+---
+
+---
+
 ## The Gap
 
 There's a distance between correct and crafted. Correct means the layout holds, the grid aligns, the colors don't clash. Crafted means someone cared about every decision down to the last pixel. You can feel the difference immediately — the way you tell a hand-thrown mug from an injection-molded one. Both hold coffee. One has presence.

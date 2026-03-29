@@ -21,9 +21,8 @@ uv run scripts/quick_validate.py <path/to/skill-directory> --strict-depth
 Use the skill-directory-relative form above when running from the `skill-writer` directory.
 If you must run the validator from another working directory, convert both paths to the correct relative path from that directory instead of introducing absolute or host-specific paths into the skill docs.
 
-2. Confirm for authoring/generator skills:
+2. Confirm transformed example artifacts exist per authoring-path.md §Example artifact requirements. Also confirm:
 
-- transformed examples exist in references (happy-path, secure/robust, anti-pattern+fix)
 - synthesis depth gates are satisfied
 - selected example profile requirements are satisfied and reported
 

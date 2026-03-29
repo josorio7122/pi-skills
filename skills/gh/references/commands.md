@@ -74,7 +74,7 @@ Full command reference for `gh`. For workflows and decision guidance, see the ma
 | Edit issue                 | `gh issue edit <number> --title "new title"`                 |
 | Pin issue                  | `gh issue pin <number>`                                      |
 | Transfer issue             | `gh issue transfer <number> owner/other-repo`                |
-| Delete issue               | `gh issue delete <number>`                                   |
+| Delete issue               | `gh issue delete <number>` # ⚠️ irreversible                 |
 | Create branch from issue   | `gh issue develop <number>`                                  |
 
 ## Repository
@@ -203,6 +203,8 @@ gh config clear-cache               # Clear CLI cache
 
 ## JSON Output
 
+> Always summarize JSON output — do not paste raw JSON into the response. Use `--jq` to extract only the fields you need.
+
 Most commands support `--json` for structured output:
 
 ```bash
@@ -224,6 +226,8 @@ gh issue list --json 2>&1 | head -5
 ```
 
 ## Environment Variables
+
+Never echo, log, or display token values. Use `gh auth status` for auth debugging.
 
 | Variable              | Purpose                                                     |
 | --------------------- | ----------------------------------------------------------- |

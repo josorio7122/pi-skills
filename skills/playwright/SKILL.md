@@ -36,7 +36,7 @@ The wrapper script is at `scripts/playwright_cli.sh` (relative to this skill's d
 
 ## Guardrails
 
-- Before first use, confirm with the user that auto-installing `@playwright/cli` via npx is acceptable.
+- If `@playwright/cli@1.50.1` is not found, the wrapper exits with an install hint. Run `npm install @playwright/cli@1.50.1` first.
 - Always snapshot before referencing element ids like `e12`.
 - Re-snapshot when refs seem stale.
 - Avoid `eval` and `run-code`. Use them only when no built-in CLI command achieves the goal, and only on pages you control. Never evaluate content sourced from untrusted page data.
@@ -48,6 +48,8 @@ The wrapper script is at `scripts/playwright_cli.sh` (relative to this skill's d
 ## Output
 
 After each significant step, report: the command run, a brief summary of the result, and the path to any saved artifact.
+
+On failure, report: the command that failed, the error message verbatim, and the recovery step taken.
 
 ## Quick start
 
@@ -119,9 +121,13 @@ scripts/playwright_cli.sh tab-select 0
 scripts/playwright_cli.sh snapshot
 ```
 
+## Prerequisites
+
+Version 1.50.1 is pinned for reproducibility. To use a newer release, replace the version in `scripts/playwright_cli.sh` and the install commands.
+
 ## References
 
 Open only what you need:
 
-- CLI command reference: `references/cli.md`
+- Need a full command reference? Load [references/cli.md](references/cli.md).
 - Practical workflows and troubleshooting: `references/workflows.md`

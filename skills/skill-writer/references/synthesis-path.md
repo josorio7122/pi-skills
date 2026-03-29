@@ -36,7 +36,7 @@ When synthesizing a skill that creates, updates, or evaluates other skills, incl
 1. This skill's own SKILL.md and references/ (the canonical workflow source).
 2. Any local compatibility alias (e.g., skill-creator if present in the repo).
 3. The agent's built-in skill-creator if available (system skill).
-4. Anthropic/Claude upstream skill-authoring source (for example `anthropics/skills/.../skill-creator` or the published GitHub path).
+4. Upstream skill-authoring reference from the agent platform in use, if publicly available (e.g., the platform's canonical skill-creator implementation).
 5. Agent Skills specification and repository conventions.
 
 If a listed source path does not exist in this repository, skip it and proceed with available sources.
@@ -95,10 +95,7 @@ Depth gates are mandatory:
 
 1. No missing high-impact coverage dimensions.
 2. For class-required dimensions, status is `complete`, or `partial` with explicit next retrieval actions.
-3. For authoring/generator skills, transformed example artifacts exist in references:
-   - happy-path
-   - secure/robust variant
-   - anti-pattern + corrected version
+3. Confirm transformed example artifacts exist per authoring-path.md §Example artifact requirements.
 4. Selected profile requirements are satisfied.
 5. Coverage expansion passes are completed and reflected in the coverage matrix.
 6. Stopping rationale is explicit (why additional retrieval is currently low-yield).

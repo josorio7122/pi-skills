@@ -287,12 +287,19 @@ docker model restart-runner
 docker model df
 ```
 
-### Performance Tips
+### Best Practices
 
-1. **Use smaller models** for development and testing
-2. **Pre-load models** with `--detach` before heavy usage
-3. **Monitor memory** - larger models require more RAM
-4. **Use GPU acceleration** when available (automatic on supported systems)
+- Use smaller models (like `ai/smollm2`) for faster responses during development.
+- Pre-load models with `--detach` for better performance in scripts.
+- Plan for model persistence — models stay loaded until another model is requested or a 5-minute timeout elapses.
+- Use the OpenAI-compatible API for integration with existing tools.
+
+## Performance Tips
+
+1. **Use smaller models** for development and testing.
+2. **Pre-load models** with `--detach` before heavy usage.
+3. **Monitor memory** — larger models require more RAM.
+4. **Use GPU acceleration** when available (automatic on supported systems).
 
 ## Resources
 

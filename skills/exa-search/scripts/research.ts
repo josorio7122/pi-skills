@@ -32,7 +32,7 @@
  * Options JSON for poll:
  *   {
  *     "pollInterval": 2000,           // ms between polls (default 2000)
- *     "timeoutMs": 600000,            // max wait time (default 10 min)
+ *     "timeoutMs": 300000,            // max wait time (default 5 min)
  *     "events": false
  *   }
  *
@@ -134,7 +134,7 @@ try {
       await executeAndPrint(async () =>
         exa.research.pollUntilFinished(createdTyped.researchId, {
           pollInterval: (opts.pollInterval as number) || 2000,
-          timeoutMs: (opts.timeoutMs as number) || 600000,
+          timeoutMs: (opts.timeoutMs as number) || 300000,
           events: opts.events as boolean | undefined,
         }),
       )

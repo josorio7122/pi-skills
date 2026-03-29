@@ -9,7 +9,7 @@
  * Options JSON (all optional):
  *   {
  *     "numResults": 10,
- *     "type": "auto",                  // "auto"|"fast"|"deep"|"deep-reasoning"|"deep-max"|"instant"
+ *     "type": "auto",                  // "auto"|"neural"|"fast"|"deep"|"deep-reasoning"|"deep-max"|"instant"
  *     "contents": true,                // true = text+highlights, or object for fine control
  *     "text": true,                    // shorthand: include text in results
  *     "highlights": true,              // shorthand: include highlights
@@ -88,6 +88,7 @@ const searchKeys = [
   'livecrawlTimeout',
   'maxAgeHours',
   'filterEmptyResults',
+  'systemPrompt',
 ] as const
 
 const searchOpts = filterOptions(opts, searchKeys)

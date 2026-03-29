@@ -41,6 +41,6 @@ When the class is ambiguous, ask one direct clarification question before synthe
 
 Do not claim completion when any required path output is missing.
 
-For authoring/generator skills, missing transformed example artifacts is a hard failure.
+Confirm transformed example artifacts exist per authoring-path.md §Example artifact requirements.
 Missing selected-profile requirements is also a hard failure.
 Missing required class dimensions is a hard failure.

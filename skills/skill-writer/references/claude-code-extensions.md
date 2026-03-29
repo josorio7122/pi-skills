@@ -1,6 +1,6 @@
 # Claude Code Extensions
 
-Claude Code extends the [Agent Skills specification](https://agentskills.io/specification) with additional frontmatter fields and features. These are optional — skills that use only the base spec remain portable across all compatible tools.
+Claude Code extends the Agent Skills specification (verify current URL at agentskills.io if needed) with additional frontmatter fields and features. These are optional — skills that use only the base spec remain portable across all compatible tools.
 
 ## Extended Frontmatter Fields
 

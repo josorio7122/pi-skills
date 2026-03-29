@@ -64,9 +64,15 @@ export function parseArgs(scriptUrl: string): { query: string; opts: Record<stri
   }
 
   const query = requireArg(args[0], 'query')
-  const opts: Record<string, unknown> = args[1]
-    ? (JSON.parse(args[1]) as Record<string, unknown>)
-    : {}
+  let opts: Record<string, unknown> = {}
+  if (args[1]) {
+    try {
+      opts = JSON.parse(args[1]) as Record<string, unknown>
+    } catch {
+      console.error('Error: options argument is not valid JSON')
+      process.exit(1)
+    }
+  }
 
   return { query, opts }
 }

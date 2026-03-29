@@ -2,7 +2,7 @@ import { out } from './config.js'
 import type { AppConfig } from './config.js'
 
 export function cmdStatus(config: AppConfig): void {
-  const tokenDisplay = config.token ? `***${config.token.slice(-4)} (present)` : 'NOT SET'
+  const tokenDisplay = config.token ? '*** (present)' : 'NOT SET'
   const achDisplay = config.achInsightId || 'NOT SET'
 
   out({
