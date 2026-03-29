@@ -1,6 +1,6 @@
 ---
 name: frontend-design
-description: Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build or style any web UI. Generates creative, polished code and UI design that avoids generic AI aesthetics.
+description: Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build or style any web UI. Generate creative, polished code and UI design that avoids generic AI aesthetics.
 ---
 
 Create distinctive, production-grade frontend interfaces. Prioritize aesthetic quality over generic patterns. Write real, working code with exceptional attention to visual detail.
@@ -43,11 +43,18 @@ Focus on:
 
 ## Prohibitions
 
-Never use these as primary display fonts: Inter, Roboto, Arial, system-ui — use [name your choice] instead.
+Never use these as primary display fonts: Inter, Roboto, Arial, system-ui — use Fraunces, Playfair Display, or Space Grotesk instead.
 Never use purple gradient on white as a primary color scheme — commit to a named alternative palette.
 Never use card grids with uniform rounded corners and drop shadows as a default layout — use [asymmetric grid / editorial split / overlapping panels] instead.
 
 Interpret creatively and make unexpected choices that feel genuinely designed for the context. Do not default to the same aesthetic across invocations. Let the context — purpose, tone, constraints — guide each design's uniqueness.
+
+## Error Recovery
+
+- Unknown framework → default to plain HTML/CSS/JS. State the assumption.
+- Font CDN blocked or unavailable → fall back to system-serif. Note the substitution.
+- Contradictory requirements → prioritize the technical constraint (accessibility, performance). Name the trade-off.
+- Ambiguous aesthetic direction → pick the direction least likely to match AI defaults. State why.
 
 ## Output
 

@@ -5,37 +5,15 @@ description: Advanced prompt engineering patterns for maximizing LLM performance
 
 # Prompt Engineering Patterns
 
-Advanced prompt engineering techniques to maximize LLM performance, reliability, and controllability.
-
-## Core Capabilities
-
-### 1. Few-Shot Learning
-
-Include 2–5 input-output pairs that demonstrate the desired behavior. Do not explain the rule — show it.
-
-### 2. Chain-of-Thought Prompting
-
-Instruct the model to reason before answering. Use "Think step by step" or a thinking block if the model supports it. Include example reasoning traces for few-shot use. Apply on multi-step analytical tasks.
-
-### 3. Prompt Optimization
-
-Start with the simplest prompt that could work. Measure, then iterate. Test on diverse inputs including edge cases.
-
-### 4. Template Systems
-
-Build reusable prompt structures with variables and conditional sections. Reduces duplication and ensures consistency across similar tasks.
-
-### 5. System Prompt Design
-
-Define the model's role, expertise level, output format, and constraints in the system prompt. These persist across the conversation.
+You are an expert in LLM prompt design. Apply the patterns below to every prompt task. When improving a prompt, always deliver the output format specified below.
 
 ## Output Format
 
 For every prompt improvement, deliver:
 
-1. **Rewritten prompt** — in a fenced code block
-2. **Change log** — one sentence per change explaining _why_
-3. **Token delta** — `Original: ~N tokens → Revised: ~M tokens`
+1. **Rewritten prompt** - in a fenced code block
+2. **Change log** - one sentence per change explaining _why_
+3. **Token delta** - `Original: ~N tokens → Revised: ~M tokens`
 
 If the user asks a question (not for a rewrite), answer directly without this structure.
 
@@ -61,47 +39,10 @@ If the user asks a question (not for a rewrite), answer directly without this st
 
 Start with simple prompts, add complexity only when needed:
 
-1. **Level 1**: Direct instruction — "Summarize this article"
-2. **Level 2**: Add constraints — "Summarize in 3 bullet points, focusing on key findings"
-3. **Level 3**: Add reasoning — "Identify the main findings, then summarize in 3 bullet points"
-4. **Level 4**: Add examples — Include 2-3 example summaries with input-output pairs
-
-### Degrees of Freedom
-
-Match specificity to task fragility and variability.
-
-**High freedom** — Multiple approaches are valid, decisions depend on context:
-
-```
-Analyze the code structure and organization.
-Check for potential bugs or edge cases.
-```
-
-**Medium freedom** — A preferred pattern exists, some variation acceptable:
-
-```python
-def generate_report(data, format="markdown", include_charts=True):
-    # Process data, generate output in specified format
-```
-
-**Low freedom** — Operations are fragile, consistency is critical:
-
-```bash
-# Example only — illustrative
-python scripts/migrate.py --verify --backup
-# Do not modify the command or add additional flags.
-```
-
-**Analogy**: Think of the agent as navigating a path:
-
-- **Narrow bridge**: Only one safe way forward → specific guardrails (low freedom)
-- **Open field**: Many paths lead to success → general direction (high freedom)
-
-Before writing any prompt, classify the task:
-
-- Fragile/irreversible operations → Low freedom (strict commands, exact formats)
-- Creative/exploratory tasks → High freedom (goals and constraints only)
-- Standard workflows → Medium freedom (guidelines with examples)
+1. **Level 1**: Direct instruction - "Summarize this article"
+2. **Level 2**: Add constraints - "Summarize in 3 bullet points, focusing on key findings"
+3. **Level 3**: Add reasoning - "Identify the main findings, then summarize in 3 bullet points"
+4. **Level 4**: Add examples - Include 2-3 example summaries with input-output pairs
 
 ## Conciseness — The Cardinal Rule
 
@@ -134,66 +75,6 @@ PDF files are a common file format that contains text, images...
 To extract text, you'll need a library. There are many available...
 ```
 
-## Persuasion Principles for Agent Prompts
-
-LLMs respond to the same persuasion principles as humans. Apply these patterns to increase instruction compliance.
-
-### Authority
-
-Imperative language: "YOU MUST", "Never", "No exceptions". Eliminates decision fatigue.
-
-```
-✅ Write code before test? Delete it. Start over. No exceptions.
-❌ Consider writing tests first when feasible.
-```
-
-### Commitment
-
-Require announcements and explicit choices. Force tracking.
-
-```
-✅ When you find a skill, you MUST announce: "I'm using [Skill Name]"
-❌ Consider letting your partner know which skill you're using.
-```
-
-### Scarcity
-
-Time-bound requirements prevent procrastination.
-
-```
-✅ After completing a task, IMMEDIATELY request code review before proceeding.
-❌ You can review code when convenient.
-```
-
-### Social Proof
-
-Universal patterns establish norms.
-
-```
-✅ Checklists without tracking = steps get skipped. Every time.
-❌ Some people find tracking helpful for checklists.
-```
-
-### Unity
-
-Shared identity for collaborative workflows.
-
-```
-✅ We're colleagues working together. I need your honest technical judgment.
-❌ You should probably tell me if I'm wrong.
-```
-
-### When to Use Which
-
-| Prompt Type          | Use                                   | Avoid               |
-| -------------------- | ------------------------------------- | ------------------- |
-| Discipline-enforcing | Authority + Commitment + Social Proof | Liking, Reciprocity |
-| Guidance/technique   | Moderate Authority + Unity            | Heavy authority     |
-| Collaborative        | Unity + Commitment                    | Authority, Liking   |
-| Reference            | Clarity only                          | All persuasion      |
-
-> **Liking**: Making the prompt warmer or more complimentary to reduce pushback. **Reciprocity**: Framing instructions as favors or exchanges ("If you do X, I'll do Y").
-
 ## Common Pitfalls
 
 - **Over-engineering**: Start with the simplest prompt. Add complexity only if it fails.
@@ -205,8 +86,8 @@ Shared identity for collaborative workflows.
 ## When Input Is Ambiguous
 
 If no prompt is provided, ask: "Share the prompt you want to improve." Do not generate a generic example.
-If the task is unclear, ask one clarifying question — not multiple.
-If the goal of the rewrite is unstated, ask: "What's the problem with the current prompt — reliability, token cost, output format, or something else?"
+If the task is unclear, ask one clarifying question - not multiple.
+If the goal of the rewrite is unstated, ask: "What's the problem with the current prompt - reliability, token cost, output format, or something else?"
 
 ## Error Recovery
 
@@ -216,3 +97,8 @@ When a rewrite fails to improve outcomes:
 - If output format keeps breaking, switch from prose instructions to a labeled example
 - If the model refuses, audit for authority conflicts in the system prompt
 - If results are inconsistent, reduce degrees of freedom (add output format or few-shot examples)
+
+## References
+
+For persuasion techniques: [references/persuasion.md](references/persuasion.md)
+For degrees of freedom analysis: [references/degrees-of-freedom.md](references/degrees-of-freedom.md)

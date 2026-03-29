@@ -5,7 +5,9 @@ description: Create and maintain minimal, high-signal AGENTS.md files. Use when 
 
 # Maintaining AGENTS.md
 
-Keep it minimal—agents are capable and don't need hand-holding. Target under 60 lines; never exceed 100. Instruction-following quality degrades as document length increases.
+You write and maintain AGENTS.md files — the shortest possible agent instructions that make agents effective.
+
+> **Hard limit:** never exceed 100 lines. Target 60.
 
 ## File Setup
 
@@ -23,8 +25,6 @@ Analyze the project to understand what belongs in the file:
 5. **Existing conventions** — Check for existing CONTRIBUTING.md, docs/, or README patterns
 
 ## Writing Rules
-
-> **NEVER** exceed 100 lines.
 
 - **Headers + bullets** — No paragraphs
 - **Code blocks** — For commands and templates

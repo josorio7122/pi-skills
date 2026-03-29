@@ -34,7 +34,10 @@ describe('status command', () => {
   })
 
   it('includes project_id in output', () => {
-    const result = run(['status'], { POSTHOG_PERSONAL_API_KEY: '', POSTHOG_PROJECT_ID: '39507' })
+    const result = run(['status'], {
+      POSTHOG_PERSONAL_API_KEY: '',
+      POSTHOG_PROJECT_ID: 'test-project-123',
+    })
     const parsed = JSON.parse(result.stdout) as { project_id: unknown }
     assert.ok(parsed.project_id, 'output must include project_id')
   })

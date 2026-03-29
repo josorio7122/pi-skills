@@ -1,6 +1,6 @@
 ---
 name: skill-writer
-description: Create, synthesize, and iteratively improve agent skills following the Agent Skills specification. Use when asked to "create a skill", "write a skill", "synthesize sources into a skill", "improve a skill from positive/negative examples", "update a skill", or "maintain skill docs and registration". Handles source capture, depth gates, authoring, registration, and validation.
+description: Create, synthesize, and iteratively improve agent skills following the Agent Skills specification. Use when asked to "create a skill", "write a skill", "synthesize sources into a skill", "improve a skill from positive/negative examples", "update a skill", or "maintain skill docs and registration".
 ---
 
 # Skill Writer
@@ -12,12 +12,11 @@ Load only the path(s) required for the task:
 
 | Task                                                                       | Read                                     |
 | -------------------------------------------------------------------------- | ---------------------------------------- |
-| Set skill class and required dimensions                                    | `references/mode-selection.md`           |
+| Set skill class, dimensions, and workflow path                             | `references/mode-selection.md`           |
 | Apply writing constraints for depth vs concision                           | `references/design-principles.md`        |
 | Select structure pattern for this skill                                    | `references/skill-patterns.md`           |
 | Select workflow orchestration pattern for process-heavy skills             | `references/workflow-patterns.md`        |
 | Select output format pattern for deterministic quality                     | `references/output-patterns.md`          |
-| Choose workflow path and required outputs                                  | `references/mode-selection.md`           |
 | Load the example profile matching your classified skill class              | `references/examples/<class>-skill.md`   |
 | Synthesize external/local sources with depth gates                         | `references/synthesis-path.md`           |
 | Author or update SKILL.md and supporting files                             | `references/authoring-path.md`           |
@@ -100,6 +99,13 @@ Read `references/registration-validation.md`.
 1. Apply repository registration steps for the active layout you verified in the workspace.
 2. Run quick validation with strict depth gates.
 3. Reject shallow outputs that fail depth gates or required artifact checks.
+
+## When Things Fail
+
+- Synthesis finds no sources → document the gap explicitly; do not fabricate content.
+- Validator returns errors → fix each error before proceeding to registration.
+- Depth gates fail → expand the source collection; do not claim completion with insufficient coverage.
+- `uv` unavailable → validate manually: check frontmatter fields, confirm references/ exists, verify SOURCES.md provenance.
 
 ## Output format
 

@@ -3,39 +3,11 @@ name: posthog-skill
 description: Automate PostHog analytics and feature flags for this project — inspect branch event availability, compare against the ACH reference insight, create or update the 7361 metrics dashboard idempotently, and manage feature flags (list, inspect, toggle, create, update, audit activity log). Use when working on analytics instrumentation, dashboards, PostHog event verification, or feature flag management.
 ---
 
-**IMPORTANT — Path Resolution:**
-This is a project-local skill. `$SKILL_DIR` is the directory containing this SKILL.md file. Resolve it from where you loaded this file — do not hardcode an absolute path.
+You are the PostHog automation agent for this project. All PostHog reads and writes go through the commands below.
+
+> Path resolution: this is a project-local skill. Resolve script paths relative to the directory containing this SKILL.md.
 
 For brevity, examples below use `$RUN` as shorthand for `npx tsx $SKILL_DIR/scripts/run.ts`.
-
-## Requirements
-
-Requires Node.js 18+ and tsx. Run `pnpm install` from the repo root.
-
----
-
-This skill is written in TypeScript and uses `tsx` for execution. All commands use `npx tsx` instead of `node`. Dependencies (`tsx`, `typescript`, `@types/node`) are installed at the repository root. Run `pnpm install` from the repo root if needed.
-
----
-
-## Command Quick Reference
-
-| Intent                                | Command                            |
-| ------------------------------------- | ---------------------------------- |
-| Check config and token status         | `status`                           |
-| See all 9 branch events (offline)     | `inspect`                          |
-| Verify events are arriving in PostHog | `inspect --live`                   |
-| Fetch the ACH reference funnel        | `compare`                          |
-| Preview ACH reference fetch (no HTTP) | `compare --dry-run`                |
-| Provision the 7361 metrics dashboard  | `create`                           |
-| List all feature flags                | `flags`                            |
-| Inspect one flag in detail            | `flags get <id>`                   |
-| Enable or disable a flag              | `flags toggle <id>`                |
-| Set a flag to a specific state        | `flags update <id> --active false` |
-| Create a new feature flag             | `flags create <key>`               |
-| Check who changed a flag              | `flags activity <id>`              |
-
----
 
 ## Write Safety Rule
 
@@ -45,6 +17,27 @@ This skill is written in TypeScript and uses `tsx` for execution. All commands u
 2. Running `--dry-run` first and showing the output
 
 These are mandatory pre-conditions. If the user asks to skip them, refuse.
+
+## Requirements
+
+Requires Node.js 18+ and tsx. Run `pnpm install` from the repo root.
+
+## Command Quick Reference
+
+| Intent                                    | Command                            |
+| ----------------------------------------- | ---------------------------------- |
+| Check config and token status             | `status`                           |
+| See all 9 branch events (local spec only) | `inspect`                          |
+| Verify events are arriving in PostHog     | `inspect --live`                   |
+| Fetch the ACH reference funnel            | `compare`                          |
+| Preview ACH reference fetch (no HTTP)     | `compare --dry-run`                |
+| Provision the 7361 metrics dashboard      | `create`                           |
+| List all feature flags                    | `flags`                            |
+| Inspect one flag in detail                | `flags get <id>`                   |
+| Enable or disable a flag                  | `flags toggle <id>`                |
+| Set a flag to a specific state            | `flags update <id> --active false` |
+| Create a new feature flag                 | `flags create <key>`               |
+| Check who changed a flag                  | `flags activity <id>`              |
 
 ## Recommended Workflow
 
@@ -59,8 +52,6 @@ These are mandatory pre-conditions. If the user asks to skip them, refuse.
 
 Zero-dependency Node.js skill for PostHog automation scoped to this project's branch-7361 instrumentation. All output is **JSON to stdout**; all diagnostics go to **stderr**. The token never leaves environment variables.
 
----
-
 ## Environment Variables
 
 | Variable                   | Required For                                          | Default                                  |
@@ -73,16 +64,12 @@ Zero-dependency Node.js skill for PostHog automation scoped to this project's br
 
 All live commands (any command without `--dry-run`) require `POSTHOG_PERSONAL_API_KEY`.
 
-**Required API key scopes** (PostHog → Settings → Personal API Keys): `feature_flag:read`, `feature_flag:write`, plus the existing analytics read/write scopes for dashboards and insights.
-
-Set these in your shell before running any live command:
+**Required API key scopes**: `feature_flag:read`, `feature_flag:write`, plus analytics read/write scopes for dashboards and insights.
 
 ```bash
 export POSTHOG_PERSONAL_API_KEY=phx_...
 export POSTHOG_PROJECT_ID=<your-project-id>
 ```
-
----
 
 ## Command Surface
 
@@ -92,288 +79,32 @@ $RUN <command> [options]
 
 ### `status`
 
-Show resolved config. Token is masked. Never requires a token. Safe in CI.
-
-```bash
-$RUN status
-```
-
-Output:
-
-```json
-{
-  "host": "https://us.posthog.com",
-  "project_id": "<POSTHOG_PROJECT_ID>",
-  "token": "NOT SET",
-  "token_present": false,
-  "ach_insight_id": "NOT SET",
-  "dashboard_name": "7361 Purchase & Insurance Flow Metrics"
-}
-```
+Requires `POSTHOG_PROJECT_ID`. Token is optional (only needed for `--live`).
 
 ### `inspect`
 
-List the 9 branch-7361 events from the local spec. Works offline with no env vars.
+List the 9 branch-7361 events from the local spec or verify them against PostHog with `--live`. Requires `POSTHOG_PROJECT_ID`. The `--live` flag additionally requires `POSTHOG_PERSONAL_API_KEY`.
 
-```bash
-$RUN inspect
-```
-
-Output shape:
-
-```json
-{
-  "source": "local-spec",
-  "events": [
-    { "name": "form_page_reached", "description": "...", "properties": ["page", "product_segment", ...] },
-    ...
-  ]
-}
-```
-
-### `inspect --live`
-
-Verify those events are arriving in PostHog. Runs one HogQL batch query for all 9 events.
-
-```bash
-POSTHOG_PERSONAL_API_KEY=phx_... $RUN inspect --live
-```
-
-Output shape:
-
-```json
-{
-  "source": "posthog-live",
-  "queried_at": "2026-03-11T20:27:20.354Z",
-  "events": [
-    { "event": "form_page_reached", "count_30d": 0, "last_seen": null },
-    { "event": "payment_method_selected", "count_30d": 1273, "last_seen": "2026-03-11T..." }
-  ]
-}
-```
-
-Events with zero occurrences in the past 30 days are returned with `count_30d: 0, last_seen: null`.
-
-If 5 or more events have `count_30d: 0`, stop and ask the user whether to proceed. Do not run `compare` or `create` automatically.
+If 5 or more events have `count_30d: 0` on `--live`, stop and ask whether to proceed. Do not run `compare` or `create` automatically.
 
 ### `compare`
 
-Fetch the ACH reference insight (set via `POSTHOG_ACH_INSIGHT_ID`) and print a structured summary.
-
-Also writes the summary to `references/ach-reference-summary.json` for spec alignment.
-
-```bash
-POSTHOG_PERSONAL_API_KEY=phx_... $RUN compare
-```
-
-Output shape:
-
-```json
-{
-  "id": "<insight-short-id>",
-  "name": "Purchases by Payment Method - ACH",
-  "description": null,
-  "query_kind": "InsightVizNode(FunnelsQuery)",
-  "series": [...],
-  "breakdown": null,
-  "date_range": "-90d",
-  "viz_type": "funnel:steps",
-  "saved_to": "references/ach-reference-summary.json"
-}
-```
+Fetch the ACH reference insight (set via `POSTHOG_ACH_INSIGHT_ID`) and print a structured summary. Also writes the summary to `references/ach-reference-summary.json`.
 
 ### `create`
 
-Idempotently provision the 7361 dashboard + 8 insights in PostHog.
-
-```bash
-POSTHOG_PERSONAL_API_KEY=phx_... $RUN create
-```
-
-Output shape:
-
-```json
-{
-  "dashboard_id": 1353084,
-  "dashboard_url": "https://us.posthog.com/project/<project-id>/dashboard/1353084",
-  "tiles": [
-    { "name": "Page Funnel", "insight_id": 7305518, "insight_url": "...", "status": "created" },
-    {
-      "name": "Payment Method Preference",
-      "insight_id": 7305519,
-      "insight_url": "...",
-      "status": "existing"
-    }
-  ]
-}
-```
-
-Idempotency: if a dashboard with the same name already exists, it is reused. If an insight with the same name already exists on the dashboard, it is skipped (`"status": "existing"`). Re-running when fully provisioned produces all `"status": "existing"` with zero new API writes.
-
-**Recovery (orphaned insights):** If `create` fails mid-run (exit 3), orphaned insights remain in the project but are harmless. To recover, soft-delete the dashboard and re-run:
-
-```bash
-# Soft-delete (hard DELETE returns 405 — use PATCH)
-curl -X PATCH -H "Authorization: Bearer $POSTHOG_PERSONAL_API_KEY" \
-  -H "Content-Type: application/json" \
-  "https://us.posthog.com/api/environments/$POSTHOG_PROJECT_ID/dashboards/<id>/" \
-  -d '{"deleted": true}'
-
-# Re-run
-$RUN create
-```
-
----
+Idempotently provision the 7361 dashboard + 8 insights. Dashboard is reused if it already exists; insights already on the dashboard are skipped (`"status": "existing"`). If it fails mid-run (exit 3), soft-delete the dashboard and re-run.
 
 ### `flags`
 
-Manage PostHog feature flags. Six subcommands cover listing, inspecting, toggling, creating, updating, and auditing flags.
+Six subcommands: `flags`, `flags get <id>`, `flags toggle <id>`, `flags create <key>`, `flags update <id> [options]`, `flags activity <id>`.
 
-**List all flags**
-
-```bash
-$RUN flags
-$RUN flags --search checkout --active true --type boolean --limit 10
-```
-
-Output shape: `{ count: N, results: [{ id, key, name, active, created_at, tags }] }`
-
-**Get a single flag**
-
-```bash
-$RUN flags get 123
-```
-
-Output shape: full flag object with `id, key, name, active, deleted, filters, created_at, updated_at, version, tags, evaluation_runtime, is_remote_configuration`
-
-**Toggle active state**
-
-```bash
-$RUN flags toggle 123
-```
-
-Output shape: `{ id, key, active_before, active_after }`. Flips the `active` field via PATCH.
-
-**Create a new flag**
-
-```bash
-$RUN flags create my-new-flag
-$RUN flags create my-new-flag --name 'My New Flag'
-```
-
-Output shape:
-
-```json
-{
-  "id": 201,
-  "key": "my-new-flag",
-  "name": "My New Flag",
-  "active": true,
-  "deleted": false,
-  "created_at": "2026-03-29T12:00:00Z",
-  "filters": { "groups": [{ "properties": [], "rollout_percentage": 0 }] },
-  "tags": []
-}
-```
-
-**Update a flag**
-
-```bash
-$RUN flags update 123 --name 'New Name' --active false --tags release,v2
-```
-
-Output shape:
-
-```json
-{
-  "id": 101,
-  "key": "enable-new-checkout",
-  "name": "Updated Name",
-  "active": true,
-  "deleted": false,
-  "updated_at": "2026-03-29T12:00:00Z",
-  "tags": ["release", "updated"]
-}
-```
-
-**View activity log**
-
-```bash
-$RUN flags activity 123 --limit 20
-```
-
-Output shape: `{ results: [{ id, activity, detail, created_at, user }] }`
-
-> **Note — soft-delete:** DELETE returns 405 on the PostHog flags API. To soft-delete a flag, use
-> `flags update <id> --active false` or PATCH directly with `{ "deleted": true }` via curl.
-
----
+> **Note — soft-delete:** DELETE returns 405 on the PostHog flags API. Use `flags update <id> --active false` or PATCH with `{ "deleted": true }`.
 
 ## Dry-Run Mode
 
 Every command accepts `--dry-run` — no HTTP calls, same JSON shape, canned fixtures. No env vars required.
 
----
+Branch events and tile definitions are defined in `scripts/lib/dashboard-spec.ts`. Read that file if you need property lists or query shapes.
 
-## First Use (No Token Yet)
-
-Run `$RUN status` to confirm config. All commands accept `--dry-run` (no token required).
-
----
-
-## Dashboard Spec
-
-The 8-tile dashboard spec lives in `scripts/lib/dashboard-spec.ts`. It defines:
-
-- **Tile 1 — Page Funnel** (`FunnelsQuery`): `form_page_reached` filtered to 5 key pages
-- **Tile 2 — Payment Method Preference** (`TrendsQuery`): `payment_method_selected` by `product_segment`
-- **Tile 3 — Payment Mode Selection** (`TrendsQuery`): `payment_mode_selected` by `product_segment`
-- **Tile 4 — FCF Selection Rate** (`TrendsQuery`): `fcf_amount_selected` + `fcf_more_info_clicked`
-- **Tile 5 — Travel Protection Selection** (`TrendsQuery`): `travel_protection_selected`
-- **Tile 6 — Signing Completion** (`TrendsQuery`): `signing_completed` by `form_type`
-- **Tile 7 — Purchase Completions Over Time** (`TrendsQuery`): `payment_completed` by `product_segment`
-- **Tile 8 — Top Counties** (`HogQLQuery`): `form_page_reached` GROUP BY `county_id`
-
-Layout: 2-column grid, `w:6, h:5` per tile (full-width for funnel + top counties, `w:12`).
-
----
-
-## Branch Events Catalog
-
-All 9 events introduced or changed on branch 7361:
-
-| Event                        | Key Properties                                             |
-| ---------------------------- | ---------------------------------------------------------- |
-| `form_page_reached`          | `page`, `product_segment`, `county_id`, `form_type`, `uid` |
-| `soil_donation_selected`     | `product_segment`, `county_id`, `uid`                      |
-| `travel_protection_selected` | `selected`, `product_segment`, `county_id`, `uid`          |
-| `fcf_amount_selected`        | `amount`, `product_segment`, `county_id`, `uid`            |
-| `fcf_more_info_clicked`      | `product_segment`, `county_id`, `uid`                      |
-| `payment_method_selected`    | `method`, `product_segment`, `county_id`, `uid`            |
-| `payment_mode_selected`      | `mode`, `product_segment`, `county_id`, `uid`              |
-| `payment_completed`          | `product_segment`, `county_id`, `form_type`, `uid`         |
-| `signing_completed`          | `form_type`, `product_segment`, `county_id`, `uid`         |
-
----
-
-For API quirks, error patterns, and exit codes, read [references/api-quirks.md](references/api-quirks.md).
-
----
-
-## File Structure
-
-```
-posthog-skill/
-├── SKILL.md
-├── scripts/
-│   ├── run.ts
-│   ├── lib/
-│   └── __tests__/               — unit and integration tests
-└── references/
-```
-
-**Running live tests:**
-
-```bash
-POSTHOG_PERSONAL_API_KEY=phx_... POSTHOG_TEST_LIVE=1 npx tsx --test $SKILL_DIR/scripts/__tests__/*.test.ts
-```
+For API quirks, error patterns, exit codes, and full output shapes, read [references/api-quirks.md](references/api-quirks.md).

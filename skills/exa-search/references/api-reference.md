@@ -197,3 +197,26 @@ tsx scripts/research.ts <subcommand> <arg> [options-json]
 | Option  | Type   | Description           |
 | ------- | ------ | --------------------- |
 | `limit` | number | Max results to return |
+
+---
+
+## Cost Awareness
+
+| Operation               | Price  | Notes                       |
+| ----------------------- | ------ | --------------------------- |
+| Search (1-25 results)   | $0.005 | Default — use this range    |
+| Search (26-100 results) | $0.025 | 5x more expensive           |
+| Answer                  | $0.005 | Per query                   |
+| Contents                | $0.005 | Per page                    |
+| Research (standard)     | Varies | 2-10x more than search      |
+| Research (pro)          | Higher | Use only for complex topics |
+
+Prices may change. Verify at https://exa.ai/pricing.
+
+**Cost strategies:**
+
+- **Default to ≤25 results** — 5x cheaper and sufficient for most queries
+- **Need 50+ results?** Run multiple targeted searches with different query angles — better quality and cheaper than one large search
+- **Prefer `answer.ts` over `search.ts`** for direct questions — one API call instead of search + read
+- **Use `numResults`** to limit results to what you actually need
+- **Avoid `research.ts`** unless the topic genuinely requires multi-step synthesis

@@ -1,5 +1,7 @@
 # GitHub CLI — Complete Command Reference
 
+> ⚠️ **Destructive commands** (marked with `⚠️ irreversible` below) must never be executed without explicit user confirmation. State what will be destroyed and wait.
+
 Full command reference for `gh`. For workflows and decision guidance, see the main SKILL.md.
 
 ## Table of Contents
@@ -96,7 +98,7 @@ Full command reference for `gh`. For workflows and decision guidance, see the ma
 | Rename repo             | `gh repo rename new-name`                                                         |
 | Set default repo        | `gh repo set-default owner/repo`                                                  |
 | Sync fork with upstream | `gh repo sync`                                                                    |
-| Archive repo            | `gh repo archive`                                                                 |
+| Archive repo            | `gh repo archive` # ⚠️ semi-permanent — sets repo read-only                       |
 | Delete repo             | `gh repo delete owner/repo` # ⚠️ irreversible — requires interactive confirmation |
 | Add deploy key          | `gh repo deploy-key add key.pub --title "CI key"`                                 |
 | List deploy keys        | `gh repo deploy-key list`                                                         |
@@ -119,14 +121,14 @@ Full command reference for `gh`. For workflows and decision guidance, see the ma
 
 ## Actions — Workflows
 
-| Task                    | Command                                   |
-| ----------------------- | ----------------------------------------- |
-| List workflows          | `gh workflow list`                        |
-| View workflow           | `gh workflow view <id-or-name>`           |
-| Run workflow (dispatch) | `gh workflow run <workflow> --ref main`   |
-| Run with inputs         | `gh workflow run <workflow> -f key=value` |
-| Enable workflow         | `gh workflow enable <id-or-name>`         |
-| Disable workflow        | `gh workflow disable <id-or-name>`        |
+| Task                    | Command                                                                          |
+| ----------------------- | -------------------------------------------------------------------------------- |
+| List workflows          | `gh workflow list`                                                               |
+| View workflow           | `gh workflow view <id-or-name>`                                                  |
+| Run workflow (dispatch) | `gh workflow run <workflow> --ref main` # ⚠️ triggers production — confirm first |
+| Run with inputs         | `gh workflow run <workflow> -f key=value`                                        |
+| Enable workflow         | `gh workflow enable <id-or-name>`                                                |
+| Disable workflow        | `gh workflow disable <id-or-name>`                                               |
 
 ## Actions — Runs
 
@@ -142,7 +144,7 @@ Full command reference for `gh`. For workflows and decision guidance, see the ma
 | Rerun entire run       | `gh run rerun <run-id>`                              |
 | Cancel a run           | `gh run cancel <run-id>`                             |
 | Download run artifacts | `gh run download <run-id>`                           |
-| Delete a run           | `gh run delete <run-id>`                             |
+| Delete a run           | `gh run delete <run-id>` # ⚠️ irreversible           |
 
 ## Actions — Cache
 

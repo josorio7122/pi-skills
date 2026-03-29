@@ -79,14 +79,7 @@ playwright-cli --help
 4. Re-snapshot after navigation or significant DOM changes.
 5. Capture artifacts (screenshot, pdf, traces) when useful.
 
-Minimal loop:
-
-```bash
-scripts/playwright_cli.sh open https://example.com
-scripts/playwright_cli.sh snapshot
-scripts/playwright_cli.sh click e3
-scripts/playwright_cli.sh snapshot
-```
+The core loop is open → snapshot → interact → re-snapshot. See [references/workflows.md](references/workflows.md) for full patterns.
 
 ## When to snapshot again
 
@@ -102,24 +95,6 @@ Refs can go stale. When a command fails due to a missing ref, snapshot again.
 ## Recommended patterns
 
 Load [references/workflows.md](references/workflows.md) only when the task involves forms, multi-step flows, sessions, or debugging.
-
-### Debug a UI flow with traces
-
-```bash
-scripts/playwright_cli.sh open https://example.com --headed
-scripts/playwright_cli.sh tracing-start
-# ...interactions...
-scripts/playwright_cli.sh tracing-stop
-```
-
-### Multi-tab work
-
-```bash
-scripts/playwright_cli.sh tab-new https://example.com
-scripts/playwright_cli.sh tab-list
-scripts/playwright_cli.sh tab-select 0
-scripts/playwright_cli.sh snapshot
-```
 
 ## Prerequisites
 

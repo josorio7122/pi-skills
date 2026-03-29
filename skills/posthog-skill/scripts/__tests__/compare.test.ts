@@ -50,10 +50,10 @@ describe('compare live (POSTHOG_TEST_LIVE=1)', { skip: !LIVE }, () => {
     assert.strictEqual(result.status, 0, `expected exit 0\nstderr: ${result.stderr}`)
   })
 
-  it('output id equals drOq2lO5', () => {
+  it('output id equals dry-run-fixture-id', () => {
     const result = run(['compare'])
     const parsed = JSON.parse(result.stdout) as { id: string }
-    assert.strictEqual(parsed.id, 'drOq2lO5')
+    assert.strictEqual(parsed.id, 'dry-run-fixture-id')
   })
 
   it('output has query_kind, name, viz_type, date_range fields', () => {
@@ -69,9 +69,9 @@ describe('compare live (POSTHOG_TEST_LIVE=1)', { skip: !LIVE }, () => {
     assert.ok(fs.existsSync(ACH_SUMMARY_PATH), `file not found: ${ACH_SUMMARY_PATH}`)
   })
 
-  it('ach-reference-summary.json contains id drOq2lO5', () => {
+  it('ach-reference-summary.json contains id dry-run-fixture-id', () => {
     run(['compare'])
     const content = JSON.parse(fs.readFileSync(ACH_SUMMARY_PATH, 'utf8')) as { id: string }
-    assert.strictEqual(content.id, 'drOq2lO5')
+    assert.strictEqual(content.id, 'dry-run-fixture-id')
   })
 })

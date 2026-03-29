@@ -1,0 +1,6 @@
+---
+agent: "scout"
+task: "## Deep 3-Lens Review: test-prompt skill\n\nRead ALL files in `skills/test-prompt/` (SKILL.md + everything in references/). Then evaluate against three lenses:\n\n### Lens 1: Skill-Writer (spec compliance)\n- Frontmatter: ONLY `name` and `description` allowed\n- Description: imperative triggers, no topic enumeration\n- SKILL.md <150 lines router\n- Conditional load gates\n- No duplication SKILL.md↔references\n- Error Recovery + Output Format required\n- Imperative voice\n\n### Lens 2: Skill-Scanner (security)\n- Subagent dispatch: no privilege escalation\n- Test scenarios: clearly marked as test-only, not to be executed\n- No secrets in examples\n- No eval/exec of test outputs\n\n### Lens 3: Prompt-Engineering (prompt quality)\n- Authority in first 3 lines\n- Non-negotiable rule placement\n- Instruction hierarchy\n- Concrete output format template\n- Error recovery + stall handling\n- Token efficiency\n- Adversarial scenario safety\n\n### Output Format\nFor EACH issue:\n```\n[LENS] [SEVERITY] — Title\nFile: path\nLine/Section: where\nIssue: what's wrong\nEvidence: quote\nFix: specific fix\n```\nSummary table + verdict. Read every line of every file."
+exitCode: 0
+usage: {"input":11,"output":6347,"cacheRead":145002,"cacheWrite":14661,"cost":0.19371735,"contextTokens":28168,"turns":9}
+---

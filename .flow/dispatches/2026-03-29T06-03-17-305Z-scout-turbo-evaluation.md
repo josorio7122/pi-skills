@@ -1,0 +1,6 @@
+---
+agent: "scout"
+task: "## Deep 3-Lens Review: frontend-design skill\n\nRead ALL files in `skills/frontend-design/` (SKILL.md + everything in references/). Then evaluate against three lenses:\n\n### Lens 1: Skill-Writer (spec compliance)\n- Frontmatter: ONLY `name` and `description` allowed\n- Description: imperative triggers, no topic enumeration, no passive\n- SKILL.md <150 lines router\n- Conditional load gates\n- No duplication SKILL.md↔references\n- Error Recovery + Output Format required\n- Imperative voice\n\n### Lens 2: Skill-Scanner (security)\n- No hardcoded secrets\n- No pipe-to-shell\n- External resource references safe\n- No absolute paths\n\n### Lens 3: Prompt-Engineering (prompt quality)\n- Authority in first 3 lines\n- Instruction hierarchy correct\n- Concrete output format\n- Error recovery specific\n- No competing authority signals (check for multiple CRITICAL/IMPORTANT/Rule N that dilute)\n- Token efficiency\n- Degrees of freedom balanced\n\n### Output Format\nFor EACH issue:\n```\n[LENS] [SEVERITY] — Title\nFile: path\nLine/Section: where\nIssue: what's wrong\nEvidence: quote\nFix: specific fix\n```\nSummary table + verdict. Read every line of every file."
+exitCode: 0
+usage: {"input":5,"output":3368,"cacheRead":31049,"cacheWrite":16717,"cost":0.12253845000000001,"contextTokens":19919,"turns":3}
+---

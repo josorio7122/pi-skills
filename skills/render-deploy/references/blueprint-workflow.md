@@ -30,7 +30,7 @@ If not installed, offer to install:
 
 > ⚠️ **Security:** Piping to shell (`curl | sh`) executes remote code. Review the script at the URL before running, or use `brew install render` instead.
 
-- Linux/macOS: `curl -fsSL https://raw.githubusercontent.com/render-oss/cli/main/bin/install.sh | sh`
+- Linux/macOS: See https://render.com/docs/cli for official installation instructions.
 
 ### 3. Check Authentication
 

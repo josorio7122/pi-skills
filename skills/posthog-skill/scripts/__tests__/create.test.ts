@@ -71,11 +71,12 @@ describe('create live first run (POSTHOG_TEST_LIVE=1)', { skip: !LIVE }, () => {
     )
   })
 
-  it('output dashboard_url contains project/39507/dashboard/', () => {
+  it('output dashboard_url contains project/<projectId>/dashboard/', () => {
     const result = run(['create'])
+    const projectId = process.env['POSTHOG_PROJECT_ID'] ?? 'EXAMPLE_PROJECT'
     const parsed = JSON.parse(result.stdout) as { dashboard_url: string }
     assert.ok(
-      parsed.dashboard_url.includes('project/39507/dashboard/'),
+      parsed.dashboard_url.includes(`project/${projectId}/dashboard/`),
       `unexpected dashboard_url: ${parsed.dashboard_url}`,
     )
   })

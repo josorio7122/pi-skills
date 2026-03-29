@@ -17,8 +17,8 @@ If `pdftoppm` returns no pages or an error, report the error to the user. Do not
 
 1. Prefer visual review: render PDF pages to PNGs and inspect them.
    - Use `pdftoppm` if available.
-   - If unavailable, install Poppler or ask the user to review the output locally.
-2. Use `reportlab` to generate PDFs when creating new documents. If reportlab raises a font or encoding error, verify all strings are UTF-8 and all image paths are absolute.
+   - If rendering is impossible and the user cannot inspect locally, halt and tell the user: delivery is blocked until visual inspection is confirmed.
+2. Use `reportlab` to generate PDFs. For generation techniques and error handling, see [references/techniques.md](references/techniques.md).
 3. Use `pdfplumber` for text extraction when table structure matters. Use `pypdf` for simple full-text extraction or when pdfplumber is unavailable. Do not rely on either for layout fidelity.
 4. After each meaningful update, re-render pages and verify alignment, spacing, and legibility.
 
@@ -37,7 +37,7 @@ Prefer `uv` for dependency management.
 Python packages:
 
 ```
-uv pip install reportlab pdfplumber pypdf
+uv pip install "reportlab>=4.2" "pdfplumber>=0.11" "pypdf>=4.3"
 ```
 
 If `uv` is unavailable, install it first (see https://docs.astral.sh/uv/getting-started/installation/) or ask the user to install the packages manually.

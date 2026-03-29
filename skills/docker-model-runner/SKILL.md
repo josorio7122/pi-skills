@@ -5,6 +5,8 @@ description: Run AI models locally using Docker Model Runner with an OpenAI-comp
 
 # Docker Model Runner
 
+Run Docker Model Runner workflows in this exact sequence. Never assume the runner is active — always verify with `docker model version` first.
+
 ## Workflow
 
 > **Default API base:** `http://localhost:12434/engines/llama.cpp/v1`
@@ -51,11 +53,4 @@ Load [references/docker-model-guide.md](references/docker-model-guide.md) when:
 
 ## Troubleshooting
 
-- **Port conflict (12434 in use):** `docker model stop-runner && docker model start-runner`
-- **OOM / model won't load:** Try a smaller model (`ai/smollm2`); check `docker model df` for disk usage
-- **API 500 errors:** Check `docker model logs` for the root cause
-- **Model not found:** Run `docker model pull <model>` first — the runner does not auto-pull
-
-## References
-
-See [references/docker-model-guide.md](references/docker-model-guide.md) for detailed documentation.
+If you hit an error, load [references/docker-model-guide.md](references/docker-model-guide.md) § Troubleshooting.

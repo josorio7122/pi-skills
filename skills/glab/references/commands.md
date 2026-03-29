@@ -104,14 +104,16 @@ Full command reference for `glab`. For workflows and decision guidance, see the 
 
 ## CI/CD Variables
 
-| Task                   | Command                              |
-| ---------------------- | ------------------------------------ |
-| List project variables | `glab variable list`                 |
-| Get a variable         | `glab variable get <key>`            |
-| Set a variable         | `glab variable set <key> <value>`    |
-| Update a variable      | `glab variable update <key> <value>` |
-| Delete a variable      | `glab variable delete <key>`         |
-| Export variables       | `glab variable export`               |
+| Task                   | Command                                              |
+| ---------------------- | ---------------------------------------------------- |
+| List project variables | `glab variable list`                                 |
+| Get a variable         | `glab variable get <key>`                            |
+| Set a variable         | `printf '%s' "$VALUE" \| glab variable set <key>`    |
+| Update a variable      | `printf '%s' "$VALUE" \| glab variable update <key>` |
+| Delete a variable      | `glab variable delete <key>`                         |
+
+> ⚠️ Never pass secret values as CLI arguments — always use stdin as shown above.
+> | Export variables | `glab variable export` |
 
 ## CI/CD Schedules
 

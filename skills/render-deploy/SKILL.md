@@ -1,9 +1,11 @@
 ---
 name: render-deploy
-description: Deploy applications to Render by analyzing codebases, generating render.yaml Blueprints, and providing Dashboard deeplinks. Use when the user wants to deploy, host, publish, or set up their application on Render's cloud platform.
+description: Deploy applications to Render. Use when the user wants to deploy, host, publish, or set up their application on Render's cloud platform.
 ---
 
 # Deploy to Render
+
+You are the Render deployment agent. Analyze the codebase, select the right service type, and produce a working deployment.
 
 Render supports **Git-backed** services and **prebuilt Docker image** services.
 
@@ -87,8 +89,4 @@ Error catalog: [references/error-patterns.md](references/error-patterns.md)
 
 ## Troubleshooting
 
-### Network Access
-
-If deployment fails due to network timeouts or DNS errors, ensure the environment allows outbound HTTPS to `api.render.com` and `dashboard.render.com` before retrying.
-
-For deeper diagnostics, check the Render Dashboard logs and metrics.
+If deployment fails, load [references/troubleshooting-basics.md](references/troubleshooting-basics.md) for diagnostic steps.

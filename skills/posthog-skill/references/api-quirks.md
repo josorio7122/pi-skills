@@ -64,3 +64,131 @@ Run with --help for usage.
 Error: flags get requires a flag ID.
 Usage: flags get <id> [--dry-run]
 ```
+
+---
+
+## Command Output Shapes
+
+### `status`
+
+```json
+{
+  "host": "https://us.posthog.com",
+  "project_id": "<POSTHOG_PROJECT_ID>",
+  "token": "NOT SET",
+  "token_present": false,
+  "ach_insight_id": "NOT SET",
+  "dashboard_name": "7361 Purchase & Insurance Flow Metrics"
+}
+```
+
+### `inspect`
+
+```json
+{
+  "source": "local-spec",
+  "events": [
+    {
+      "name": "form_page_reached",
+      "description": "...",
+      "properties": ["page", "product_segment", "..."]
+    }
+  ]
+}
+```
+
+### `inspect --live`
+
+```json
+{
+  "source": "posthog-live",
+  "queried_at": "2026-03-11T20:27:20.354Z",
+  "events": [
+    { "event": "form_page_reached", "count_30d": 0, "last_seen": null },
+    { "event": "payment_method_selected", "count_30d": 1273, "last_seen": "2026-03-11T..." }
+  ]
+}
+```
+
+Events with zero occurrences in the past 30 days are returned with `count_30d: 0, last_seen: null`.
+
+If 5 or more events have `count_30d: 0`, stop and ask the user whether to proceed.
+
+### `compare`
+
+```json
+{
+  "id": "<insight-short-id>",
+  "name": "Purchases by Payment Method - ACH",
+  "description": null,
+  "query_kind": "InsightVizNode(FunnelsQuery)",
+  "series": [],
+  "breakdown": null,
+  "date_range": "-90d",
+  "viz_type": "funnel:steps",
+  "saved_to": "references/ach-reference-summary.json"
+}
+```
+
+### `create`
+
+```json
+{
+  "dashboard_id": 1353084,
+  "dashboard_url": "https://us.posthog.com/project/<project-id>/dashboard/1353084",
+  "tiles": [
+    { "name": "Page Funnel", "insight_id": 7305518, "insight_url": "...", "status": "created" },
+    {
+      "name": "Payment Method Preference",
+      "insight_id": 7305519,
+      "insight_url": "...",
+      "status": "existing"
+    }
+  ]
+}
+```
+
+Idempotency: dashboard reused if same name exists; insights skipped if already on the dashboard (`"status": "existing"`).
+
+**Recovery (orphaned insights — exit 3):** Soft-delete the dashboard and re-run:
+
+```bash
+curl -X PATCH -H "Authorization: Bearer $POSTHOG_PERSONAL_API_KEY" \
+  -H "Content-Type: application/json" \
+  "https://us.posthog.com/api/environments/$POSTHOG_PROJECT_ID/dashboards/<id>/" \
+  -d '{"deleted": true}'
+```
+
+### `flags`
+
+**List:** `{ count: N, results: [{ id, key, name, active, created_at, tags }] }`
+
+```bash
+$RUN flags
+$RUN flags --search checkout --active true --type boolean --limit 10
+```
+
+**Get:** full flag object with `id, key, name, active, deleted, filters, created_at, updated_at, version, tags, evaluation_runtime, is_remote_configuration`
+
+**Toggle:** `{ id, key, active_before, active_after }`
+
+**Create:**
+
+```json
+{
+  "id": 201,
+  "key": "my-new-flag",
+  "name": "My New Flag",
+  "active": true,
+  "deleted": false,
+  "created_at": "...",
+  "filters": { "groups": [{ "properties": [], "rollout_percentage": 0 }] },
+  "tags": []
+}
+```
+
+**Update:** `{ id, key, name, active, deleted, updated_at, tags }`
+
+**Activity:** `{ results: [{ id, activity, detail, created_at, user }] }`
+
+> **Note — soft-delete:** DELETE returns 405. Use `flags update <id> --active false` or PATCH with `{ "deleted": true }`.

@@ -30,7 +30,7 @@ const FIXTURES: Record<FixtureKey, unknown> = {
   },
 
   compare: {
-    id: 'drOq2lO5',
+    id: 'dry-run-fixture-id',
     name: 'ACH Payment Reference (dry-run fixture)',
     description: 'Canned fixture — no live data fetched',
     query_kind: 'InsightVizNode(FunnelsQuery)',
@@ -138,11 +138,11 @@ const FIXTURES: Record<FixtureKey, unknown> = {
 
   create: {
     dashboard_id: 99901,
-    dashboard_url: 'https://us.posthog.com/project/39507/dashboard/99901',
+    dashboard_url: 'https://us.posthog.com/project/EXAMPLE_PROJECT/dashboard/99901',
     tiles: tiles.map((tile, i) => ({
       name: tile.name,
       insight_id: 80000 + i,
-      insight_url: `https://us.posthog.com/project/39507/insights/${80000 + i}`,
+      insight_url: `https://us.posthog.com/project/EXAMPLE_PROJECT/insights/${80000 + i}`,
       status: 'created',
     })),
   },

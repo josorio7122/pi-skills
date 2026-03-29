@@ -5,46 +5,46 @@ description: Interact with GitHub from the command line using the gh CLI. Use wh
 
 # GitHub CLI (gh)
 
-Work with GitHub repositories, pull requests, issues, releases, and Actions from the command line.
+You operate the `gh` CLI. Run `gh auth status` before the first command in any session. Prefer built-in commands over `gh api`.
 
 ## Prerequisites
 
-```bash
-gh --version     # Must be installed
-gh auth status   # Must be authenticated
-```
+Verify before any command:
 
-If not authenticated:
-
-```bash
-gh auth login                          # Interactive (browser OAuth — recommended)
-# Preferred: pipe from env var so the token never appears in history
-echo "$GITHUB_TOKEN" | gh auth login --with-token
-# Or use the interactive browser flow:
-gh auth login
-```
-
-If `gh` is not installed:
-
-- macOS: `brew install gh`
-- Linux: see https://github.com/cli/cli/blob/trunk/docs/install_linux.md
-- Windows: `winget install --id GitHub.cli`
+- `gh --version` — must be installed (macOS: `brew install gh`; Linux: see https://github.com/cli/cli/blob/trunk/docs/install_linux.md; Windows: `winget install --id GitHub.cli`)
+- `gh auth status` — must be authenticated (`gh auth login` for browser OAuth, or `echo "$GITHUB_TOKEN" | gh auth login --with-token`)
 
 ---
 
 ## Choosing the Right Command
 
-Most GitHub work falls into a few categories. Pick the right one and you avoid wasting time.
+| Goal                                       | Workflow         |
+| ------------------------------------------ | ---------------- |
+| Push your work and get it reviewed         | Create a PR      |
+| Check if CI passed before merging          | Check CI         |
+| Review someone else's PR                   | Review a PR      |
+| Ship a PR to main                          | Merge a PR       |
+| Track or report a bug/feature              | Work with Issues |
+| Cut a new version                          | Make a Release   |
+| Monitor or trigger Actions runs            | Monitor Actions  |
+| Do something gh doesn't have a command for | Use the API      |
 
-| Goal                                       | Start here                            |
-| ------------------------------------------ | ------------------------------------- |
-| Push your work and get it reviewed         | [Create a PR](#create-a-pr)           |
-| Check if CI passed before merging          | [Check CI](#check-ci)                 |
-| Review someone else's PR                   | [Review a PR](#review-a-pr)           |
-| Ship a PR to main                          | [Merge a PR](#merge-a-pr)             |
-| Track or report a bug/feature              | [Work with Issues](#work-with-issues) |
-| Cut a new version                          | [Make a Release](#make-a-release)     |
-| Do something gh doesn't have a command for | [Use the API](#use-the-api)           |
+Read [references/workflows.md](references/workflows.md) for the complete step-by-step sequence for each goal above.
+
+---
+
+## Destructive Operations
+
+**Never execute these without explicit user confirmation in the current message:**
+
+- `gh repo delete`
+- `gh release delete`
+- `gh cache delete --all`
+- `gh issue delete`
+- `gh run delete`
+- `gh repo archive` (semi-permanent — sets repo read-only)
+
+State what will be destroyed and wait for confirmation before running any of the above.
 
 ---
 
@@ -52,142 +52,6 @@ Most GitHub work falls into a few categories. Pick the right one and you avoid w
 
 - **List/view commands:** Summarize key fields (PR: number, title, status, author, checks, URL; Issue: number, title, state, labels; Run: ID, workflow, status, conclusion). Never dump raw JSON.
 - **Create/merge commands:** Confirm the action and return the resulting URL.
-
----
-
-## Destructive Operations
-
-**Never execute these commands without explicit user confirmation in the current message:**
-
-- `gh repo delete`
-- `gh release delete`
-- `gh cache delete --all`
-- `gh issue delete`
-
-If the user asks to run any of these, state what will be destroyed and wait for confirmation.
-
----
-
-## Workflows
-
-These are the sequences you'll use most. Each one is a complete flow — follow it top to bottom.
-
-### Create a PR
-
-The most common operation. Prefer `--fill` to auto-populate from commits; override with `--title`/`--body` if the user provides a specific description.
-
-```bash
-git push -u origin HEAD
-gh pr create --fill
-```
-
-Common variations:
-
-```bash
-gh pr create --fill --draft                    # Not ready for review yet
-gh pr create --fill --base develop             # Target a specific branch
-gh pr create --fill --reviewer alice --label bug # Add reviewer + label
-gh pr create --title "feat: add X" --body "..." # Manual title/body
-```
-
-### Check CI
-
-Before merging, verify the pipeline passed. `--watch` blocks until all checks finish — useful in scripts or when you want to wait.
-
-```bash
-gh pr checks                  # Current PR's check status
-gh pr checks <number> --watch # Block until checks complete
-```
-
-If a check failed:
-
-```bash
-gh run list --limit 5          # Find the run-id for the failing run
-gh run view <run-id> --log    # Read the full log
-gh run rerun <run-id> --failed # Retry only failed jobs
-```
-
-### Review a PR
-
-Check out the code locally, read it, then leave your verdict.
-
-```bash
-gh pr checkout <number>                                  # Get the code
-gh pr diff <number>                                      # See the changes
-gh pr review <number> --approve                          # Approve
-gh pr review <number> --request-changes --body "Details" # Request changes
-gh pr review <number> --comment --body "Looks good"      # Comment only
-```
-
-### Merge a PR
-
-Pick the merge strategy that matches the project's convention. Squash is the most common — it collapses all commits into one clean entry on main.
-
-```bash
-gh pr merge <number> --squash --delete-branch  # Squash + cleanup (most common)
-gh pr merge <number> --rebase --delete-branch  # Rebase (linear history)
-gh pr merge <number> --delete-branch           # Merge commit (preserves branch history)
-```
-
-**When to use which:**
-
-- **Squash** — default for most projects. One commit per PR on main. Clean log.
-- **Rebase** — when individual commits are meaningful and well-structured.
-- **Merge commit** — when you need to preserve the branch topology (rare).
-
-### Work with Issues
-
-```bash
-gh issue create --title "Bug: X" --body "Details" --label bug
-gh issue list --assignee @me            # What's on my plate
-gh issue view <number>                  # Read the details
-gh issue close <number>                 # Done
-gh issue develop <number>              # Create a branch from the issue
-```
-
-### Make a Release
-
-```bash
-gh release create v1.0.0 --generate-notes                # Auto-generate notes from PRs
-gh release create v1.0.0 --notes-file CHANGELOG.md       # Use a changelog file
-gh release upload v1.0.0 ./dist/*.tar.gz                  # Attach build artifacts
-```
-
-### Monitor Actions
-
-```bash
-gh run list                             # Recent workflow runs
-gh run list --workflow deploy.yml       # Runs for a specific workflow
-gh run watch <run-id>                   # Live-stream a run
-gh workflow run deploy.yml --ref main   # Trigger a workflow manually
-```
-
-Confirm with the user before triggering any workflow on a production branch (main, master, release/\*).
-
----
-
-## Use the API
-
-`gh api` is your escape hatch for anything gh doesn't have a built-in command for. It handles auth, pagination, and formatting automatically.
-
-```bash
-# REST
-gh api repos/owner/repo
-gh api repos/owner/repo/issues -f title="Bug" -f body="Details"
-gh api repos/owner/repo/pulls --jq '.[].title'
-
-# GraphQL
-gh api graphql -f query='{ viewer { login } }'
-
-# Pagination
-gh api repos/owner/repo/issues --paginate
-```
-
----
-
-## Tips
-
-Most commands infer the repo from git remotes — use `--repo` only for cross-repo operations.
 
 ---
 
@@ -206,4 +70,5 @@ Most commands infer the repo from git remotes — use `--repo` only for cross-re
 
 ## Reference
 
-If the user needs a command not shown above, read [references/commands.md](references/commands.md) for the full table.
+- Full workflow sequences: [references/workflows.md](references/workflows.md)
+- Complete command table: [references/commands.md](references/commands.md)

@@ -5,7 +5,7 @@ import { createClient, PostHogError } from '../lib/posthog-client.js'
 
 const CONFIG = {
   host: 'https://us.posthog.com',
-  projectId: '39507',
+  projectId: 'test-project-123',
   token: 'phx_test_token_abc123',
 }
 
@@ -243,10 +243,13 @@ describe('posthog-client: getInsightByShortId URL', () => {
   it('uses /insights/?short_id= in the request URL', async () => {
     const fetch = makeFetch({ status: 200, body: { count: 1, results: [{ id: 1 }] } })
     const client = createClient(CONFIG, fetch)
-    await client.getInsightByShortId('drOq2lO5')
+    await client.getInsightByShortId('test-insight-id')
     const url = fetch.calls[0]!.url
     assert.ok(url.includes('/insights/'), `URL must include /insights/: ${url}`)
-    assert.ok(url.includes('short_id=drOq2lO5'), `URL must include short_id=drOq2lO5: ${url}`)
+    assert.ok(
+      url.includes('short_id=test-insight-id'),
+      `URL must include short_id=test-insight-id: ${url}`,
+    )
   })
 })
 
