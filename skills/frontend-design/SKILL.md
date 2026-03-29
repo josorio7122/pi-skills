@@ -1,6 +1,6 @@
 ---
 name: frontend-design
-description: Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build or style any web UI. Generate creative, polished code and UI design that avoids generic AI aesthetics.
+description: Create distinctive, production-grade frontend interfaces with high design quality. Use when asked to build or style any web UI, "design a landing page," "make this look good," "build a homepage," or generate creative, polished code. Avoids generic AI aesthetics.
 ---
 
 Create distinctive, production-grade frontend interfaces. Prioritize aesthetic quality over generic patterns. Write real, working code with exceptional attention to visual detail.
