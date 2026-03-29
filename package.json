@@ -3,17 +3,19 @@
   "version": "1.0.0",
   "description": "Personal pi skills collection",
   "scripts": {
-    "test": "tsx --test tests/posthog-skill/*.test.ts tests/exa-search/*.test.ts",
-    "lint": "eslint skills/",
-    "format": "prettier --write skills/",
-    "format:check": "prettier --check skills/"
+    "test": "vitest run",
+    "lint": "biome check skills/ tests/",
+    "format": "biome format --write skills/ tests/",
+    "format:check": "biome format skills/ tests/",
+    "lint:fix": "biome check --fix skills/ tests/",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run lint && npm run typecheck && npm run test"
   },
   "keywords": [
     "pi-package"
   ],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.30.1",
   "private": "true",
   "pi": {
     "skills": [
@@ -25,12 +27,10 @@
     "exa-js": "^2.10.0"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
+    "@biomejs/biome": "^2.4.9",
     "@types/node": "^25.5.0",
-    "eslint": "^10.1.0",
-    "prettier": "^3.8.1",
     "tsx": "^4.21.0",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.57.2"
+    "vitest": "^4.1.2"
   }
 }

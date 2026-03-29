@@ -15,7 +15,7 @@
  *   tsx scripts/flags-get.ts 101
  */
 
-import { parseArgs, resolveConfig, requireToken, executeAndPrint } from './lib/common.js'
+import { executeAndPrint, parseArgs, requireToken, resolveConfig } from './lib/common.js'
 import { createClient } from './lib/posthog-client.js'
 
 const { target: id } = parseArgs(import.meta.url)

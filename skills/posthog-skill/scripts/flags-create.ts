@@ -22,7 +22,7 @@
  *   tsx scripts/flags-create.ts "my-new-flag" '{"name":"My New Flag","tags":["release"]}'
  */
 
-import { parseArgs, resolveConfig, requireToken, executeAndPrint } from './lib/common.js'
+import { executeAndPrint, parseArgs, requireToken, resolveConfig } from './lib/common.js'
 import { createClient } from './lib/posthog-client.js'
 
 const { target: key, opts } = parseArgs(import.meta.url)
@@ -33,7 +33,7 @@ requireToken(config)
 const client = createClient(config)
 
 const body: Record<string, unknown> = {}
-if (opts.name !== undefined) body['name'] = opts.name
-if (opts.tags !== undefined) body['tags'] = opts.tags
+if (opts.name !== undefined) body.name = opts.name
+if (opts.tags !== undefined) body.tags = opts.tags
 
 await executeAndPrint(() => client.createFeatureFlag(key, body))

@@ -1,44 +1,63 @@
-import { describe, it } from 'node:test'
-import assert from 'node:assert/strict'
-import { run } from './helpers.js'
+import { spawnSync } from 'node:child_process'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { describe, expect, it } from 'vitest'
 
-describe('status command', () => {
-  it('exits 0 with no token set', () => {
-    const result = run(['status'], { POSTHOG_PERSONAL_API_KEY: '' })
-    assert.strictEqual(result.status, 0, `expected exit 0, got ${result.status}\n${result.stderr}`)
-  })
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const STATUS_SCRIPT = path.join(
+	__dirname,
+	'..',
+	'..',
+	'skills',
+	'posthog-skill',
+	'scripts',
+	'status.ts',
+)
 
-  it('stdout contains NOT SET when no token', () => {
-    const result = run(['status'], { POSTHOG_PERSONAL_API_KEY: '' })
-    assert.ok(result.stdout.includes('NOT SET'), `expected "NOT SET" in stdout:\n${result.stdout}`)
-  })
+function runScript(env: Record<string, string> = {}): {
+	status: number
+	stdout: string
+	stderr: string
+} {
+	const result = spawnSync('npx', ['tsx', STATUS_SCRIPT], {
+		encoding: 'utf8',
+		env: { ...process.env, ...env },
+	})
+	return {
+		status: result.status ?? -1,
+		stdout: result.stdout ?? '',
+		stderr: result.stderr ?? '',
+	}
+}
 
-  it('stdout contains masked token when token is set', () => {
-    const result = run(['status'], { POSTHOG_PERSONAL_API_KEY: 'phx_supersecrettoken123' })
-    assert.ok(
-      result.stdout.includes('***'),
-      `expected masked token "***" in stdout:\n${result.stdout}`,
-    )
-    assert.ok(
-      !result.stdout.includes('supersecrettoken123'),
-      'token value must not appear in plaintext',
-    )
-  })
+describe('status script', () => {
+	it('exits 0 with no token set', () => {
+		const result = runScript({ POSTHOG_PERSONAL_API_KEY: '' })
+		expect(result.status).toBe(0)
+	})
 
-  it('stdout is valid JSON', () => {
-    const result = run(['status'], { POSTHOG_PERSONAL_API_KEY: '' })
-    assert.doesNotThrow(
-      () => JSON.parse(result.stdout),
-      `stdout is not valid JSON:\n${result.stdout}`,
-    )
-  })
+	it('stdout contains NOT SET when no token', () => {
+		const result = runScript({ POSTHOG_PERSONAL_API_KEY: '' })
+		expect(result.stdout).toContain('NOT SET')
+	})
 
-  it('includes project_id in output', () => {
-    const result = run(['status'], {
-      POSTHOG_PERSONAL_API_KEY: '',
-      POSTHOG_PROJECT_ID: 'test-project-123',
-    })
-    const parsed = JSON.parse(result.stdout) as { project_id: unknown }
-    assert.ok(parsed.project_id, 'output must include project_id')
-  })
+	it('stdout contains masked token when token is set', () => {
+		const result = runScript({ POSTHOG_PERSONAL_API_KEY: 'phx_supersecrettoken123' })
+		expect(result.stdout).toContain('***')
+		expect(result.stdout).not.toContain('supersecrettoken123')
+	})
+
+	it('stdout is valid JSON', () => {
+		const result = runScript({ POSTHOG_PERSONAL_API_KEY: '' })
+		expect(() => JSON.parse(result.stdout)).not.toThrow()
+	})
+
+	it('includes project_id in output', () => {
+		const result = runScript({
+			POSTHOG_PERSONAL_API_KEY: '',
+			POSTHOG_PROJECT_ID: 'test-project-123',
+		})
+		const parsed = JSON.parse(result.stdout) as { project_id: unknown }
+		expect(parsed.project_id).toBeTruthy()
+	})
 })

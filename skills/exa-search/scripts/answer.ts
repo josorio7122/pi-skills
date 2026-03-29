@@ -26,7 +26,14 @@
  *   tsx scripts/answer.ts "List top 3 ORMs" '{"outputSchema":{"type":"object","properties":{"items":{"type":"array","items":{"type":"string"}}}}}'
  */
 
-import { parseArgs, requireApiKey, handleError, filterOptions, createClient, out } from './lib/common.js'
+import {
+	createClient,
+	filterOptions,
+	handleError,
+	out,
+	parseArgs,
+	requireApiKey,
+} from './lib/common.js'
 
 const { target: query, opts } = parseArgs(import.meta.url)
 requireApiKey()
@@ -34,29 +41,29 @@ requireApiKey()
 const exa = createClient()
 
 const answerOpts = filterOptions(opts, [
-  'text',
-  'model',
-  'systemPrompt',
-  'outputSchema',
-  'userLocation',
+	'text',
+	'model',
+	'systemPrompt',
+	'outputSchema',
+	'userLocation',
 ])
 
 try {
-  if (opts.stream) {
-    // Streaming mode — write chunks as they arrive
-    for await (const chunk of exa.streamAnswer(query, answerOpts)) {
-      const typedChunk = chunk as { content?: string; citations?: unknown }
-      if (typedChunk.content) process.stdout.write(typedChunk.content)
-      if (typedChunk.citations) {
-        process.stdout.write('\n')
-        out({ citations: typedChunk.citations })
-      }
-    }
-    process.stdout.write('\n')
-  } else {
-    const result = await exa.answer(query, answerOpts)
-    out(result)
-  }
+	if (opts.stream) {
+		// Streaming mode — write chunks as they arrive
+		for await (const chunk of exa.streamAnswer(query, answerOpts)) {
+			const typedChunk = chunk as { content?: string; citations?: unknown }
+			if (typedChunk.content) process.stdout.write(typedChunk.content)
+			if (typedChunk.citations) {
+				process.stdout.write('\n')
+				out({ citations: typedChunk.citations })
+			}
+		}
+		process.stdout.write('\n')
+	} else {
+		const result = await exa.answer(query, answerOpts)
+		out(result)
+	}
 } catch (err) {
-  handleError(err)
+	handleError(err)
 }

@@ -53,19 +53,19 @@
  */
 
 import {
-  showHelp,
-  requireApiKey,
-  handleError,
-  requireArg,
-  createClient,
-  executeAndPrint,
+	createClient,
+	executeAndPrint,
+	handleError,
+	requireApiKey,
+	requireArg,
+	showHelp,
 } from './lib/common.js'
 
 // research.ts has a subcommand pattern: parseArgs assumes args[1] is JSON opts,
 // which conflicts with create/run where args[1] is instructions text. Use
 // showHelp directly and index process.argv by position instead.
 if (process.argv.includes('--help') || process.argv.length <= 2) {
-  showHelp(import.meta.url)
+	showHelp(import.meta.url)
 }
 
 const subcommand = process.argv[2]
@@ -76,84 +76,84 @@ requireApiKey()
 const exa = createClient()
 
 try {
-  switch (subcommand) {
-    case 'create': {
-      const instructions = requireArg(arg1, 'instructions')
-      const opts: Record<string, unknown> = process.argv[4]
-        ? (JSON.parse(process.argv[4]) as Record<string, unknown>)
-        : {}
-      await executeAndPrint(async () =>
-        exa.research.create({
-          instructions,
-          model:
-            (opts.model as 'exa-research-fast' | 'exa-research' | 'exa-research-pro') ?? undefined,
-          outputSchema: (opts.outputSchema as Record<string, unknown>) ?? undefined,
-        }),
-      )
-      break
-    }
+	switch (subcommand) {
+		case 'create': {
+			const instructions = requireArg(arg1, 'instructions')
+			const opts: Record<string, unknown> = process.argv[4]
+				? (JSON.parse(process.argv[4]) as Record<string, unknown>)
+				: {}
+			await executeAndPrint(async () =>
+				exa.research.create({
+					instructions,
+					model:
+						(opts.model as 'exa-research-fast' | 'exa-research' | 'exa-research-pro') ?? undefined,
+					outputSchema: (opts.outputSchema as Record<string, unknown>) ?? undefined,
+				}),
+			)
+			break
+		}
 
-    case 'get': {
-      const researchId = requireArg(arg1, 'research-id')
-      const opts: Record<string, unknown> = process.argv[4]
-        ? (JSON.parse(process.argv[4]) as Record<string, unknown>)
-        : {}
-      if (opts.stream) {
-        const streamResult = await exa.research.get(researchId, { stream: true, ...opts })
-        for await (const event of streamResult) {
-          process.stdout.write(JSON.stringify(event) + '\n')
-        }
-      } else {
-        await executeAndPrint(async () => exa.research.get(researchId, opts))
-      }
-      break
-    }
+		case 'get': {
+			const researchId = requireArg(arg1, 'research-id')
+			const opts: Record<string, unknown> = process.argv[4]
+				? (JSON.parse(process.argv[4]) as Record<string, unknown>)
+				: {}
+			if (opts.stream) {
+				const streamResult = await exa.research.get(researchId, { stream: true, ...opts })
+				for await (const event of streamResult) {
+					process.stdout.write(JSON.stringify(event) + '\n')
+				}
+			} else {
+				await executeAndPrint(async () => exa.research.get(researchId, opts))
+			}
+			break
+		}
 
-    case 'poll': {
-      const researchId = requireArg(arg1, 'research-id')
-      const opts: Record<string, unknown> = process.argv[4]
-        ? (JSON.parse(process.argv[4]) as Record<string, unknown>)
-        : {}
-      await executeAndPrint(async () => exa.research.pollUntilFinished(researchId, opts))
-      break
-    }
+		case 'poll': {
+			const researchId = requireArg(arg1, 'research-id')
+			const opts: Record<string, unknown> = process.argv[4]
+				? (JSON.parse(process.argv[4]) as Record<string, unknown>)
+				: {}
+			await executeAndPrint(async () => exa.research.pollUntilFinished(researchId, opts))
+			break
+		}
 
-    case 'run': {
-      const instructions = requireArg(arg1, 'instructions')
-      const opts: Record<string, unknown> = process.argv[4]
-        ? (JSON.parse(process.argv[4]) as Record<string, unknown>)
-        : {}
-      const created = await exa.research.create({
-        instructions,
-        model:
-          (opts.model as 'exa-research-fast' | 'exa-research' | 'exa-research-pro') ?? undefined,
-        outputSchema: (opts.outputSchema as Record<string, unknown>) ?? undefined,
-      })
-      const createdTyped = created as { researchId: string }
-      process.stderr.write(`Research task created: ${createdTyped.researchId} — polling...\n`)
-      await executeAndPrint(async () =>
-        exa.research.pollUntilFinished(createdTyped.researchId, {
-          pollInterval: (opts.pollInterval as number) || 2000,
-          timeoutMs: (opts.timeoutMs as number) || 300000,
-          events: opts.events as boolean | undefined,
-        }),
-      )
-      break
-    }
+		case 'run': {
+			const instructions = requireArg(arg1, 'instructions')
+			const opts: Record<string, unknown> = process.argv[4]
+				? (JSON.parse(process.argv[4]) as Record<string, unknown>)
+				: {}
+			const created = await exa.research.create({
+				instructions,
+				model:
+					(opts.model as 'exa-research-fast' | 'exa-research' | 'exa-research-pro') ?? undefined,
+				outputSchema: (opts.outputSchema as Record<string, unknown>) ?? undefined,
+			})
+			const createdTyped = created as { researchId: string }
+			process.stderr.write(`Research task created: ${createdTyped.researchId} — polling...\n`)
+			await executeAndPrint(async () =>
+				exa.research.pollUntilFinished(createdTyped.researchId, {
+					pollInterval: (opts.pollInterval as number) || 2000,
+					timeoutMs: (opts.timeoutMs as number) || 300000,
+					...(typeof opts.events === 'boolean' ? { events: opts.events } : {}),
+				}),
+			)
+			break
+		}
 
-    case 'list': {
-      const opts: Record<string, unknown> = arg1
-        ? (JSON.parse(arg1) as Record<string, unknown>)
-        : {}
-      await executeAndPrint(async () => exa.research.list(opts))
-      break
-    }
+		case 'list': {
+			const opts: Record<string, unknown> = arg1
+				? (JSON.parse(arg1) as Record<string, unknown>)
+				: {}
+			await executeAndPrint(async () => exa.research.list(opts))
+			break
+		}
 
-    default:
-      process.stderr.write(`Error: Unknown subcommand "${subcommand}".\n`)
-      process.stderr.write('Valid subcommands: create, get, poll, list, run\n')
-      process.exit(1)
-  }
+		default:
+			process.stderr.write(`Error: Unknown subcommand "${subcommand}".\n`)
+			process.stderr.write('Valid subcommands: create, get, poll, list, run\n')
+			process.exit(1)
+	}
 } catch (err) {
-  handleError(err)
+	handleError(err)
 }

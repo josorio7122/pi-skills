@@ -21,7 +21,7 @@
  *   tsx scripts/flags-activity.ts 101 '{"limit":5}'
  */
 
-import { parseArgs, resolveConfig, requireToken, executeAndPrint } from './lib/common.js'
+import { executeAndPrint, parseArgs, requireToken, resolveConfig } from './lib/common.js'
 import { createClient } from './lib/posthog-client.js'
 
 const { target: id, opts } = parseArgs(import.meta.url)
@@ -32,5 +32,5 @@ requireToken(config)
 const client = createClient(config)
 
 await executeAndPrint(() =>
-  client.getFeatureFlagActivity(id, (opts.limit as number | undefined) ?? 10),
+	client.getFeatureFlagActivity(id, (opts.limit as number | undefined) ?? 10),
 )

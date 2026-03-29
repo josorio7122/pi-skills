@@ -25,12 +25,7 @@
  *   tsx scripts/flags-list.ts '{"active":"true","limit":10}'
  */
 
-import {
-  parseArgsOptional,
-  resolveConfig,
-  requireToken,
-  executeAndPrint,
-} from './lib/common.js'
+import { executeAndPrint, parseArgsOptional, requireToken, resolveConfig } from './lib/common.js'
 import { createClient } from './lib/posthog-client.js'
 
 const { opts } = parseArgsOptional(import.meta.url)
@@ -40,11 +35,10 @@ requireToken(config)
 
 const client = createClient(config)
 
-await executeAndPrint(() =>
-  client.listFeatureFlags({
-    search: opts.search as string | undefined,
-    active: opts.active as string | undefined,
-    type: opts.type as string | undefined,
-    limit: opts.limit as number | undefined,
-  }),
-)
+const params: Record<string, string | number> = {}
+if (typeof opts.search === 'string') params.search = opts.search
+if (typeof opts.active === 'string') params.active = opts.active
+if (typeof opts.type === 'string') params.type = opts.type
+if (typeof opts.limit === 'number') params.limit = opts.limit
+
+await executeAndPrint(() => client.listFeatureFlags(params))
