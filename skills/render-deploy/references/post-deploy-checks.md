@@ -4,11 +4,11 @@ Use this after any deploy or service creation. Keep it short; stop when a check 
 
 ## 1) Confirm deploy status
 
-```
-list_deploys(serviceId: "<service-id>", limit: 1)
+```bash
+render deploys list <SERVICE_ID> --output json
 ```
 
-- Expect `status: "live"`.
+- Expect `"status": "live"` in the most recent deploy object.
 - If status is failed, inspect build/runtime logs immediately.
 
 ## 2) Verify service health
@@ -18,8 +18,8 @@ list_deploys(serviceId: "<service-id>", limit: 1)
 
 ## 3) Scan recent error logs
 
-```
-list_logs(resource: ["<service-id>"], level: ["error"], limit: 50)
+```bash
+render logs -r <SERVICE_ID> --level error --output json
 ```
 
 - If you see a clear error signature, jump to the matching fix in

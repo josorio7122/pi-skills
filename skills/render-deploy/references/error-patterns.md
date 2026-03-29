@@ -4,7 +4,7 @@ Use this to quickly map log signatures to likely causes and fixes.
 
 | Log pattern                                      | Likely cause          | Quick fix                                            |
 | ------------------------------------------------ | --------------------- | ---------------------------------------------------- |
-| `KeyError`, `not defined`, `missing environment` | Missing env var       | Add env var in render.yaml or via MCP, then redeploy |
+| `KeyError`, `not defined`, `missing environment` | Missing env var       | Add env var in render.yaml or via CLI, then redeploy |
 | `EADDRINUSE`, `listen EADDRINUSE`                | Port binding conflict | Bind to `0.0.0.0:$PORT`                              |
 | `Cannot find module`, `ModuleNotFoundError`      | Missing dependency    | Add dependency to manifest and rebuild               |
 | `ECONNREFUSED`, `connection refused`             | DB not reachable      | Verify DATABASE_URL and DB status                    |

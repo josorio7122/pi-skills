@@ -1,6 +1,6 @@
-# Direct Creation (MCP) Details
+# Direct Creation (CLI) Details
 
-Use this reference for MCP direct-creation examples and follow-on configuration.
+Use this reference for Render CLI direct-creation commands and follow-on configuration.
 
 ## Direct Creation Workflow
 
@@ -8,114 +8,117 @@ Use this reference for MCP direct-creation examples and follow-on configuration.
 
 Use [codebase-analysis.md](codebase-analysis.md) to determine runtime, build/start commands, env vars, and datastores.
 
-### Step 2: Create Resources via MCP
+### Step 2: Create Resources via CLI
 
 **Create a Web Service:**
 
+```bash
+render services create \
+  --name my-api \
+  --type web_service \
+  --repo https://github.com/username/repo \
+  --runtime node \
+  --build-command "npm ci" \
+  --start-command "npm start" \
+  --plan free \
+  --region oregon \
+  --env-var NODE_ENV=production \
+  --output json
 ```
-create_web_service(
-  name: "my-api",
-  runtime: "node",  # or python, go, rust, ruby, elixir, docker
-  repo: "https://github.com/username/repo",
-  branch: "main",  # optional, defaults to repo default branch
-  buildCommand: "npm ci",
-  startCommand: "npm start",
-  plan: "free",  # free, starter, standard, pro, pro_max, pro_plus, pro_ultra
-  region: "oregon",  # oregon, frankfurt, singapore, ohio, virginia
-  envVars: [
-    {"key": "NODE_ENV", "value": "production"}
-  ]
-)
-```
+
+Valid runtimes: `node`, `python`, `go`, `rust`, `ruby`, `elixir`, `docker`
+Valid plans: `free`, `starter`, `standard`, `pro`, `pro_max`, `pro_plus`, `pro_ultra`
+Valid regions: `oregon`, `frankfurt`, `singapore`, `ohio`, `virginia`
+
+Pass `--env-var KEY=VALUE` multiple times to set multiple variables at creation.
 
 **Create a Static Site:**
 
+```bash
+render services create \
+  --name my-frontend \
+  --type static_site \
+  --repo https://github.com/username/repo \
+  --build-command "npm run build" \
+  --publish-directory dist \
+  --env-var VITE_API_URL=https://api.example.com \
+  --output json
 ```
-create_static_site(
-  name: "my-frontend",
-  repo: "https://github.com/username/repo",
-  branch: "main",
-  buildCommand: "npm run build",
-  publishPath: "dist",  # or build, public, out
-  envVars: [
-    {"key": "VITE_API_URL", "value": "https://api.example.com"}
-  ]
-)
-```
+
+Common publish directories: `dist`, `build`, `public`, `out`
 
 **Create a Cron Job:**
 
-```
-create_cron_job(
-  name: "daily-cleanup",
-  runtime: "node",
-  repo: "https://github.com/username/repo",
-  schedule: "0 0 * * *",  # Daily at midnight (cron syntax)
-  buildCommand: "npm ci",
-  startCommand: "node scripts/cleanup.js",
-  plan: "free"
-)
+```bash
+render services create \
+  --name daily-cleanup \
+  --type cron_job \
+  --repo https://github.com/username/repo \
+  --runtime node \
+  --cron-schedule "0 0 * * *" \
+  --cron-command "node scripts/cleanup.js" \
+  --plan free \
+  --output json
 ```
 
 **Create a PostgreSQL Database:**
 
-```
-create_postgres(
-  name: "myapp-db",
-  plan: "free",  # free, basic_256mb, basic_1gb, basic_4gb, pro_4gb, etc.
-  region: "oregon"
-)
-```
+> ⚠️ **Not available via CLI.** Create via Blueprint (`render.yaml`) or the Render Dashboard:
+> `https://dashboard.render.com`
 
 **Create a Key-Value Store (Redis):**
 
-```
-create_key_value(
-  name: "myapp-cache",
-  plan: "free",  # free, starter, standard, pro, pro_plus
-  region: "oregon",
-  maxmemoryPolicy: "allkeys_lru"  # eviction policy
-)
-```
+> ⚠️ **Not available via CLI.** Create via Blueprint (`render.yaml`) or the Render Dashboard:
+> `https://dashboard.render.com`
+
+For apps that need a database or cache, use the Blueprint method instead so all resources are
+provisioned together.
 
 ### Step 3: Configure Environment Variables
 
-After creating services, add environment variables:
+After creating a service, update environment variables:
 
-```
-update_environment_variables(
-  serviceId: "<service-id-from-creation>",
-  envVars: [
-    {"key": "DATABASE_URL", "value": "<connection-string>"},
-    {"key": "JWT_SECRET", "value": "<secret-value>"},
-    {"key": "API_KEY", "value": "<api-key>"}
-  ]
-)
+```bash
+render services update <SERVICE_ID> \
+  --env-var DATABASE_URL=<connection-string> \
+  --env-var JWT_SECRET=<secret-value> \
+  --env-var API_KEY=<api-key> \
+  --output json \
+  --confirm
 ```
 
-**Note:** For database connection strings, get the internal URL from the database details in Dashboard or via `get_postgres(postgresId: "<id>")`.
+Pass `--env-var KEY=VALUE` multiple times for multiple variables.
+
+`<SERVICE_ID>` is returned in the JSON output of `render services create`. You can also retrieve it
+with:
+
+```bash
+render services --output json
+```
+
+**Note:** For database connection strings, copy the internal URL from the Render Dashboard service
+detail page.
 
 ### Step 4: Verify Deployment
 
-Services with `autoDeploy: "yes"` (default) will deploy automatically when created.
+Services deploy automatically when created.
 
 **Check deployment status:**
 
+```bash
+render deploys list <SERVICE_ID> --output json
 ```
-list_deploys(serviceId: "<service-id>", limit: 1)
-```
+
+Look for `"status": "live"` in the most recent deploy object.
 
 **Monitor logs for errors:**
 
-```
-list_logs(resource: ["<service-id>"], level: ["error"], limit: 50)
+```bash
+render logs -r <SERVICE_ID> --level error --output json
 ```
 
 **Check health metrics:**
 
-```
-get_metrics(
-  resourceId: "<service-id>",
-  metricTypes: ["http_request_count", "cpu_usage", "memory_usage"]
-)
-```
+> Metrics (CPU, memory, request count) are not available via the CLI. Visit the Render Dashboard to
+> view them:
+> `https://dashboard.render.com`

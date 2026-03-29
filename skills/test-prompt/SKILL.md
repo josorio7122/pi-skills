@@ -3,7 +3,7 @@ name: test-prompt
 description: Test any prompt before deployment using RED-GREEN-REFACTOR applied to prompt engineering. Use when creating or editing commands, hooks, skills, sub-agent instructions, or production LLM prompts to verify they produce desired behavior. Also use when asked to "test this prompt", "verify prompt behavior", "stress test a skill", "check if this prompt works", or any prompt validation task. Uses subagents for isolated testing.
 metadata:
   author: NeoLabHQ
-  version: "1.0"
+  version: '1.0'
   source: https://github.com/NeoLabHQ/context-engineering-kit/blob/master/plugins/customaize-agent/skills/test-prompt/SKILL.md
   license: See source repository
 ---
@@ -18,24 +18,24 @@ Test any prompt before deployment: commands, hooks, skills, subagent instruction
 
 ## TDD Mapping for Prompt Testing
 
-| TDD Phase | Prompt Testing | What You Do |
-|-----------|----------------|-------------|
-| **RED** | Baseline test | Run scenario WITHOUT prompt, observe behavior |
-| **Verify RED** | Document behavior | Capture exact agent actions/reasoning verbatim |
-| **GREEN** | Write prompt | Address specific baseline failures |
-| **Verify GREEN** | Test with prompt | Run WITH prompt, verify improvement |
-| **REFACTOR** | Optimize prompt | Close loopholes, reduce tokens, improve clarity |
-| **Stay GREEN** | Re-verify | Test again with fresh context, ensure still works |
+| TDD Phase        | Prompt Testing    | What You Do                                       |
+| ---------------- | ----------------- | ------------------------------------------------- |
+| **RED**          | Baseline test     | Run scenario WITHOUT prompt, observe behavior     |
+| **Verify RED**   | Document behavior | Capture exact agent actions/reasoning verbatim    |
+| **GREEN**        | Write prompt      | Address specific baseline failures                |
+| **Verify GREEN** | Test with prompt  | Run WITH prompt, verify improvement               |
+| **REFACTOR**     | Optimize prompt   | Close loopholes, reduce tokens, improve clarity   |
+| **Stay GREEN**   | Re-verify         | Test again with fresh context, ensure still works |
 
 ## Prompt Types & Testing Strategies
 
-| Prompt Type | Test Focus | Key Question |
-|-------------|------------|--------------|
-| **Instruction** | Steps followed correctly? | Does agent skip steps? |
-| **Discipline-enforcing** | Resists rationalization under pressure? | Does agent rationalize violations? |
-| **Guidance** | Advice applied appropriately? | Does agent misapply in wrong context? |
-| **Reference** | Information accurate and accessible? | Is anything missing or wrong? |
-| **Subagent** | Task accomplished reliably? | Does task fail on edge cases? |
+| Prompt Type              | Test Focus                              | Key Question                          |
+| ------------------------ | --------------------------------------- | ------------------------------------- |
+| **Instruction**          | Steps followed correctly?               | Does agent skip steps?                |
+| **Discipline-enforcing** | Resists rationalization under pressure? | Does agent rationalize violations?    |
+| **Guidance**             | Advice applied appropriately?           | Does agent misapply in wrong context? |
+| **Reference**            | Information accurate and accessible?    | Is anything missing or wrong?         |
+| **Subagent**             | Task accomplished reliably?             | Does task fail on edge cases?         |
 
 ## RED Phase: Baseline Testing
 
@@ -50,6 +50,7 @@ Test any prompt before deployment: commands, hooks, skills, subagent instruction
 ### Scenario Design by Prompt Type
 
 **Instruction prompts** — test if steps are followed and edge cases handled:
+
 ```
 Task: You need to commit changes.
 Files: src/payment.ts (complete), src/experimental.ts (broken WIP)
@@ -58,6 +59,7 @@ Make the commit.
 ```
 
 **Discipline-enforcing prompts** — test resistance under pressure:
+
 ```
 You spent 4 hours implementing a payment feature. It works perfectly.
 You manually tested edge cases. It's 6pm, exhausted.
@@ -67,6 +69,7 @@ Choose and be honest.
 ```
 
 **Guidance prompts** — test if advice is understood in varied contexts:
+
 ```
 Design a system for processing 10,000 webhook events per second.
 Each event triggers database updates and external API calls.
@@ -78,6 +81,7 @@ Must be resilient to downstream failures.
 Write prompt addressing ONLY the specific baseline failures documented. Do not add content for hypothetical cases.
 
 **For instruction prompts** — add explicit steps for each failure:
+
 ```
 1. Review changes (git status, git diff)
 2. Run tests before committing
@@ -86,6 +90,7 @@ Write prompt addressing ONLY the specific baseline failures documented. Do not a
 ```
 
 **For discipline-enforcing prompts** — add explicit counters for each rationalization:
+
 ```
 | Excuse | Reality |
 |--------|---------|
@@ -94,6 +99,7 @@ Write prompt addressing ONLY the specific baseline failures documented. Do not a
 ```
 
 **Success criteria:**
+
 - Agent follows prompt instructions
 - Baseline failures no longer occur
 - Agent cites prompt when relevant
@@ -119,6 +125,7 @@ Add to prompt:
 Ask the agent: "You read the prompt and chose C when A was correct. How could the prompt be written differently to make A the only acceptable answer?"
 
 Three possible responses:
+
 1. "The prompt WAS clear, I chose to ignore it" → need stronger authority language
 2. "The prompt should have said X" → clarity problem, add their suggestion
 3. "I didn't see section Y" → organization problem, make key points prominent
@@ -142,26 +149,32 @@ Re-test after optimization to ensure behavior unchanged.
 ## Subagent Testing Patterns
 
 ### Parallel Baseline
+
 Launch 3-5 scenarios simultaneously to find failure patterns faster.
 
 ### A/B Testing
+
 Same scenario, different prompt versions. Compare clarity, tokens, correctness.
 
 ### Regression Testing
+
 After changing prompt, re-run all previous test scenarios.
 
 ### Stress Testing
+
 Maximum pressure, ambiguous edge cases, contradictory constraints, minimal context. Verify prompt provides adequate guidance even in worst case.
 
 ## Testing Checklist
 
 **RED Phase:**
+
 - [ ] Designed test scenarios for prompt type
 - [ ] Ran scenarios WITHOUT prompt
 - [ ] Documented agent behavior/failures verbatim
 - [ ] Identified patterns and critical failures
 
 **GREEN Phase:**
+
 - [ ] Wrote prompt addressing specific baseline failures
 - [ ] Applied appropriate degrees of freedom
 - [ ] Used persuasion principles if discipline-enforcing
@@ -169,6 +182,7 @@ Maximum pressure, ambiguous edge cases, contradictory constraints, minimal conte
 - [ ] Verified baseline failures resolved
 
 **REFACTOR Phase:**
+
 - [ ] Tested for new rationalizations/loopholes
 - [ ] Added explicit counters for discipline violations
 - [ ] Used meta-testing to verify clarity

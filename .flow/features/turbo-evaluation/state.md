@@ -1,9 +1,9 @@
 ---
 feature: turbo-evaluation
 started_at: 2026-03-29T01:50:09.097Z
-last_updated: 2026-03-29T04:00:20.212Z
-budget_total_tokens: 215515
-budget_total_cost_usd: 12.463552100000003
+last_updated: 2026-03-29T04:17:05.279Z
+budget_total_tokens: 240829
+budget_total_cost_usd: 13.943913050000004
 ---
 
 ## Progress Log
@@ -103,3 +103,15 @@ dispatch: builder: exit=0, builder: exit=0, builder: exit=0, builder: exit=0
 
 ### 2026-03-29 04:00
 dispatch: builder: exit=0, builder: exit=0, builder: exit=0, builder: exit=0
+
+### 2026-03-29 04:08
+dispatch: scout: exit=0, scout: exit=0
+
+### 2026-03-29 04:10
+dispatch: scout: exit=0
+
+### 2026-03-29 04:13
+dispatch: scout: exit=0, probe: exit=0
+
+### 2026-03-29 04:17
+dispatch: builder: exit=0

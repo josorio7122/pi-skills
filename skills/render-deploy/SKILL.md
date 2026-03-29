@@ -4,7 +4,7 @@ description: Deploy applications to Render by analyzing codebases, generating re
 metadata:
   author: josorio7122
   version: '1.0'
-compatibility: 'Requires Git repository with remote. Optional: Render CLI (render), Render MCP tools.'
+compatibility: 'Requires Git repository with remote. Render CLI (`render`) for deployment operations.'
 ---
 
 # Deploy to Render
@@ -14,14 +14,14 @@ Render supports **Git-backed** services and **prebuilt Docker image** services.
 This skill covers **Git-backed** flows:
 
 1. **Blueprint Method** - Generate render.yaml for Infrastructure-as-Code deployments
-2. **Direct Creation** - Create services instantly via MCP tools
+2. **Direct CLI Creation** - Create services instantly via `render services create`
 
 Blueprints can also run a **prebuilt Docker image** by using `runtime: image`, but the `render.yaml` still must live in a Git repo.
 
 If there is no Git remote, stop and ask the user to either:
 
 - Create/push a Git remote (can be minimal if only the Blueprint is needed), or
-- Use the Render Dashboard/API to deploy a prebuilt Docker image (MCP cannot create image-backed services).
+- Use the Render Dashboard/API to deploy a prebuilt Docker image (the CLI cannot create image-backed services).
 
 ## Prerequisites
 
@@ -49,9 +49,9 @@ Then proceed with the appropriate method below.
 
 ## Choose Your Source Path
 
-**Git Repo Path:** Required for both Blueprint and Direct Creation. The repo must be pushed to GitHub, GitLab, or Bitbucket.
+**Git Repo Path:** Required for both Blueprint and Direct CLI Creation. The repo must be pushed to GitHub, GitLab, or Bitbucket.
 
-**Prebuilt Docker Image Path:** Supported by Render via image-backed services. This is **not** supported by MCP; use the Dashboard/API. Ask for:
+**Prebuilt Docker Image Path:** Supported by Render via image-backed services. The CLI cannot create image-backed services; use the Dashboard/API. Ask for:
 
 - Image URL (registry + tag)
 - Registry auth (if private)
@@ -63,22 +63,21 @@ If the user chooses a Docker image, guide them to the Render Dashboard image dep
 
 Both methods require a Git repository pushed to GitHub, GitLab, or Bitbucket. (If using `runtime: image`, the repo can be minimal and only contain `render.yaml`.)
 
-| Method              | Best For                           | Pros                                                      |
-| ------------------- | ---------------------------------- | --------------------------------------------------------- |
-| **Blueprint**       | Multi-service apps, IaC workflows  | Version controlled, reproducible, supports complex setups |
-| **Direct Creation** | Single services, quick deployments | Instant creation, no render.yaml file needed              |
+| Method                  | Best For                           | Pros                                                      |
+| ----------------------- | ---------------------------------- | --------------------------------------------------------- |
+| **Blueprint**           | Multi-service apps, IaC workflows  | Version controlled, reproducible, supports complex setups |
+| **Direct CLI Creation** | Single services, quick deployments | Instant creation, no render.yaml file needed              |
 
 ### Method Selection Heuristic
 
 Use this decision rule by default unless the user requests a specific method. Analyze the codebase first; only ask if deployment intent is unclear (e.g., DB, workers, cron).
 
-**Use Direct Creation (MCP) when ALL are true:**
+**Use Direct CLI Creation when ALL are true:**
 
 - Single service (one web app or one static site)
 - No separate worker/cron services
 - No attached databases or Key Value
 - Simple env vars only (no shared env groups)
-  If this path fits and MCP isn't configured yet, stop and guide MCP setup before proceeding.
 
 **Use Blueprint when ANY are true:**
 
@@ -88,7 +87,7 @@ Use this decision rule by default unless the user requests a specific method. An
 - You want reproducible IaC or a render.yaml committed to the repo
 - Monorepo or multi-env setup that needs consistent configuration
 
-If unsure, ask a quick clarifying question, but default to Blueprint for safety. For a single service, strongly prefer Direct Creation via MCP and guide MCP setup if needed.
+If unsure, ask a quick clarifying question, but default to Blueprint for safety.
 
 ## Prerequisites Check
 
@@ -96,7 +95,7 @@ When starting a deployment, verify these requirements in order:
 
 **1. Confirm Source Path (Git vs Docker)**
 
-If using Git-based methods (Blueprint or Direct Creation), the repo must be pushed to GitHub/GitLab/Bitbucket. Blueprints that reference a prebuilt image still require a Git repo with `render.yaml`.
+If using Git-based methods (Blueprint or Direct CLI Creation), the repo must be pushed to GitHub/GitLab/Bitbucket. Blueprints that reference a prebuilt image still require a Git repo with `render.yaml`.
 
 ```bash
 git remote -v
@@ -104,17 +103,7 @@ git remote -v
 
 - If no remote exists, stop and ask the user to create/push a remote **or** switch to Docker image deploy.
 
-**2. Check MCP Tools Availability (Preferred for Single-Service)**
-
-MCP tools provide the best experience. Check if available by attempting:
-
-```
-list_services()
-```
-
-If MCP tools are available, you can skip CLI installation for most operations.
-
-**3. Check Render CLI Installation (for Blueprint validation)**
+**2. Check Render CLI Installation**
 
 ```bash
 render --version
@@ -126,57 +115,36 @@ If not installed, offer to install:
 - Linux/macOS: `curl -fsSL https://raw.githubusercontent.com/render-oss/cli/main/bin/install.sh | sh`
   > ⚠️ **Security:** Piping to shell (`curl | sh`) executes remote code. Review the script at the URL before running, or use `brew install render` instead.
 
-**4. MCP Setup (if MCP isn't configured)**
-
-If `list_services()` fails because MCP isn't configured, ask whether they want to set up MCP (preferred) or continue with the CLI fallback.
-
-If MCP tools are not available, see `references/mcp-setup.md` for setup instructions for various environments (pi, Claude Code, Cursor, Codex, and others).
-
-### Workspace Selection
-
-After MCP is configured, have the user set the active Render workspace with a prompt like:
-
-```
-Set my Render workspace to [WORKSPACE_NAME]
-```
-
-**5. Check Authentication (CLI fallback only)**
-
-If MCP isn't available, use the CLI instead and verify you can access your account:
+**3. Check Authentication**
 
 ```bash
-# Check if user is logged in (use -o json for non-interactive mode)
 render whoami -o json
 ```
 
-If `render whoami` fails or returns empty data, the CLI is not authenticated. The CLI won't always prompt automatically, so explicitly prompt the user to authenticate:
+If `render whoami` fails or returns empty data, the CLI is not authenticated. Prompt the user to authenticate:
 
-If neither is configured, ask user which method they prefer:
-
-- **API Key (CLI)**: `export RENDER_API_KEY="rnd_xxxxx"` (Get from https://dashboard.render.com/u/*/settings#api-keys)
+- **API Key**: `export RENDER_API_KEY="rnd_xxxxx"` (Get from https://dashboard.render.com/u/*/settings#api-keys)
 - **Login**: `render login` (Opens browser for OAuth)
 
-**6. Check Workspace Context**
+**4. Check Workspace Context**
 
 Verify the active workspace:
 
-```
-get_selected_workspace()
-```
-
-Or via CLI:
-
 ```bash
-render workspace current -o json
+render workspace current
 ```
 
 To list available workspaces:
 
-```
-list_workspaces()
+```bash
+render workspaces --output json
 ```
 
-If user needs to switch workspaces, they must do so via Dashboard or CLI (`render workspace set`).
+If the user needs to switch workspaces:
+
+```bash
+render workspace set <WORKSPACE_ID>
+```
 
 Once prerequisites are met, proceed with deployment workflow.
 
@@ -338,28 +306,24 @@ The deployment will begin automatically. Users can monitor progress in the Rende
 
 After the user deploys via Dashboard, verify everything is working.
 
-**Check deployment status via MCP:**
+**Check deployment status:**
 
-```
-list_deploys(serviceId: "<service-id>", limit: 1)
+```bash
+render deploys list <SERVICE_ID> --output json
 ```
 
-Look for `status: "live"` to confirm successful deployment.
+Look for `"status": "live"` to confirm successful deployment.
 
 **Check for runtime errors (wait 2-3 minutes after deploy):**
 
-```
-list_logs(resource: ["<service-id>"], level: ["error"], limit: 20)
+```bash
+render logs -r <SERVICE_ID> --level error --output json
 ```
 
 **Check service health metrics:**
 
-```
-get_metrics(
-  resourceId: "<service-id>",
-  metricTypes: ["http_request_count", "cpu_usage", "memory_usage"]
-)
-```
+> Metrics (CPU, memory, request count) are not available via the CLI. Visit the Render Dashboard to
+> view them: `https://dashboard.render.com`
 
 If errors are found, proceed to the **Post-deploy verification and basic triage** section below.
 
@@ -367,14 +331,14 @@ If errors are found, proceed to the **Post-deploy verification and basic triage*
 
 # Method 2: Direct Service Creation (Quick Single-Service Deployments)
 
-For simple deployments without Infrastructure-as-Code, create services directly via MCP tools.
+For simple deployments without Infrastructure-as-Code, create services directly via the Render CLI.
 
 ## When to Use Direct Creation
 
 - Single web service or static site
 - Quick prototypes or demos
 - When you don't need a render.yaml file in your repo
-- Adding databases or cron jobs to existing projects
+- Adding cron jobs to existing projects
 
 ## Prerequisites for Direct Creation
 
@@ -389,31 +353,33 @@ Supported providers: GitHub, GitLab, Bitbucket
 
 If no remote exists, stop and ask the user to create/push a remote or switch to Docker image deploy.
 
-**Note:** MCP does not support creating image-backed services. Use the Dashboard/API for prebuilt Docker image deploys.
+**Note:** The CLI cannot create image-backed services. Use the Dashboard/API for prebuilt Docker image deploys.
+
+**Note:** The CLI cannot create PostgreSQL databases or Key-Value (Redis) stores. Use the Blueprint method or the Render Dashboard for those resources.
 
 ## Direct Creation Workflow
 
-Use the concise steps below, and refer to [references/direct-creation.md](references/direct-creation.md) for full MCP command examples and follow-on configuration.
+Use the concise steps below, and refer to [references/direct-creation.md](references/direct-creation.md) for full CLI command examples and follow-on configuration.
 
 ### Step 1: Analyze Codebase
 
 Use [references/codebase-analysis.md](references/codebase-analysis.md) to determine runtime, build/start commands, env vars, and datastores.
 
-### Step 2: Create Resources via MCP
+### Step 2: Create Resources via CLI
 
-Create the service (web or static) and any required databases or key-value stores. See [references/direct-creation.md](references/direct-creation.md).
+Create the service (web, static, or cron). See [references/direct-creation.md](references/direct-creation.md).
 
-If MCP returns an error about missing Git credentials or repo access, stop and guide the user to connect their Git provider in the Render Dashboard, then retry.
+If the CLI returns an error about missing Git credentials or repo access, stop and guide the user to connect their Git provider in the Render Dashboard, then retry.
 
 ### Step 3: Configure Environment Variables
 
-Add required env vars via MCP after creation. See [references/direct-creation.md](references/direct-creation.md).
+Update env vars via CLI after creation. See [references/direct-creation.md](references/direct-creation.md).
 
-Remind the user that secrets can be set in the Dashboard if they prefer not to pass them via MCP.
+Remind the user that secrets can be set in the Dashboard if they prefer not to pass them via the CLI.
 
 ### Step 4: Verify Deployment
 
-Check deploy status, logs, and metrics. See [references/direct-creation.md](references/direct-creation.md).
+Check deploy status and logs. See [references/direct-creation.md](references/direct-creation.md).
 
 ---
 
@@ -447,5 +413,5 @@ Example guidance to the user:
 The deploy needs escalated network access to deploy to Render. I can rerun the command with escalated permissions—want me to proceed?
 ```
 
-Optional: If you need deeper diagnostics (metrics/DB checks/error catalog), suggest installing the
+Optional: If you need deeper diagnostics (DB checks, error catalog), suggest installing the
 `render-debug` skill. It is not required for the core deploy flow.

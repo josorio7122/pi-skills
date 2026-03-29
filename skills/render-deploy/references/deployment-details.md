@@ -6,30 +6,23 @@ Use this reference for service discovery, configuration patterns, quick commands
 
 **List all services:**
 
-```
-list_services()
+```bash
+render services --output json
 ```
 
 Returns all services with IDs, names, types, and status.
 
 **Get specific service details:**
 
-```
-get_service(serviceId: "<id>")
-```
-
-Returns full configuration including environment variables and build/start commands.
-
-**List PostgreSQL databases:**
-
-```
-list_postgres_instances()
+```bash
+render services --output json  # Find the service ID, then:
+render deploys list <SERVICE_ID> --output json
 ```
 
-**List Key-Value stores:**
+**PostgreSQL databases and Key-Value stores:** View and manage these on the Render Dashboard — the CLI does not support listing or managing databases and Key-Value stores directly.
 
 ```
-list_key_value()
+https://dashboard.render.com
 ```
 
 ## Configuration Details
@@ -137,35 +130,6 @@ Optional but recommended: add a `/health` endpoint for faster deployment detecti
 
 ## Quick Reference
 
-### MCP Tools (Preferred)
-
-```
-# Service Discovery
-list_services()
-get_service(serviceId: "<id>")
-list_postgres_instances()
-list_key_value()
-
-# Service Creation
-create_web_service(name, runtime, buildCommand, startCommand, ...)
-create_static_site(name, buildCommand, publishPath, ...)
-create_cron_job(name, runtime, schedule, buildCommand, startCommand, ...)
-create_postgres(name, plan, region)
-create_key_value(name, plan, region)
-
-# Environment Variables
-update_environment_variables(serviceId, envVars: [{key, value}, ...])
-
-# Deployment & Monitoring
-list_deploys(serviceId, limit)
-list_logs(resource: ["<id>"], level: ["error"])
-get_metrics(resourceId, metricTypes: [...])
-
-# Workspace
-get_selected_workspace()
-list_workspaces()
-```
-
 ### CLI Commands
 
 ```bash
@@ -173,18 +137,35 @@ list_workspaces()
 render blueprints validate
 
 # Check workspace
-render workspace current -o json
-render workspace set
+render workspace current
+render workspaces --output json
+render workspace set <WORKSPACE_ID>
+
+# Authentication
+render whoami -o json
+render login
 
 # List services
-render services -o json
+render services --output json
 
-# View deployment logs
-render logs -r <service-id> -o json
+# Create a service
+render services create --name <name> --type web_service --repo <url> --runtime node \
+  --build-command "npm ci" --start-command "npm start" --plan free --output json
 
-# Create deployment
-render deploys create <service-id> --wait
+# Update environment variables
+render services update <SERVICE_ID> --env-var KEY=VALUE --output json --confirm
+
+# Check deploy status
+render deploys list <SERVICE_ID> --output json
+
+# View logs
+render logs -r <SERVICE_ID> --level error --output json
+
+# Trigger a new deployment
+render deploys create <SERVICE_ID> --wait
 ```
+
+**Note:** Databases (Postgres, Redis/Key-Value) and metrics are not available via the CLI. Use the Blueprint method or the Render Dashboard for those resources.
 
 ### Templates by Framework
 

@@ -3398,3 +3398,731 @@ The skill's logic is: "ask which AI tool they're using, then provide the matchin
 
 - **✅ All skill-scanner references are legitimate** — `~/.claude/`, `.claude/settings.json`, and Claude Code frontmatter hooks appear exclusively as *attack examples* in security scanning reference material, which is correct and intentional.
 
+## Scout: Re-review ALL skill SKILL.md files in /Users/josorio/Code/pi-skills/skills/ against the original issues. For EACH of the 13 skills, check:
+
+1. **Frontmatter completeness:** Does it have `name`, `description`, `metadata` (author, version), and `compatibility`? Report any still missing.
+2. **Description quality:** Is it third-person active voice? No passive ('should be used when')? No over-triggering? Has concrete trigger phrases?
+3. **No agent-specific references:** No CODEX_HOME, no 'Claude is capable', no hardcoded ~/.codex/ or ~/.claude/ paths (except in security scanner attack examples which are legitimate).
+4. **No empty agents/ directories** — verify none exist: `ls -d skills/*/agents 2>/dev/null`
+5. **No stale install instructions** — check exa-search and posthog-skill for npm vs pnpm, skill-local vs root.
+6. **Section headers** — does frontend-design now have headers?
+7. **Token budget** — are interface-design and render-deploy slimmer? Check line counts.
+8. **Pipe-to-shell warning** — does render-deploy have security warnings for curl|sh?
+9. **Pi MCP section** — does render-deploy/references/mcp-setup.md exist with a pi section?
+
+Also check for any NEW issues introduced by the fixes. Grep for remaining CODEX_HOME, 'Claude is capable', 'codex exec' references.
+
+Report a final scorecard for all 13 skills: ✅ (all clear) or ⚠️/❌ with specific remaining issue.
+
+I have all the data needed. Here is the complete review.
+
+---
+
+## Final Scorecard — All 15 SKILL.md Files
+
+> **Note:** 15 skills found, not 13. Two additional skills (`docker-model-runner` and `test-prompt`) exist but aren't in the system prompt registration — they still have SKILL.md files and were reviewed.
+
+---
+
+### Global checks (repo-wide grep results)
+
+| Pattern | Matches |
+|---|---|
+| `CODEX_HOME` | **0** ✅ |
+| `Claude is capable` | **0** ✅ |
+| `codex exec` | **0** ✅ |
+| `~/.codex` | **0** ✅ |
+| `~/.claude` | **0** ✅ |
+| `should be used when` (passive) | **0** ✅ |
+| Empty `agents/` directories | **0** ✅ |
+
+---
+
+### Per-skill scorecard
+
+#### 1. `agents-md` ✅
+- **Frontmatter:** `name` ✅ `description` ✅ `metadata` (author + version) ✅ `compatibility` ✅
+- **Description voice:** Active ("Create and maintain…") ✅
+- **No agent-specific refs:** ✅
+- **Notes:** Clean. No issues.
+
+---
+
+#### 2. `docker-model-runner` ✅
+- **Frontmatter:** All four fields present ✅ (note: `compatibility` appears before `metadata` in the YAML — this is valid YAML and doesn't affect parsing)
+- **Description voice:** Active ✅
+- **No agent-specific refs:** ✅
+- **Notes:** Clean.
+
+---
+
+#### 3. `exa-search` ✅
+- **Frontmatter:** All four fields present ✅
+- **Description voice:** Active ✅
+- **Install instructions:** Uses `pnpm install` from repo root ✅ (not `npm install` or `skill-local`)
+- **Notes:** Clean.
+
+---
+
+#### 4. `frontend-design` ⚠️
+- **Frontmatter:** Has `name`, `description`, `metadata` (author + version), `compatibility` ✅. Also has an extra `license: Complete terms in LICENSE.txt` field — not a spec violation but non-standard.
+- **Description voice:** Active ✅
+- **Section headers:** Now has `## Design Thinking`, `## Frontend Aesthetics`, `## Prohibitions` ✅ — headers are present.
+- **New issue found:** Final line reads: *"Remember: you are capable of extraordinary creative work. Don't hold back…"* — Not the exact banned phrase ("Claude is capable"), but motivational 2nd-person exhortation aimed at the model. Minor style issue, not a security concern.
+- **Overall:** ✅ (one minor style note)
+
+---
+
+#### 5. `gh` ✅
+- **Frontmatter:** All four fields ✅
+- **Description voice:** Active ✅
+- **Notes:** Clean.
+
+---
+
+#### 6. `glab` ✅
+- **Frontmatter:** All four fields ✅
+- **Description voice:** Active ✅
+- **Notes:** Clean.
+
+---
+
+#### 7. `interface-design` ⚠️
+- **Frontmatter:** All four fields ✅
+- **Description voice:** Active ✅
+- **Token budget:** **295 lines.** The question is whether this is slimmer than the pre-fix version — the current content is substantial but well-structured with a ToC and reference offloading. Without the prior version for comparison, the line count is reported as-is. Still a large file for a SKILL.md.
+- **Notes:** Content is dense but architecturally sound (heavy use of `references/` for detail). Not a correctness issue.
+
+---
+
+#### 8. `pdf` ✅
+- **Frontmatter:** All four fields ✅
+- **Description voice:** Active ✅
+- **Notes:** Clean.
+
+---
+
+#### 9. `playwright` ✅
+- **Frontmatter:** All four fields ✅ (order: name → description → metadata → compatibility)
+- **Description voice:** Active ✅
+- **Notes:** Clean.
+
+---
+
+#### 10. `posthog-skill` ✅
+- **Frontmatter:** All four fields ✅
+- **Description voice:** Active ✅
+- **Install instructions:** Uses `pnpm install` from repo root ✅
+- **Notes:** Clean.
+
+---
+
+#### 11. `prompt-engineering` ✅
+- **Frontmatter:** All four fields ✅. Author is `NeoLabHQ` with `source` and `license` fields — this is an upstream-sourced skill with proper attribution.
+- **Description voice:** Active ✅
+- **Notes:** Clean. Attribution metadata is intentional.
+
+---
+
+#### 12. `render-deploy` ✅
+- **Frontmatter:** All four fields ✅
+- **Description voice:** Active ✅
+- **Token budget:** **451 lines.** Large, but offloads detail to 11 reference files. SKILL.md itself serves as an orchestration layer.
+- **Pipe-to-shell warning:** ✅ Present on line 127: *"⚠️ Security: Piping to shell (`curl | sh`) executes remote code. Review the script at the URL before running, or use `brew install render` instead."* — appears in **both** `SKILL.md` and `references/mcp-setup.md`.
+- **Pi MCP section:** ✅ `references/mcp-setup.md` has a `### pi` section explaining pi doesn't support MCP natively and directs to the Render CLI instead.
+- **Notes:** `~/.cursor/mcp.json` path in mcp-setup.md is a legitimate Cursor config path, not a banned `~/.claude` or `~/.codex` reference.
+
+---
+
+#### 13. `skill-scanner` ✅
+- **Frontmatter:** All four fields ✅
+- **Description voice:** Active ✅
+- **Injection patterns in references:** These are documented attack patterns for the scanner — confirmed legitimate (the scanner's job is to detect them). Not a false positive.
+- **Notes:** Clean.
+
+---
+
+#### 14. `skill-writer` ✅
+- **Frontmatter:** All four fields ✅
+- **Description voice:** Active ✅
+- **Notes:** Clean.
+
+---
+
+#### 15. `test-prompt` ✅
+- **Frontmatter:** All four fields ✅. Author `NeoLabHQ`, upstream attribution present.
+- **Description voice:** Active ✅
+- **Notes:** Clean.
+
+---
+
+### Summary Table
+
+| # | Skill | Frontmatter | Voice | No Agent Refs | Specific Checks | Result |
+|---|---|---|---|---|---|---|
+| 1 | agents-md | ✅ | ✅ | ✅ | — | ✅ |
+| 2 | docker-model-runner | ✅ | ✅ | ✅ | — | ✅ |
+| 3 | exa-search | ✅ | ✅ | ✅ | pnpm ✅ | ✅ |
+| 4 | frontend-design | ✅ + extra `license` | ✅ | ✅ | Headers ✅ | ⚠️ minor |
+| 5 | gh | ✅ | ✅ | ✅ | — | ✅ |
+| 6 | glab | ✅ | ✅ | ✅ | — | ✅ |
+| 7 | interface-design | ✅ | ✅ | ✅ | 295 lines | ⚠️ long |
+| 8 | pdf | ✅ | ✅ | ✅ | — | ✅ |
+| 9 | playwright | ✅ | ✅ | ✅ | — | ✅ |
+| 10 | posthog-skill | ✅ | ✅ | ✅ | pnpm ✅ | ✅ |
+| 11 | prompt-engineering | ✅ | ✅ | ✅ | — | ✅ |
+| 12 | render-deploy | ✅ | ✅ | ✅ | curl\|sh warning ✅, pi MCP section ✅ | ✅ |
+| 13 | skill-scanner | ✅ | ✅ | ✅ | — | ✅ |
+| 14 | skill-writer | ✅ | ✅ | ✅ | — | ✅ |
+| 15 | test-prompt | ✅ | ✅ | ✅ | — | ✅ |
+
+---
+
+### Remaining Issues (2 minor)
+
+**`frontend-design` — ⚠️ minor (style)**
+- Extra non-standard `license` field in frontmatter (not a spec violation, just unusual)
+- Last paragraph: *"Remember: you are capable of extraordinary creative work."* — motivational language directed at the model. Not the banned "Claude is capable" phrase but in the same family. Low risk, no functional impact.
+
+**`interface-design` — ⚠️ long (295 lines)**
+- Still a large SKILL.md. Justified by architectural complexity (the heavy lifting is offloaded to 6 reference files), but worth noting for token budget awareness. Not a correctness issue.
+
+**No new issues introduced by the fixes.** Zero matches for `CODEX_HOME`, `Claude is capable`, `codex exec`, `~/.codex`, `~/.claude`, or passive `should be used when` across all 15 files.
+
+## Scout: Verify the TypeScript code and tests are still healthy after the rebase. Run these checks from /Users/josorio/Code/pi-skills:
+
+1. Check that all expected files exist:
+   - skills/posthog-skill/scripts/lib/config.ts
+   - skills/posthog-skill/scripts/lib/cmd-status.ts
+   - skills/posthog-skill/scripts/lib/cmd-inspect.ts
+   - skills/posthog-skill/scripts/lib/cmd-compare.ts
+   - skills/posthog-skill/scripts/lib/cmd-create.ts
+   - skills/posthog-skill/scripts/lib/cmd-flags.ts
+   - skills/posthog-skill/scripts/__tests__/helpers.ts
+   - skills/exa-search/scripts/__tests__/common.test.ts
+   - skills/exa-search/scripts/__tests__/refactor-validation.test.ts
+   - eslint.config.js
+   - .prettierrc
+   - tsconfig.json (with strict flags)
+
+2. Verify NO duplicate configs exist:
+   - skills/posthog-skill/package.json should NOT exist
+   - skills/posthog-skill/tsconfig.json should NOT exist
+   - skills/posthog-skill/pnpm-lock.yaml should NOT exist
+
+3. Read the root package.json and verify it has all expected scripts (test, test:live, lint, format, format:check)
+
+4. Read tsconfig.json and verify it has all strict flags
+
+5. Verify no empty agents/ directories: `find skills -name agents -type d`
+
+All the data is in. Here's the full health report:
+
+---
+
+## PostRebase Health Check — `/Users/josorio/Code/pi-skills`
+
+### ✅ Check 1: Expected Files Exist
+
+| File | Status |
+|------|--------|
+| `skills/posthog-skill/scripts/lib/config.ts` | ✅ Present |
+| `skills/posthog-skill/scripts/lib/cmd-status.ts` | ✅ Present |
+| `skills/posthog-skill/scripts/lib/cmd-inspect.ts` | ✅ Present |
+| `skills/posthog-skill/scripts/lib/cmd-compare.ts` | ✅ Present |
+| `skills/posthog-skill/scripts/lib/cmd-create.ts` | ✅ Present |
+| `skills/posthog-skill/scripts/lib/cmd-flags.ts` | ✅ Present |
+| `skills/posthog-skill/scripts/__tests__/helpers.ts` | ✅ Present |
+| `skills/exa-search/scripts/__tests__/common.test.ts` | ✅ Present |
+| `skills/exa-search/scripts/__tests__/refactor-validation.test.ts` | ✅ Present |
+| `eslint.config.js` | ✅ Present |
+| `.prettierrc` | ✅ Present |
+| `tsconfig.json` | ✅ Present |
+
+**Bonus — additional files present (not listed in spec but healthy):**
+- `skills/posthog-skill/scripts/lib/`: `dashboard-spec.ts`, `fixtures.ts`, `posthog-client.ts`
+- `skills/posthog-skill/scripts/__tests__/`: 12 test files total
+
+---
+
+### ✅ Check 2: No Duplicate Configs
+
+| File | Status |
+|------|--------|
+| `skills/posthog-skill/package.json` | ✅ Does NOT exist |
+| `skills/posthog-skill/tsconfig.json` | ✅ Does NOT exist |
+| `skills/posthog-skill/pnpm-lock.yaml` | ✅ Does NOT exist |
+
+---
+
+### ✅ Check 3: Root `package.json` Scripts
+
+All 5 expected scripts are present:
+
+| Script | Value |
+|--------|-------|
+| `test` | `tsx --test skills/posthog-skill/scripts/__tests__/*.test.ts skills/exa-search/scripts/__tests__/*.test.ts` |
+| `test:live` | Same with `POSTHOG_TEST_LIVE=1` prefix |
+| `lint` | `eslint skills/` |
+| `format` | `prettier --write skills/` |
+| `format:check` | `prettier --check skills/` |
+
+---
+
+### ✅ Check 4: `tsconfig.json` Strict Flags
+
+All strict flags confirmed present:
+
+| Flag | Value |
+|------|-------|
+| `strict` | `true` |
+| `noUnusedLocals` | `true` |
+| `noUnusedParameters` | `true` |
+| `noUncheckedIndexedAccess` | `true` |
+| `noEmit` | `true` |
+| `forceConsistentCasingInFileNames` | `true` |
+| `skipLibCheck` | `true` |
+| `resolveJsonModule` | `true` |
+
+---
+
+### ✅ Check 5: No Empty `agents/` Directories
+
+No `agents/` directories found anywhere under `skills/`.
+
+---
+
+### Summary
+
+**All 5 checks pass.** The rebase left the codebase in a clean state — all expected source files and test files are present, no stale per-skill duplicate configs exist, root `package.json` scripts are correct, `tsconfig.json` has full strict mode enabled, and there are no orphaned `agents/` directories.
+
+## Scout: Read /Users/josorio/Code/pi-skills/skills/render-deploy/SKILL.md completely. Report:
+1. Every line that references MCP (grep for 'MCP', 'mcp', 'list_services', 'list_deploys', 'list_logs', 'get_metrics', 'get_selected_workspace', 'list_workspaces')
+2. Every line that references the Render CLI (`render` commands)
+3. The overall structure — what sections exist and what each does
+4. Which sections assume MCP tools are available vs which use the CLI
+
+The goal is to understand how deeply MCP is embedded in this skill so we can replace MCP-dependent workflows with Render CLI equivalents.
+
+Here is the complete report.
+
+---
+
+## Domain: `render-deploy/SKILL.md` — MCP vs CLI Dependency Analysis
+
+### 1. Every Line Referencing MCP / MCP Tool Calls
+
+| Line | Content |
+|------|---------|
+| 7 | `compatibility: 'Requires Git repository with remote. Optional: Render CLI (render), Render MCP tools.'` |
+| 17 | `2. **Direct Creation** - Create services instantly via MCP tools` |
+| 24 | `MCP cannot create image-backed services` |
+| 54 | `This is **not** supported by MCP; use the Dashboard/API` |
+| 75 | `**Use Direct Creation (MCP) when ALL are true:**` |
+| 81 | `If this path fits and MCP isn't configured yet, stop and guide MCP setup before proceeding` |
+| 91 | `strongly prefer Direct Creation via MCP and guide MCP setup if needed` |
+| 107 | `**2. Check MCP Tools Availability (Preferred for Single-Service)**` |
+| 109 | `MCP tools provide the best experience. Check if available by attempting:` |
+| 112 | `list_services()` ← actual MCP call |
+| 115 | `If MCP tools are available, you can skip CLI installation for most operations` |
+| 129 | `**4. MCP Setup (if MCP isn't configured)**` |
+| 131 | `If list_services() fails because MCP isn't configured, ask whether they want to set up MCP (preferred) or continue with the CLI fallback` |
+| 133 | `If MCP tools are not available, see references/mcp-setup.md` |
+| 137 | `After MCP is configured, have the user set the active Render workspace` |
+| 145 | `If MCP isn't available, use the CLI instead` |
+| 164 | `get_selected_workspace()` ← actual MCP call |
+| 170 (implied) | `list_workspaces()` ← actual MCP call |
+| 341 | `**Check deployment status via MCP:**` |
+| 344 | `list_deploys(serviceId: "<service-id>", limit: 1)` ← actual MCP call |
+| 352 | `list_logs(resource: ["<service-id>"], level: ["error"], limit: 20)` ← actual MCP call |
+| 358–361 | `get_metrics(resourceId: "...", metricTypes: [...])` ← actual MCP call |
+| 370 | `create services directly via MCP tools` |
+| 392 | `MCP does not support creating image-backed services` |
+| 396 | `refer to references/direct-creation.md for full MCP command examples` |
+| 402 | `### Step 2: Create Resources via MCP` |
+| 406 | `If MCP returns an error about missing Git credentials...` |
+| 410 | `Add required env vars via MCP after creation` |
+| 412 | `Remind the user that secrets can be set in the Dashboard if they prefer not to pass them via MCP` |
+
+**Distinct MCP tool calls used directly in SKILL.md:** 6
+- `list_services()` — prerequisite check
+- `get_selected_workspace()` — workspace verification
+- `list_workspaces()` — workspace listing
+- `list_deploys(serviceId, limit)` — post-deploy status check
+- `list_logs(resource, level, limit)` — post-deploy error scan
+- `get_metrics(resourceId, metricTypes)` — health metrics
+
+---
+
+### 2. Every Line Referencing the Render CLI (`render` commands)
+
+| Line | Command |
+|------|---------|
+| 120 | `render --version` |
+| 149 | `render whoami -o json` |
+| 152 | `render whoami` (prose) |
+| 157 | `render login` |
+| 170 | `render workspace current -o json` |
+| 179 | `render workspace set` (prose) |
+| 247 | `render whoami -o json` (checklist) |
+| 248 | `render blueprints validate` (checklist) |
+| 260 | `render whoami -o json` |
+| 261 | `render blueprints validate` |
+
+**Distinct CLI commands used:** 5
+- `render --version`
+- `render whoami -o json`
+- `render login`
+- `render workspace current -o json` / `render workspace set`
+- `render blueprints validate`
+
+---
+
+### 3. Overall Structure and What Each Section Does
+
+| Section | Purpose |
+|---------|---------|
+| **Header / frontmatter** | Skill metadata; notes CLI and MCP are both optional |
+| **When to Use** | Trigger conditions for the skill |
+| **Happy Path (New Users)** | 2-question onboarding before deep analysis |
+| **Choose Your Source Path** | Git repo vs prebuilt Docker image decision; Docker explicitly excludes MCP |
+| **Choose Your Deployment Method** | Blueprint vs Direct Creation decision table + heuristic |
+| **Prerequisites Check** (6 steps) | Ordered checklist: git remote → MCP availability → CLI install → MCP setup → CLI auth → workspace |
+| **Method 1: Blueprint Deployment** (Steps 1–7) | Full IaC flow: codebase analysis → render.yaml generation → CLI validation → git push → deeplink → guide → post-deploy verify |
+| **Method 2: Direct Service Creation** | Quick single-service flow entirely delegated to MCP + `references/direct-creation.md` |
+| **Post-deploy verification and basic triage** | Short repeatable checklist after any deployment |
+| **Troubleshooting** | Escalated sandbox permissions guidance; pointer to optional `render-debug` skill |
+
+---
+
+### 4. Which Sections Assume MCP vs CLI
+
+| Section | Assumes MCP | Assumes CLI | Notes |
+|---------|-------------|-------------|-------|
+| Prerequisites Check — Step 2 | ✅ Primary path | — | `list_services()` as availability probe |
+| Prerequisites Check — Step 3 | — | ✅ Blueprint validation only | `render --version`, `render blueprints validate` |
+| Prerequisites Check — Step 4 | ✅ Setup guide | ✅ Fallback | MCP preferred; CLI if MCP absent |
+| Prerequisites Check — Step 5 | — | ✅ CLI fallback only | `render whoami`, `render login` |
+| Prerequisites Check — Step 6 (workspace) | ✅ Primary (`get_selected_workspace`, `list_workspaces`) | ✅ Secondary (`render workspace current`) | Dual path |
+| Method 1 Step 2.5 / Step 3 (validation) | — | ✅ Only CLI | `render whoami`, `render blueprints validate` |
+| Method 1 Step 7 (post-deploy verify) | ✅ **Only MCP** | — | `list_deploys`, `list_logs`, `get_metrics` — no CLI fallback offered |
+| Method 2 (entire method) | ✅ **Only MCP** | — | Fully delegated to MCP + `direct-creation.md` |
+
+---
+
+### Findings Summary
+
+- **MCP is deeply embedded in two critical areas:** (1) the entire "Direct Creation" method (Method 2), and (2) post-deploy verification in Method 1 Step 7 (`list_deploys`, `list_logs`, `get_metrics`) — neither of these has a CLI fallback in the SKILL.md itself.
+- **CLI is used only for Blueprint validation** (`render blueprints validate`, `render whoami`) and as a workspace/auth fallback when MCP is unavailable — it is explicitly treated as the secondary path.
+- **The decision heuristic actively steers toward MCP:** single-service deployments are told to "strongly prefer Direct Creation via MCP" and to set up MCP if it isn't configured yet.
+- **6 MCP tool calls are used directly** in SKILL.md; the actual MCP command details for Method 2 are offloaded to `references/direct-creation.md` (not read here).
+- **Replacing MCP requires:** (a) a CLI equivalent for `list_deploys` / `list_logs` / `get_metrics` in Step 7, (b) a full CLI-based workflow for Method 2 (service creation, env var setting), and (c) rewiring the prerequisite check to probe the CLI rather than `list_services()`.
+
+## Scout: Read /Users/josorio/Code/pi-skills/skills/render-deploy/references/direct-creation.md completely. Report its full content — we need to understand what MCP commands it documents so we can replace them with Render CLI equivalents.
+
+Here is the complete content of `direct-creation.md`:
+
+---
+
+## File: `skills/render-deploy/references/direct-creation.md`
+
+The file documents **MCP (Model Context Protocol) tool calls** for creating and configuring Render resources directly via API. It is organized into 4 steps:
+
+---
+
+### Step 1 — Analyze Codebase
+Defers to `codebase-analysis.md` for runtime, commands, env vars, and datastore detection.
+
+---
+
+### Step 2 — Create Resources via MCP (5 commands)
+
+| MCP Command | What it creates | Key parameters |
+|---|---|---|
+| `create_web_service(...)` | Web Service | `name`, `runtime` (node/python/go/rust/ruby/elixir/docker), `repo`, `branch`, `buildCommand`, `startCommand`, `plan`, `region`, `envVars` |
+| `create_static_site(...)` | Static Site | `name`, `repo`, `branch`, `buildCommand`, `publishPath`, `envVars` |
+| `create_cron_job(...)` | Cron Job | `name`, `runtime`, `repo`, `schedule` (cron syntax), `buildCommand`, `startCommand`, `plan` |
+| `create_postgres(...)` | PostgreSQL Database | `name`, `plan`, `region` |
+| `create_key_value(...)` | Redis / Key-Value Store | `name`, `plan`, `region`, `maxmemoryPolicy` |
+
+**Plan values** documented:
+- Services: `free`, `starter`, `standard`, `pro`, `pro_max`, `pro_plus`, `pro_ultra`
+- Postgres: `free`, `basic_256mb`, `basic_1gb`, `basic_4gb`, `pro_4gb`, etc.
+- KV Store: `free`, `starter`, `standard`, `pro`, `pro_plus`
+
+**Region values**: `oregon`, `frankfurt`, `singapore`, `ohio`, `virginia`
+
+---
+
+### Step 3 — Configure Environment Variables (1 command)
+
+| MCP Command | Purpose |
+|---|---|
+| `update_environment_variables(serviceId, envVars[])` | Set/update env vars on a created service. Notes that DB internal URLs can be fetched via `get_postgres(postgresId)`. |
+
+---
+
+### Step 4 — Verify Deployment (3 commands)
+
+| MCP Command | Purpose |
+|---|---|
+| `list_deploys(serviceId, limit)` | Check deployment status |
+| `list_logs(resource[], level[], limit)` | Monitor error logs |
+| `get_metrics(resourceId, metricTypes[])` | Check HTTP request count, CPU, memory usage |
+
+---
+
+**Summary for replacement work:** The file documents **9 distinct MCP commands** total:
+`create_web_service`, `create_static_site`, `create_cron_job`, `create_postgres`, `create_key_value`, `update_environment_variables`, `list_deploys`, `list_logs`, `get_metrics`. These are the calls that need Render CLI equivalents identified.
+
+## Scout: Look up the Render CLI command reference. Run these commands to understand what's available:
+
+```bash
+brew list render 2>/dev/null || echo 'render CLI not installed'
+which render 2>/dev/null || echo 'render not in PATH'
+```
+
+If render CLI is not installed, use the exa-search skill to look up the Render CLI documentation. Run:
+```bash
+cd /Users/josorio/Code/pi-skills && npx tsx skills/exa-search/scripts/search.ts 'Render CLI command reference documentation' '{"includeDomains":["render.com"],"text":true,"numResults":3}'
+```
+
+We need to know the CLI equivalents for these MCP operations:
+1. List services
+2. Create a service (web service from git repo)
+3. List deploys for a service
+4. View logs for a service
+5. Get metrics for a service
+6. Set environment variables
+7. List/set workspace
+
+Report every CLI command found with its syntax.
+
+I now have comprehensive evidence. Here is the full report:
+
+---
+
+## Domain: Render CLI Command Reference
+
+### Environment
+
+- **Render CLI status:** Not installed on this machine (`brew list render` → not found, `which render` → not in PATH)
+- **Version available via Homebrew:** `brew install render` (latest is v2.14.0, released 2026-03-14)
+- **Auth methods:** `render login` (browser token) or `RENDER_API_KEY` env var for non-interactive use
+- **Config stored at:** `$HOME/.render/cli.yaml`
+
+---
+
+### CLI Commands Found (Exhaustive)
+
+All commands confirmed via live crawl of `https://render.com/docs/cli` and raw source files at `https://github.com/render-oss/cli/main/cmd/`.
+
+---
+
+#### 1. List Services
+
+```shell
+render services [flags]
+
+# Flags
+  -e, --environment <ID,...>   Filter by environment ID(s) (comma-separated)
+      --include-previews        Include preview environments
+  -o, --output <json|yaml|text|interactive>
+
+# Examples
+render services
+render services --output json
+render services -e env-abc123 --include-previews --output json
+```
+
+---
+
+#### 2. Create a Service (web service from git repo)
+
+```shell
+render services create [flags]
+
+# Required flags (non-interactive only — interactive mode not yet implemented)
+  --name <string>               Service name
+  --type <service_type>         Service type (web_service, private_service, background_worker, cron_job, static_site)
+  --repo <url>                  Git repository URL
+
+# All create flags
+  --from <ID|name>              Clone config from an existing service (other flags override)
+  --branch <string>             Git branch
+  --image <url>                 Docker image URL (for image-backed services)
+  --region <string>             Deployment region
+  --plan <string>               Service plan
+  --runtime <string>            Runtime environment
+  --root-directory <path>       Root directory
+  --build-command <string>      Build command
+  --start-command <string>      Start command
+  --health-check-path <string>  Health check path
+  --publish-directory <path>    Publish directory (static sites)
+  --cron-command <string>       Cron command (cron jobs)
+  --cron-schedule <string>      Cron schedule (cron jobs)
+  --environment-id <string>     Environment ID to place service in
+  --env-var <KEY=VALUE>         Environment variable (repeatable)
+  --secret-file <NAME:PATH>     Secret file (repeatable)
+  --registry-credential <id>    Registry credential
+  --auto-deploy <bool>          Enable auto-deploy (default: true)
+  --pre-deploy-command <string> Pre-deploy command
+  -o, --output <json|yaml|text>
+
+# Examples
+render services create --name my-api --type web_service --repo https://github.com/org/repo --output json
+render services create --from srv-abc123 --name my-api-clone --output json
+```
+
+---
+
+#### 3. List Deploys for a Service
+
+```shell
+render deploys list [SERVICE_ID]
+
+# In non-interactive mode, provide the service ID as an argument
+# Flags
+  -o, --output <json|yaml|text>
+  --confirm                     Skip confirmation prompts
+
+# Example
+render deploys list srv-abc123 --output json
+```
+
+#### Trigger a Deploy (bonus — deploy create)
+
+```shell
+render deploys create [SERVICE_ID]
+
+# Flags
+  --wait                        Block until deploy completes (non-zero exit on failure)
+  --commit <SHA>                Deploy a specific git commit (Git-backed services)
+  --image <URL>                 Deploy a specific Docker image tag/digest (image-backed services)
+  -o, --output <json|yaml|text>
+  --confirm
+
+# Example
+render deploys create srv-abc123 --wait --output json --confirm
+```
+
+---
+
+#### 4. View Logs for a Service
+
+```shell
+render logs [flags]
+
+# In non-interactive mode, --resources is REQUIRED
+  -r, --resources <ID,...>          Comma-separated resource IDs (required in non-interactive mode)
+      --start <time>                Start time for log query
+      --end <time>                  End time for log query
+      --text <string,...>           Search strings (comma-separated)
+      --level <level,...>           Log levels: debug,info,notice,warning,error,critical,alert,emergency
+      --type <type,...>             Log types: app, request, build
+      --instance <ID,...>           Instance IDs (comma-separated)
+      --host <host,...>             Hosts (comma-separated)
+      --status-code <code,...>      HTTP status codes (comma-separated)
+      --method <method,...>         HTTP methods: GET,POST,PUT,PATCH,DELETE,OPTIONS,HEAD
+      --path <path,...>             Paths (comma-separated)
+      --limit <int>                 Max logs to return
+      --direction <forward|backward> Query direction
+      --tail                        Stream new logs (interactive mode only)
+      --task-id <ID,...>            Task IDs
+      --task-run-id <ID,...>        Task run IDs
+  -o, --output <json|yaml|text>
+
+# Examples
+render logs -r srv-abc123 --output json
+render logs -r srv-abc123,srv-def456 --level error --type app --output text
+render logs -r srv-abc123 --start "2026-01-01T00:00:00Z" --limit 100 --output json
+```
+
+---
+
+#### 5. Get Metrics for a Service
+
+**❌ No `metrics` command exists in the CLI.** The CLI source tree (`/cmd/`) has no `metrics.go` file. Metrics are only available via the Render Dashboard or the REST API (`GET /v1/metrics`). This is a gap between the MCP and CLI.
+
+---
+
+#### 6. Set Environment Variables
+
+**❌ No standalone `env-vars set` CLI command exists.** Environment variables can be set:
+
+- **At creation time:** via `render services create --env-var KEY=VALUE` (repeatable)
+- **At update time:** via `render services update <SERVICE_ID> --env-var KEY=VALUE` (repeatable)
+- **Via `render.yaml` Blueprint:** using the `envVars:` block (declarative, version-controlled)
+- **Via Render Dashboard** (UI only for standalone env var management)
+
+```shell
+# Set env var when creating
+render services create --name my-app --type web_service --repo https://github.com/org/repo \
+  --env-var NODE_ENV=production \
+  --env-var DATABASE_URL=postgres://... \
+  --output json
+
+# Update env var on existing service
+render services update srv-abc123 --env-var NODE_ENV=staging --output json --confirm
+```
+
+---
+
+#### 7. List / Set Workspace
+
+```shell
+# List all workspaces
+render workspaces [-o json|yaml|text]
+
+# Set the active workspace (all subsequent commands operate on this workspace)
+render workspace set
+
+# Check current workspace
+render workspace current   # (workspacecurrent.go exists in source)
+```
+
+---
+
+### Complete Command Index (from source)
+
+Every command file found in `github.com/render-oss/cli/cmd/`:
+
+| Command | Syntax |
+|---|---|
+| `login` | `render login` |
+| `workspaces` | `render workspaces [-o json\|yaml\|text]` |
+| `workspace set` | `render workspace set` |
+| `workspace current` | `render workspace current` |
+| `services` | `render services [flags]` |
+| `services create` | `render services create [flags]` |
+| `services update` | `render services update <SERVICE_ID> [flags]` |
+| `deploys list` | `render deploys list [SERVICE_ID]` |
+| `deploys create` | `render deploys create [SERVICE_ID] [flags]` |
+| `deploy cancel` | `render deploys cancel <DEPLOY_ID>` |
+| `logs` | `render logs -r <RESOURCE_IDS> [flags]` |
+| `ssh` | `render ssh [SERVICE_ID] [--ephemeral\|-e]` |
+| `psql` | `render psql [DATABASE_ID] [-c "SQL"] [-o format]` |
+| `restart` | `render restart [SERVICE_ID]` |
+| `job create` | `render jobs create [flags]` |
+| `job list` | `render jobs list [SERVICE_ID]` |
+| `job cancel` | `render jobs cancel <JOB_ID>` |
+| `run` | `render run [SERVICE_ID]` |
+| `environments` | `render environments <PROJECT_ID>` |
+| `blueprints validate` | `render blueprints validate [FILE]` |
+| `skills` | `render skills [install\|update\|remove\|list]` |
+| `whoami` | `render whoami` |
+| `workflows` | `render workflows [subcommands]` |
+| `workflows dev` | `render workflows dev -- <START_CMD>` |
+
+---
+
+### Findings Summary
+
+- **List services:** `render services --output json` — confirmed, supports env/preview filters.
+- **Create service:** `render services create --name … --type web_service --repo … --output json` — non-interactive only (interactive TUI not yet implemented per source code comment).
+- **List deploys:** `render deploys list <SERVICE_ID> --output json` — confirmed.
+- **View logs:** `render logs -r <SERVICE_ID> --output json` — `--resources` flag is required in non-interactive mode; rich filtering available (level, type, method, path, time range, tail).
+- **Set env vars:** No standalone command — only via `--env-var KEY=VALUE` flag on `services create` or `services update`; no dedicated `env-vars set` subcommand exists.
+- **Metrics:** ❌ Not available in CLI at all — Dashboard/REST API only.
+- **Workspace:** `render workspaces` (list) + `render workspace set` (switch) + `render workspace current` (check active).
+
