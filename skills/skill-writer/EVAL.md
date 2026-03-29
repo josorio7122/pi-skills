@@ -50,8 +50,8 @@ Fail if completion is claimed with unresolved high-impact gaps and no next retri
 When you need stronger confidence, run this sequence:
 
 1. Use a fixed prompt set (positives + negatives).
-2. Capture deterministic traces (`codex exec --json`).
-3. Apply rubric/schema checks where practical (`--output-schema`).
+2. Capture deterministic traces (using the agent CLI in JSON-output mode).
+3. Apply rubric/schema checks where practical (using output schema options where supported).
 4. Compare baseline vs candidate and report deltas.
 
 ## Isolated Eval Runbook
@@ -64,14 +64,9 @@ rm -rf "$EVAL_DIR"
 mkdir -p "$EVAL_DIR"
 rsync -a "<repo-root>/"/ "$EVAL_DIR"/
 
-codex exec \
-  --ephemeral \
-  --full-auto \
-  --sandbox workspace-write \
-  --skip-git-repo-check \
-  --add-dir "<pi-mono-root>" \
-  -C "$EVAL_DIR" \
-  "$(cat <eval-prompt-file>)"
+# Invoke your agent CLI of choice in non-interactive / full-auto mode, e.g.:
+# pi --non-interactive -C "$EVAL_DIR" "$(cat <eval-prompt-file>)"
+# Adjust flags to match the agent you are using (pi, Claude Code, Codex, etc.).
 ```
 
 Where `<eval-prompt-file>` contains the exact eval prompt from this file.

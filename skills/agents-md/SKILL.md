@@ -1,6 +1,10 @@
 ---
 name: agents-md
-description: This skill should be used when the user asks to "create AGENTS.md", "update AGENTS.md", "maintain agent docs", "set up CLAUDE.md", or needs to keep agent instructions concise. Enforces research-backed best practices for minimal, high-signal agent documentation.
+description: Create and maintain minimal, high-signal AGENTS.md files. Use when asked to "create AGENTS.md", "update AGENTS.md", "maintain agent docs", "set up CLAUDE.md", or when agent instructions need to be kept concise. Enforces research-backed best practices for agent documentation.
+metadata:
+  author: josorio7122
+  version: '1.0'
+compatibility: 'No external dependencies required'
 ---
 
 # Maintaining AGENTS.md
@@ -71,7 +75,7 @@ AI commits MUST include:
 Co-Authored-By: (the agent's name and attribution byline)
 
 ```
-Example: `Co-Authored-By: Claude Sonnet 4 <noreply@example.com>`
+Example: `Co-Authored-By: AI Assistant <noreply@example.com>`
 ```
 
 ### Key Conventions

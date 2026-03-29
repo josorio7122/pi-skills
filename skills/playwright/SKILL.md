@@ -1,6 +1,10 @@
 ---
 name: playwright
 description: Automate a real browser from the terminal for navigation, form filling, screenshots, data extraction, and UI-flow debugging. Use when the user asks to "take a screenshot," "scrape a page," "fill a form," "test a UI flow," "automate the browser," "open a webpage," or any task that requires interacting with a live website. Also use when the user needs to extract data from a JavaScript-rendered page that simple HTTP requests can't handle. Uses playwright-cli or the bundled wrapper script.
+metadata:
+  author: josorio7122
+  version: '1.0'
+compatibility: 'Requires Node.js 18+ with npx available. Playwright CLI installed via npx on first use.'
 ---
 
 # Playwright CLI Skill
@@ -30,41 +34,21 @@ playwright-cli --help
 
 Once `npx` is present, proceed with the wrapper script. A global install of `playwright-cli` is optional.
 
-### Browser install (first run only)
+## Skill path
 
-After the first `open` command, if you see an error like `Chromium distribution is not found`, install the browser:
-
-```bash
-"$PWCLI" install chromium
-```
-
-This only needs to happen once per machine.
-
-## Skill path (set once)
-
-Locate the wrapper script bundled with this skill. The path depends on how skills are installed — use `find` to resolve it:
-
-```bash
-export PWCLI="$(find "${PI_HOME:-$HOME/.pi}" -path "*/playwright/scripts/playwright_cli.sh" -print -quit 2>/dev/null)"
-```
-
-If the above returns empty (e.g. skills installed elsewhere), fall back to a broader search:
-
-```bash
-export PWCLI="$(find "$HOME" -path "*/playwright/scripts/playwright_cli.sh" -print -quit 2>/dev/null)"
-```
+The wrapper script is at `scripts/playwright_cli.sh` (relative to this skill's directory). Resolve the full path before use.
 
 ## Quick start
 
 Use the wrapper script:
 
 ```bash
-"$PWCLI" open https://playwright.dev --headed
-"$PWCLI" snapshot
-"$PWCLI" click e15
-"$PWCLI" type "Playwright"
-"$PWCLI" press Enter
-"$PWCLI" screenshot
+scripts/playwright_cli.sh open https://playwright.dev --headed
+scripts/playwright_cli.sh snapshot
+scripts/playwright_cli.sh click e15
+scripts/playwright_cli.sh type "Playwright"
+scripts/playwright_cli.sh press Enter
+scripts/playwright_cli.sh screenshot
 ```
 
 If the user prefers a global install, this is also valid:
@@ -85,10 +69,10 @@ playwright-cli --help
 Minimal loop:
 
 ```bash
-"$PWCLI" open https://example.com
-"$PWCLI" snapshot
-"$PWCLI" click e3
-"$PWCLI" snapshot
+scripts/playwright_cli.sh open https://example.com
+scripts/playwright_cli.sh snapshot
+scripts/playwright_cli.sh click e3
+scripts/playwright_cli.sh snapshot
 ```
 
 ## When to snapshot again
@@ -107,30 +91,30 @@ Refs can go stale. When a command fails due to a missing ref, snapshot again.
 ### Form fill and submit
 
 ```bash
-"$PWCLI" open https://example.com/form
-"$PWCLI" snapshot
-"$PWCLI" fill e1 "user@example.com"
-"$PWCLI" fill e2 "password123"
-"$PWCLI" click e3
-"$PWCLI" snapshot
+scripts/playwright_cli.sh open https://example.com/form
+scripts/playwright_cli.sh snapshot
+scripts/playwright_cli.sh fill e1 "user@example.com"
+scripts/playwright_cli.sh fill e2 "password123"
+scripts/playwright_cli.sh click e3
+scripts/playwright_cli.sh snapshot
 ```
 
 ### Debug a UI flow with traces
 
 ```bash
-"$PWCLI" open https://example.com --headed
-"$PWCLI" tracing-start
+scripts/playwright_cli.sh open https://example.com --headed
+scripts/playwright_cli.sh tracing-start
 # ...interactions...
-"$PWCLI" tracing-stop
+scripts/playwright_cli.sh tracing-stop
 ```
 
 ### Multi-tab work
 
 ```bash
-"$PWCLI" tab-new https://example.com
-"$PWCLI" tab-list
-"$PWCLI" tab-select 0
-"$PWCLI" snapshot
+scripts/playwright_cli.sh tab-new https://example.com
+scripts/playwright_cli.sh tab-list
+scripts/playwright_cli.sh tab-select 0
+scripts/playwright_cli.sh snapshot
 ```
 
 ## Wrapper script
@@ -138,7 +122,7 @@ Refs can go stale. When a command fails due to a missing ref, snapshot again.
 The wrapper script uses `npx --package @playwright/cli playwright-cli` so the CLI can run without a global install:
 
 ```bash
-"$PWCLI" --help
+scripts/playwright_cli.sh --help
 ```
 
 Prefer the wrapper unless the repository already standardizes on a global install.

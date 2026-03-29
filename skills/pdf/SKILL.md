@@ -1,6 +1,10 @@
 ---
 name: pdf
-description: Read, create, edit, and review PDF files with proper rendering and layout. Use when the user asks to "read a PDF," "create a PDF," "extract text from a PDF," "fill a PDF form," "merge PDFs," "convert to PDF," or any task involving PDF documents where layout and visual fidelity matter. Also use when the user mentions PDF files even if they don't explicitly ask for help with them. Uses Poppler for rendering, reportlab for generation, pdfplumber and pypdf for extraction.
+description: Read, create, edit, and review PDF files with proper rendering and layout. Use when the user asks to "read a PDF," "create a PDF," "extract text from a PDF," "fill a PDF form," "merge PDFs," "convert to PDF," or any task involving PDF documents where layout and visual fidelity matter. Uses Poppler for rendering, reportlab for generation, pdfplumber and pypdf for extraction.
+compatibility: 'Requires Python 3.8+ with reportlab, pdfplumber, pypdf. System: poppler-utils (pdftoppm).'
+metadata:
+  author: josorio7122
+  version: '1.0'
 ---
 
 # PDF Skill

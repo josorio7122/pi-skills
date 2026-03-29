@@ -18,11 +18,7 @@ node --version   # Must be 18+
 echo $EXA_API_KEY # Must be set
 ```
 
-If deps are not installed, run from the skill directory:
-
-```bash
-cd <skill-dir>/skills/exa-search && npm install
-```
+Dependencies are managed at the repository root. Run `pnpm install` from the repo root if needed.
 
 Get an API key at: https://dashboard.exa.ai/api-keys
 

@@ -1,16 +1,15 @@
 # Playwright CLI Reference
 
-Use the wrapper script unless the CLI is already installed globally:
+The wrapper script is at `scripts/playwright_cli.sh` (relative to this skill's directory). Resolve the full path before use.
 
 ```bash
-export PWCLI="$(find "${PI_HOME:-$HOME/.pi}" -path "*/playwright/scripts/playwright_cli.sh" -print -quit 2>/dev/null)"
-"$PWCLI" --help
+scripts/playwright_cli.sh --help
 ```
 
 Optional convenience alias:
 
 ```bash
-alias pwcli="$PWCLI"
+alias pwcli="scripts/playwright_cli.sh"
 ```
 
 ## Core

@@ -2,6 +2,9 @@
 name: docker-model-runner
 description: Run AI models locally using Docker Model Runner with an OpenAI-compatible API. Use when the user wants to run a local LLM, use local inference, pull or manage AI models with Docker, set up a local model endpoint, or integrate local models into code via the OpenAI SDK. Also use when they mention "docker model," "local LLM," "run a model locally," or need an alternative to cloud AI APIs. Requires Docker Desktop or Docker Engine with Model Runner enabled.
 compatibility: 'Requires Docker Desktop 4.40+ or Docker Engine with Model Runner. Run `docker model version` to verify.'
+metadata:
+  author: josorio7122
+  version: '1.0'
 ---
 
 # Docker Model Runner

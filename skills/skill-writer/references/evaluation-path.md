@@ -29,7 +29,7 @@ Use this only when:
 Suggested workflow:
 
 1. Build a prompt set with positives, implicit triggers, and negatives.
-2. Capture deterministic run traces (for example `codex exec --json`).
+2. Capture deterministic run traces (for example using the agent CLI in JSON-output mode).
 3. Apply machine-checkable rubric/schema checks (for example `--output-schema` where applicable).
 4. Compare baseline vs updated behavior and report deltas.
 
@@ -51,7 +51,7 @@ Use those prompts when you need a repeatable depth check against `skill-writer`.
 
 ## Agent-agnostic requirement
 
-Keep evaluation instructions tool-agnostic so they work in both Codex and Claude environments.
+Keep evaluation instructions tool-agnostic so they work across any agent environment (pi, Claude Code, Codex, etc.).
 
 ## Required output
 

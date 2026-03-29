@@ -2112,3 +2112,1289 @@ Now I have a comprehensive picture. Let me compile the findings.
 
 - **No `.d.ts` files, no `src/` directory, no root-level `shared/` directory exist.** The current organization — skill-level `lib/` for internal helpers, `scripts/` for entrypoints, `__tests__/` nested inside scripts — is consistent between the two TypeScript skills and fits the project's scope.
 
+## Scout: Read these three skill files completely and report their FULL content:
+1. /Users/josorio/.pi/agent/git/github.com/josorio7122/pi-skills/skills/skill-writer/SKILL.md
+2. /Users/josorio/.pi/agent/git/github.com/josorio7122/pi-skills/skills/skill-scanner/SKILL.md
+3. /Users/josorio/.pi/agent/git/github.com/josorio7122/pi-skills/skills/prompt-engineering/SKILL.md
+
+Also read any referenced docs that define evaluation criteria, scoring rubrics, or review checklists. Specifically check:
+- skill-writer/EVAL.md (evaluation criteria)
+- skill-writer/references/authoring-path.md
+- skill-writer/references/design-principles.md
+- skill-writer/references/description-optimization.md
+- skill-scanner/references/prompt-injection-patterns.md
+- skill-scanner/references/dangerous-code-patterns.md
+- skill-scanner/references/permission-analysis.md
+- prompt-engineering/SKILL.md references section
+
+Report the full content of the main SKILL.md files and summarize the key evaluation criteria from each.
+
+Here is the complete report of all files read.
+
+---
+
+## Full Content Report
+
+---
+
+### 1. `skill-writer/SKILL.md` — Full Content
+
+**Frontmatter:**
+```yaml
+name: skill-writer
+description: Create, synthesize, and iteratively improve agent skills following the Agent Skills specification. Use when asked to "create a skill", "write a skill", "synthesize sources into a skill", "improve a skill from positive/negative examples", "update a skill", or "maintain skill docs and registration". Handles source capture, depth gates, authoring, registration, and validation.
+```
+
+**Body:** A 7-step workflow:
+
+| Step | Action | Reference file to load |
+|------|--------|----------------------|
+| 1 | Resolve target and path; classify skill class | `references/mode-selection.md` |
+| 2 | Run synthesis (collect/score sources, apply trust rules, enforce depth gates) | `references/synthesis-path.md` |
+| 3 | Run iteration first when improving from outcomes/examples | `references/iteration-path.md` |
+| 4 | Author or update skill artifacts | `references/authoring-path.md` |
+| 5 | Optimize description quality (should-trigger / should-not-trigger sets) | `references/description-optimization.md` |
+| 6 | Evaluate outcomes (qualitative check + optional quantitative) | `references/evaluation-path.md` |
+| 7 | Register and validate (depth gates + artifact checks) | `references/registration-validation.md` |
+
+**Output format:** Summary → Changes Made → Validation Results → Open Gaps.
+
+---
+
+### 2. `skill-scanner/SKILL.md` — Full Content
+
+**Frontmatter:**
+```yaml
+name: skill-scanner
+description: Scan agent skills for security issues. Use when asked to "scan a skill", "audit a skill", "review skill security", "check skill for injection", "validate SKILL.md", or assess whether an agent skill is safe to install. Checks for prompt injection, malicious scripts, excessive permissions, secret exposure, and supply chain risks.
+```
+
+**Body:** An 8-phase workflow:
+
+| Phase | Action |
+|-------|--------|
+| 1 | Input & Discovery — locate skill directory, validate SKILL.md exists, `ls` structure |
+| 2 | Automated Static Scan — run `uv run scripts/scan_skill.py <dir>` → parse JSON |
+| 3 | Frontmatter Validation — required fields, name consistency, `allowed-tools` justification |
+| 4 | Prompt Injection Analysis — load `references/prompt-injection-patterns.md`; distinguish **performing** vs **discussing** injection |
+| 5 | Behavioral Analysis (agent-only) — description vs instructions alignment; config/memory poisoning; scope creep; structural attacks (symlinks, frontmatter hooks, `` !`cmd` `` syntax, test auto-discovery, npm lifecycle hooks, PNG metadata) |
+| 6 | Script Analysis — load `references/dangerous-code-patterns.md`; check exfiltration, reverse shells, credential theft, eval/exec, PEP 723 deps |
+| 7 | Supply Chain Assessment — review URLs; trusted vs untrusted domains; remote instruction loading |
+| 8 | Permission Analysis — load `references/permission-analysis.md`; least-privilege check; rate overall permission profile |
+
+**Confidence Levels:** HIGH (report with severity) / MEDIUM (needs verification) / LOW (do not report). False positive awareness is critical.
+
+**Output format:** `## Skill Security Scan: [Name]` → Summary → Findings (SKILL-SEC-NNN with Location, Confidence, Category, Issue, Evidence, Risk, Remediation) → Needs Verification → Assessment (Safe / Caution / Do not install).
+
+---
+
+### 3. `prompt-engineering/SKILL.md` — Full Content
+
+**Frontmatter:**
+```yaml
+name: prompt-engineering
+description: Advanced prompt engineering patterns for maximizing LLM performance. Use when writing commands, hooks, skills, sub-agent prompts, system prompts, or any LLM interaction. Also use when asked to "improve this prompt", "optimize a prompt", "write a system prompt", "make this prompt more effective", or any prompt engineering task. Covers few-shot learning, chain-of-thought, template systems, persuasion principles, degrees of freedom, and token efficiency.
+metadata:
+  author: NeoLabHQ
+  version: "1.0"
+  source: https://github.com/NeoLabHQ/context-engineering-kit/...
+  license: See source repository
+```
+
+**Core Capabilities:**
+1. **Few-Shot Learning** — 2–5 input-output pairs; balance examples vs token cost
+2. **Chain-of-Thought** — "Let's think step by step" (zero-shot) or example reasoning traces (few-shot); +30–50% accuracy on analytical tasks
+3. **Prompt Optimization** — start simple, measure, iterate; test edge cases
+4. **Template Systems** — reusable structures with variables and conditional sections
+5. **System Prompt Design** — set role, expertise, output format, safety guidelines
+
+**Key Patterns:**
+- **Instruction Hierarchy:** `[System Context] → [Task Instruction] → [Examples] → [Input Data] → [Output Format]`
+- **Progressive Disclosure:** 4 levels from direct instruction to instruction+constraints+reasoning+examples
+- **Degrees of Freedom:** High freedom (many valid approaches) → Medium → Low (fragile, must be exact). Narrow bridge vs open field analogy.
+- **Conciseness Rule:** Challenge every token. Good example ~50 tokens vs bad ~150 tokens.
+- **Persuasion Principles** (Meincke et al. 2025 — 33%→72% compliance): Authority (`YOU MUST`, `No exceptions`), Commitment (force announcements), Scarcity (time-bound requirements), Social Proof (universal norms), Unity (shared identity)
+- **When to use which:** Discipline-enforcing → Authority+Commitment+Social Proof; Guidance → Moderate Authority+Unity; Collaborative → Unity+Commitment; Reference → Clarity only
+- **Token Efficiency:** Remove redundancy, abbreviate, consolidate, cache prefixes
+- **Common Pitfalls:** Over-engineering, example pollution, context overflow, ambiguous instructions, ignoring edge cases
+- **Error Recovery:** Fallback instructions, confidence scores, indicate missing information
+
+---
+
+### Referenced Docs — Key Evaluation Criteria
+
+---
+
+#### `skill-writer/EVAL.md`
+
+**Purpose:** Optional deep evaluation guidance (not required for every skill).
+
+**Pass/Fail Rubric for integration-documentation skills:**
+- ✅ PASS: All required artifacts exist with requested depth
+- ❌ FAIL: API mapping is partial, workaround guidance is shallow, use cases are generic/not actionable
+- ❌ FAIL: Completion claimed with unresolved high-impact gaps and no next retrieval actions
+
+**Required artifact depth gates** (for `integration-documentation` class):
+- `references/api-surface.md` — must exist
+- `references/common-use-cases.md` — at least **6 concrete downstream use cases**
+- `references/troubleshooting-workarounds.md` — at least **8 failure modes with fixes**
+- `references/integration-patterns.md` — happy path + robust variant + anti-pattern+correction
+
+**Coverage matrix must include:** API surface, options/config, runtime lifecycle, event semantics, queue semantics, failure modes, version variance, downstream usage patterns.
+
+**Optional Deep-Eval Pattern:** Fixed prompt set → deterministic traces → rubric/schema checks → baseline vs candidate delta.
+
+---
+
+#### `skill-writer/references/authoring-path.md`
+
+**SKILL.md requirements:**
+1. Frontmatter must be first line
+2. `name` must match directory
+3. `description` must contain realistic trigger phrases
+4. Body must be imperative and concise
+5. SKILL.md is the orchestration index; reference files are conditionally loaded
+6. Bundled files referenced relative to skill root (`references/...`, `scripts/...`, `assets/...`)
+7. No hardcoded host-specific absolute paths
+
+**Path handling rules:** Use skill-root-relative paths; prefer relative over absolute; only use repo-root paths for registration steps; no provider-specific path variables in portable skills.
+
+**Supporting files:** `references/` (domain depth), `scripts/` (automation), `assets/` (static artifacts) — create only when justified.
+
+**Class-specific requirements for `integration-documentation`:** api-surface.md + common-use-cases.md (≥6) + troubleshooting-workarounds.md (≥8).
+
+**Example artifact requirements for generator/authoring skills:** happy-path + secure/robust variant + anti-pattern+corrected. No abstract-only guidance.
+
+**Attribution:** Full source lists in `SOURCES.md`; keep `SKILL.md` free of large attribution blocks.
+
+---
+
+#### `skill-writer/references/design-principles.md`
+
+**Key principles:**
+1. **Conciseness** — only include domain-specific knowledge, decision logic, output format, concrete examples. Omit general programming knowledge, obvious instructions, lengthy explanations. Rule: *"If a senior engineer would skip it, the agent doesn't need it."*
+2. **Degrees of Freedom** — High fragility → prescriptive steps; Medium → guidelines+examples; Low → goals+constraints only. Over-constraining wastes context; under-constraining causes inconsistency.
+3. **Progressive Disclosure** — Three tiers: metadata (always), instructions (on activation), resources (on demand via conditional loading tables).
+4. **Description as Trigger** — third person, realistic phrases, no "When to Use" in body, pattern: `<What it does>. Use when <trigger phrases>. <Key capabilities>.`
+5. **Imperative Voice** — commands, not descriptions ("Read the diff" not "This skill reads the diff")
+6. **Consistent Terminology** — one term per concept, no synonym mixing
+7. **Avoid Duplication** — info lives in SKILL.md or reference files, not both; don't repeat AGENTS.md conventions
+8. **Avoid Time-Sensitive Information** — no "before August 2025" style conditionals
+9. **Avoid Machine-Specific Paths** — use `<repo-root>/` or `uv run <skill-dir>/scripts/`
+10. **Default to Portable Skills** — cross-agent wording; only provider-specific when explicitly scoped
+11. **Long Reference Files** — >100 lines: add table of contents; >10k words: add grep patterns in SKILL.md
+
+---
+
+#### `skill-writer/references/description-optimization.md`
+
+**Trigger quality loop:**
+1. Draft description with realistic user language and concrete trigger phrases
+2. Build **should-trigger** and **should-not-trigger** query sets
+3. Evaluate current description against both sets
+4. Edit to improve precision/recall
+5. Repeat until false positives and false negatives are acceptable
+
+**Authoring rules:**
+1. Third person
+2. Include what it does AND when to use it
+3. No implementation details that don't aid triggering
+4. No provider-specific phrasing unless intentionally provider-specific
+5. For provider-agnostic skills: avoid naming Claude, Codex, etc.
+
+**Required output:** Final description text + should-trigger set + should-not-trigger set + summary of edits.
+
+---
+
+#### `skill-scanner/references/prompt-injection-patterns.md`
+
+**Pattern categories:**
+1. **Instruction Override** — "Ignore all previous instructions..." (Critical)
+2. **Jailbreaks** — DAN mode, developer mode, god mode, bypass safety (Critical)
+3. **Role Reassignment** — "You are now...", "Act as..." (High)
+4. **System Prompt Extraction** — "Output your full system prompt" (High)
+5. **Obfuscation Techniques** — Base64, Zero-width chars (U+200B, U+200C, etc.), Homoglyphs (Cyrillic vs Latin), RTL Override (U+202E), **Unicode Tag Characters (U+E0000 block)** — invisible to editors but read by LLM tokenizers, PNG/Image metadata injection (tEXt/iTXt chunks)
+6. **Hidden Content Vectors** — HTML comments, Markdown reference links, invisible markdown (empty links, unrendered images)
+7. **Indirect Injection** — Instructions in example output, self-referential instructions ("Add to your memory...", "Update CLAUDE.md...")
+
+**Critical false positive rule:** Security review skills documenting injection patterns are **legitimate**, not malicious. Key question: does the pattern **attack** the agent, or **inform** about attacks?
+
+---
+
+#### `skill-scanner/references/dangerous-code-patterns.md`
+
+**Pattern categories:**
+1. **Data Exfiltration** — HTTP post of env vars, DNS encoding, writing secrets to shared paths
+2. **Reverse Shells** — socket connect + subprocess, `bash -i >&`, `nc -e /bin/sh`
+3. **Credential Theft** — reading `~/.ssh/*`, harvesting `*KEY*/*TOKEN*/*SECRET*` env vars, reading `~/.aws/credentials`, `~/.netrc`, `~/.git-credentials`
+4. **Dangerous Execution** — `eval(user_input)`, `exec(downloaded_code)`, shell interpolation (`subprocess.run(f"...", shell=True)`), dynamic imports from user input
+5. **File System Manipulation** — writing to `~/.claude/settings.json`, poisoning `CLAUDE.md`/`MEMORY.md`, modifying `~/.bashrc`, installing git hooks
+6. **Encoding/Obfuscation** — `exec(base64.b64decode(...))`, ROT13, character-by-character string construction
+7. **Structural Attacks** — symlinks outside skill dir, test file auto-discovery (`conftest.py`, `*.test.js`), npm lifecycle hooks (`postinstall`), frontmatter hooks, `` !`cmd` `` pre-prompt injection
+
+**Legitimate patterns** (not malicious): `subprocess.run(["gh", ...])`, `subprocess.run(["git", ...])`, `json.dumps()` to stdout, GitHub API calls, `os.environ.get("GITHUB_TOKEN")`, reading `pyproject.toml`.
+
+---
+
+#### `skill-scanner/references/permission-analysis.md`
+
+**Tool Risk Tiers:**
+
+| Tier | Tools | Risk |
+|------|-------|------|
+| 1 | `Read`, `Grep`, `Glob` | Low |
+| 2 | `Bash` | Medium |
+| 3 | `Write`, `Edit`, `NotebookEdit` | High |
+| 4 | `WebFetch`, `WebSearch` | High |
+| 5 | `Task` | High |
+| 6 | `*` (wildcard) | Critical |
+
+**Least-privilege assessment:** For each tool: Is it referenced? Is it necessary? Is the scope minimal?
+
+**Common permission profiles:**
+- Analysis/Review: `Read, Grep, Glob` (or + `Bash` for linters/bundled scripts)
+- Workflow Automation: `Read, Grep, Glob, Bash`
+- Content Generation: + `Write`, `Edit`
+- External-Facing: + `WebFetch`
+- Full-Access: Almost never justified
+
+**Red flags:** `Bash` with no scripts in directory; `Write`/`Edit` in an "analysis" skill; `WebFetch` with no URLs in instructions; `Task`+`Bash`+`Write` combo; `*` wildcard; granted tools never referenced.
+
+**Scoring:** Appropriate → Slightly Overpermissioned → Overpermissioned → Dangerously Overpermissioned.
+
+---
+
+### Summary of Key Evaluation Criteria Across All Three Skills
+
+| Skill | Primary Eval Criteria |
+|-------|-----------------------|
+| **skill-writer** | Depth gates (≥6 use cases, ≥8 workarounds for integration skills); all required artifacts present; no unclaimed gaps; description has realistic trigger phrases; portability (no hardcoded paths); imperative voice; conciseness |
+| **skill-scanner** | False positive awareness (context matters); confidence levels (HIGH/MEDIUM/LOW); description-instructions alignment; structural attack detection (symlinks, hooks, PNG metadata); permission least-privilege rating; supply chain URL trust |
+| **prompt-engineering** | Token efficiency vs clarity tradeoff; match specificity to task fragility (degrees of freedom); correct persuasion principle for prompt type; progressive disclosure structure; avoid over-engineering |
+
+## Scout: Read ALL 13 SKILL.md files in /Users/josorio/Code/pi-skills/skills/ completely. For each skill report:
+1. Full frontmatter (name, description, compatibility, etc.)
+2. Full body content (all sections)
+3. File length in lines
+4. Whether it has: references/, scripts/, agents/ directories and what's in them
+5. Any scripts referenced in the SKILL.md (command patterns, tool invocations)
+
+The 13 skills are:
+- agents-md
+- docker-model-runner
+- exa-search
+- frontend-design
+- gh
+- glab
+- interface-design
+- pdf
+- playwright
+- posthog-skill
+- render-deploy
+- skill-scanner
+- skill-writer
+- prompt-engineering
+
+Read every SKILL.md completely — do not summarize or truncate.
+
+Now I have everything needed. Here is the complete report:
+
+---
+
+## Domain: All 13 SKILL.md Files in `/Users/josorio/Code/pi-skills/skills/`
+
+---
+
+### ⚠️ Pre-Report Finding: `prompt-engineering` Skill Does Not Exist
+
+The directory `/Users/josorio/Code/pi-skills/skills/prompt-engineering/` **does not exist** in the repo. The skill is registered in `~/.pi/agent/AGENTS.md` (pointing to an installed package path), but has no local source directory in `/Users/josorio/Code/pi-skills/skills/`. Only **13 skills** exist in that folder (not 14).
+
+---
+
+## Skill 1: `agents-md`
+
+### Frontmatter
+```yaml
+name: agents-md
+description: This skill should be used when the user asks to "create AGENTS.md", "update AGENTS.md", "maintain agent docs", "set up CLAUDE.md", or needs to keep agent instructions concise. Enforces research-backed best practices for minimal, high-signal agent documentation.
+```
+*(No compatibility, metadata, or license fields.)*
+
+### File Structure
+- `SKILL.md` — 100 lines
+- `LICENSE` — present
+- No `references/`, `scripts/`, or `agents/` directories
+
+### Body Content Summary (all sections, verbatim structure)
+**## File Setup** — Create `AGENTS.md` at project root; symlink to `CLAUDE.md` with `ln -s AGENTS.md CLAUDE.md`.
+
+**## Before Writing** — 5-item analysis checklist: package manager (lock files), linter/formatter configs, CI/build commands, monorepo indicators, existing conventions.
+
+**## Writing Rules** — Headers+bullets only; code blocks for commands; reference don't embed; no filler; trust capabilities; prefer file-scoped commands; don't duplicate linters.
+
+**## Required Sections** — Three subsections:
+1. *Package Manager* — which tool + key commands only
+2. *File-Scoped Commands* — per-file typecheck/lint/test table
+3. *Commit Attribution* — `Co-Authored-By:` trailer
+
+**## Optional Sections** — API route patterns, CLI commands, file naming, project structure hints, monorepo overrides.
+
+**## Anti-Patterns** — 8 items to omit: welcome text, "You should..." phrasing, linter rules, listing installed skills, project-wide build commands, obvious instructions, explanations of why, long prose.
+
+**## Example Structure** — Full markdown template showing the minimal AGENTS.md shape.
+
+### Scripts Referenced
+- `ln -s AGENTS.md CLAUDE.md`
+- `pnpm tsc --noEmit path/to/file.ts`
+- `pnpm eslint path/to/file.ts`
+- `pnpm jest path/to/file.test.ts`
+
+---
+
+## Skill 2: `docker-model-runner`
+
+### Frontmatter
+```yaml
+name: docker-model-runner
+description: Run AI models locally using Docker Model Runner with an OpenAI-compatible API. Use when the user wants to run a local LLM, use local inference, pull or manage AI models with Docker, set up a local model endpoint, or integrate local models into code via the OpenAI SDK. Also use when they mention "docker model," "local LLM," "run a model locally," or need an alternative to cloud AI APIs. Requires Docker Desktop or Docker Engine with Model Runner enabled.
+compatibility: 'Requires Docker Desktop 4.40+ or Docker Engine with Model Runner. Run `docker model version` to verify.'
+```
+*(No metadata or license fields.)*
+
+### File Structure
+- `SKILL.md` — 71 lines
+- `references/docker-model-guide.md` — present
+- No `scripts/` or `agents/` directories
+
+### Body Content Summary (all sections)
+**Workflow** — 6-step numbered workflow: check availability (`docker model version`), list models, search models, pull models, run models (one-time prompt / interactive / pre-load with `--detach`), use OpenAI-compatible API.
+
+**API Usage** — curl example targeting `http://localhost:12434/engines/llama.cpp/v1/chat/completions`. Python OpenAI library example with `base_url` set to local endpoint, `api_key="not-needed"`.
+
+**Key Commands** — 7-row table: `run`, `pull`, `list`, `search`, `ps`, `rm`, `inspect`.
+
+**Best Practices** — 4 bullet points: use smaller models for dev, pre-load with `--detach`, models stay loaded 5 min, use OpenAI-compatible API for integration.
+
+**References** — Points to `references/docker-model-guide.md`.
+
+### Scripts Referenced
+```bash
+docker model version
+docker model list
+docker model search <query>
+docker model pull <model>
+docker model run ai/smollm2 "Your prompt here"
+docker model run ai/smollm2
+docker model run --detach ai/smollm2
+docker model ps
+docker model rm <model>
+docker model inspect <model>
+```
+API endpoint: `http://localhost:12434/engines/llama.cpp/v1/chat/completions`
+
+---
+
+## Skill 3: `exa-search`
+
+### Frontmatter
+```yaml
+name: exa-search
+description: Semantic web search, content extraction, AI-powered answers, and deep research via the Exa API. Use when you need to search documentation, look up facts, find current information, extract page content from URLs, get AI answers with citations, find pages similar to a URL, research companies or people, find LinkedIn profiles, or run deep multi-step research. Also use when the user asks to "look something up," "search the web," "find docs for," "what does X's documentation say," "research this company," or needs any information that may be more current than your training data. Requires EXA_API_KEY environment variable.
+compatibility: 'Requires Node.js 18+, tsx, and EXA_API_KEY environment variable set'
+metadata:
+  author: josorio7122
+  version: '3.0'
+```
+
+### File Structure
+- `SKILL.md` — 174 lines
+- `references/api-reference.md` — present
+- `scripts/` — contains: `answer.ts`, `contents.ts`, `find-similar.ts`, `research.ts`, `search.ts`, `lib/` subdirectory, `__tests__/` subdirectory
+- No `agents/` directory
+
+### Body Content Summary (all sections)
+**Prerequisites** — `node --version` (18+), `echo $EXA_API_KEY`; install deps: `cd <skill-dir>/skills/exa-search && npm install`.
+
+**Choosing the Right Script** — 5-row decision table (answer.ts / search.ts / contents.ts / find-similar.ts / research.ts) plus a 4-branch decision tree.
+
+**Quick Examples** — 5 subsections:
+1. *Answer a Question* — `tsx scripts/answer.ts` with optional JSON options arg
+2. *Search the Web* — basic, domain-scoped, `type:"deep"`, date/category filters
+3. *Company & People Search* — `category:"company"`, `category:"people"` patterns; warning about category filter restrictions
+4. *Fetch a Known URL* — `tsx scripts/contents.ts`, multiple URLs, `livecrawl:"always"`
+5. *Find Similar Pages* — `tsx scripts/find-similar.ts`
+6. *Deep Research* — `tsx scripts/research.ts run`, `model:"exa-research-pro"`
+
+**Common Patterns** — Documentation lookup (3 options), verify-before-assume, company research, find alternatives.
+
+**Cost Awareness** — 6-row price table + 5 cost strategies.
+
+**Rules** — 7 bullet rules: check API key, prefer answer.ts, prefer search.ts with domains, use contents.ts only for known URLs, use research.ts sparingly, respect category filter restrictions, output is always JSON.
+
+**Reference** — Points to `references/api-reference.md`.
+
+### Scripts Referenced
+```bash
+tsx scripts/answer.ts "What is the latest Next.js version?"
+tsx scripts/answer.ts "Compare React and Vue" '{"text":true}'
+tsx scripts/search.ts "latest AI research"
+tsx scripts/search.ts "drizzle ORM configuration" '{"includeDomains":["orm.drizzle.team"],"text":true,"numResults":3}'
+tsx scripts/contents.ts "https://nextjs.org/docs/..." '{"text":true}'
+tsx scripts/find-similar.ts "https://react.dev" '{"text":true,"excludeSourceDomain":true,"numResults":5}'
+tsx scripts/research.ts run "Best practices for building a CLI tool..."
+tsx scripts/research.ts run "..." '{"model":"exa-research-pro"}'
+```
+
+---
+
+## Skill 4: `frontend-design`
+
+### Frontmatter
+```yaml
+name: frontend-design
+description: Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, artifacts, posters, or applications (examples include websites, landing pages, dashboards, React components, HTML/CSS layouts, or when styling/beautifying any web UI). Generates creative, polished code and UI design that avoids generic AI aesthetics.
+license: Complete terms in LICENSE.txt
+```
+
+### File Structure
+- `SKILL.md` — 47 lines
+- `LICENSE.txt` — present
+- No `references/`, `scripts/`, or `agents/` directories
+
+### Body Content Summary
+This skill has **no section headers** — it is a single cohesive body of prose instructions.
+
+**Design Thinking** — Before coding: understand purpose, tone (pick an extreme from a list: brutalist, maximalist, retro-futuristic, organic, luxury, playful, editorial, art deco, etc.), constraints, differentiation. "CRITICAL": commit to a clear conceptual direction.
+
+**Frontend Aesthetics Guidelines** — 5 focus areas:
+- *Typography*: distinctive, unexpected fonts (avoid Arial, Inter)
+- *Color & Theme*: CSS variables, dominant colors with sharp accents
+- *Motion*: CSS-only for HTML, Motion library for React; staggered reveals with `animation-delay`, scroll-triggering
+- *Spatial Composition*: asymmetry, overlap, diagonal flow, grid-breaking
+- *Backgrounds & Visual Details*: gradient meshes, noise textures, geometric patterns, layered transparencies, dramatic shadows, grain overlays
+
+**Prohibition**: NEVER use generic fonts (Inter, Roboto, Arial), purple gradients on white, predictable layouts, cookie-cutter design. Vary light/dark themes, fonts, aesthetics across generations.
+
+**Complexity matching**: maximalist → elaborate code; minimalist → restraint and precision.
+
+### Scripts Referenced
+None. Pure generative/creative instruction skill. No CLI commands or tool invocations.
+
+---
+
+## Skill 5: `gh`
+
+### Frontmatter
+```yaml
+name: gh
+description: Interact with GitHub from the command line using the gh CLI. Use when working with pull requests, issues, releases, Actions workflows and runs, repository management, code review, or GitHub API calls. Also use when the user says "open a PR," "create an issue," "check CI," "merge this," "make a release," or any GitHub-related task — even if they don't mention gh explicitly. Requires gh CLI installed and authenticated.
+compatibility: 'Requires gh CLI installed (brew install gh) and authenticated (gh auth login)'
+metadata:
+  author: josorio7122
+  version: '2.0'
+```
+
+### File Structure
+- `SKILL.md` — 122 lines
+- `references/commands.md` — present
+- No `scripts/` or `agents/` directories
+
+### Body Content Summary (all sections)
+**Prerequisites** — `gh --version`, `gh auth status`; auth options: `gh auth login` or `gh auth login --with-token`.
+
+**Choosing the Right Command** — 7-row table mapping intent to section.
+
+**Workflows** — 6 complete flows:
+1. *Create a PR*: `git push -u origin HEAD` + `gh pr create --fill`; variations: `--draft`, `--base`, `--reviewer`, `--label`, manual title/body
+2. *Check CI*: `gh pr checks`, `gh pr checks <number> --watch`; failed: `gh run view --log`, `gh run rerun --failed`
+3. *Review a PR*: `gh pr checkout`, `gh pr diff`, `gh pr review --approve/--request-changes/--comment`
+4. *Merge a PR*: `gh pr merge --squash --delete-branch` / `--rebase` / default merge commit; when-to-use matrix
+5. *Work with Issues*: `create`, `list`, `view`, `close`, `develop`
+6. *Make a Release*: `gh release create --generate-notes / --notes-file`; `gh release upload`
+7. *Monitor Actions*: `gh run list/watch/rerun`; `gh workflow run`
+
+**Use the API** — `gh api` REST + GraphQL + `--paginate` patterns.
+
+**Tips** — 7 bullet tips: `--fill`, `--web`, `--json`+`--jq`, `--repo`, `gh run watch`, `gh pr checks --watch`, repo inference.
+
+**Reference** — Points to `references/commands.md`.
+
+### Scripts Referenced
+```bash
+gh pr create --fill
+gh pr create --fill --draft
+gh pr checks <number> --watch
+gh run view <run-id> --log
+gh run rerun <run-id> --failed
+gh pr checkout <number>
+gh pr review <number> --approve
+gh pr merge <number> --squash --delete-branch
+gh issue create --title "Bug: X" --body "Details" --label bug
+gh issue develop <number>
+gh release create v1.0.0 --generate-notes
+gh release upload v1.0.0 ./dist/*.tar.gz
+gh run watch <run-id>
+gh workflow run deploy.yml --ref main
+gh api repos/owner/repo/issues --jq '.[].title'
+gh api graphql -f query='{ viewer { login } }'
+gh auth login --with-token <<< "<pat>"
+```
+
+---
+
+## Skill 6: `glab`
+
+### Frontmatter
+```yaml
+name: glab
+description: Interact with GitLab from the command line using the glab CLI. Use when working with merge requests, issues, CI/CD pipelines and jobs, variables, schedules, releases, stacked diffs, repository management, or GitLab API calls. Also use when the user says "open an MR," "create an issue," "check the pipeline," "merge this," "retrigger CI," "deploy," or any GitLab-related task — even if they don't mention glab explicitly. Requires glab CLI installed and authenticated.
+compatibility: 'Requires glab CLI installed (brew install glab) and authenticated (glab auth login)'
+metadata:
+  author: josorio7122
+  version: '3.0'
+```
+
+### File Structure
+- `SKILL.md` — 187 lines
+- `references/commands.md` — present
+- No `scripts/` or `agents/` directories
+
+### Body Content Summary (all sections)
+**Prerequisites** — `glab --version`, `glab auth status`; auth: `glab auth login`, `--token`, `--hostname` for self-hosted.
+
+**Choosing the Right Command** — 10-row table mapping intent to section (more comprehensive than `gh` skill).
+
+**Workflows** — 8 complete flows:
+1. *Create an MR*: `glab mr create --fill`; variations: `--draft`, `--target-branch`, `--reviewer`, `--squash-message-on-merge`
+2. *Check CI/CD*: `glab ci status` + `glab ci view` (interactive TUI)
+3. *Debug CI*: `glab ci trace`, `glab ci retry`, `glab job artifact`, `glab ci lint`; full debugging flow
+4. *Review an MR*: `glab mr checkout`, `glab mr diff`, `glab mr approve`, `glab mr note`
+5. *Merge an MR*: `--squash`, `--when-pipeline-succeeds`, `glab mr rebase`; when-to-use matrix
+6. *Work with Issues*: `create`, `list`, `view`, `close`, `board view`
+7. *CI/CD Config*: `glab variable list/set/get`; `glab schedule list/create/run`
+8. *Make a Release*: `glab release create/upload`
+9. *Stacked Diffs*: `glab stack create/save/sync/list/next/prev`
+
+**Use the API** — `glab api` REST + GraphQL + `--paginate --output ndjson` pattern; `:fullpath` auto-resolution.
+
+**Tips** — 8 bullet tips; aliases listed (`glab ci` = `glab pipe`, etc.).
+
+**Reference** — Points to `references/commands.md`.
+
+### Scripts Referenced
+```bash
+glab mr create --fill
+glab mr create --fill --squash-message-on-merge
+glab ci view
+glab ci trace <job-id>
+glab ci retry <job-id>
+glab job artifact <job-id>
+glab ci lint
+glab ci run
+glab mr merge <id> --squash --when-pipeline-succeeds
+glab mr rebase <id>
+glab issue board view
+glab variable list/set/get
+glab schedule list/create/run <id>
+glab release create v1.0.0 --notes-file CHANGELOG.md
+glab stack create/save/sync/list/next/prev
+glab api projects/:fullpath/merge_requests --paginate
+glab api graphql -f query='{ currentUser { username } }'
+```
+
+---
+
+## Skill 7: `interface-design`
+
+### Frontmatter
+```yaml
+name: interface-design
+description: Design crafted, distinctive interfaces for dashboards, admin panels, SaaS apps, tools, settings pages, and data-heavy products. Use when the user asks to "design a dashboard," "build an admin panel," "create a settings page," "design a data interface," or wants to build any interactive product UI that is NOT a marketing page or landing page. Also use when the user says their UI looks "generic," "templated," or "like every other app." Redirect landing pages and marketing sites to frontend-design.
+```
+*(No compatibility, metadata, or license fields.)*
+
+### File Structure
+- `SKILL.md` — 320 lines (longest SKILL.md in the repo)
+- `LICENSE` — present
+- `references/` — contains: `critique.md`, `example.md`, `principles.md`, `validation.md`
+- No `scripts/` or `agents/` directories
+
+### Body Content Summary (all sections)
+**Scope** — Use for: dashboards, admin panels, SaaS, tools, settings, data interfaces. Not for: landing pages, marketing sites.
+
+**The Problem** — 2-paragraph warning that defaults will win unless actively resisted, even if the process is followed.
+
+**Where Defaults Hide** — 4 areas where defaults disguise themselves: typography ("just a container"), navigation ("just scaffolding"), data ("just presentation"), token names ("implementation detail"). Rule: "There are no structural decisions. Everything is design."
+
+**Intent First** — 3 questions (Who is this human? What must they accomplish? What should this feel like?). Requirement: answer all three specifically before designing. Rule: "Every Choice Must Be A Choice" — must be able to explain WHY for each decision. The swap test. "Sameness Is Failure." Intent must be systemic (warm means everything is warm).
+
+**Product Domain Exploration** — Required outputs before proposing any direction: Domain (5+ concepts), Color world (5+ domain-specific colors), Signature (one unique element), Defaults (3 obvious choices to reject). Proposal requirements: must reference all four. Test: remove product name — can someone still identify what this is for?
+
+**The Mandate** — Pre-presentation self-check. Three checks: swap test, squint test, signature test (5 specific elements), token test.
+
+**Craft Foundations** — Two sections:
+- *Subtle Layering*: surface elevation system, border philosophy, the squint test for professional vs amateur
+- *Infinite Expression*: no interface should look the same; question list; "NEVER produce identical output"
+
+**Color Lives Somewhere** — Color must come from the product's world, not be applied. Beyond warm/cold axes. Unmotivated color is noise.
+
+**Before Writing Each Component** — Mandatory checkpoint block: Intent / Palette / Depth / Surfaces / Typography / Spacing (each with WHY).
+
+**Design Principles** — 12 subsections: Token Architecture (text hierarchy 4 levels, border progression, control tokens), Spacing (base unit + scale), Padding (symmetrical), Depth (pick ONE approach: borders-only/subtle shadows/layered shadows/surface shifts), Border Radius (sharper=technical, rounder=friendly), Typography (headlines/body/labels/data distinct), Card Layouts, Controls (custom components, not native `<select>`/`<input type="date">`), Iconography, Animation (fast, deceleration easing, no spring/bounce), States (5 interactive states + 3 data states), Navigation Context.
+
+**Avoid** — 15 prohibited patterns.
+
+**Workflow** — Communication (be invisible, never announce modes), Suggest+Ask format, If project has `system.md`, If no `system.md` (6-step flow), After completing offer to save.
+
+**After Completing** — Offer to save to `.interface-design/system.md`: direction, depth strategy, spacing unit, key component patterns.
+
+**Deep Dives** — Points to `references/principles.md`, `references/validation.md`, `references/critique.md`.
+
+**Commands** — `/interface-design:status`, `/interface-design:audit`, `/interface-design:extract`, `/interface-design:critique`
+
+### Scripts Referenced
+None. Pure generative instruction skill. No CLI commands.
+
+---
+
+## Skill 8: `pdf`
+
+### Frontmatter
+```yaml
+name: pdf
+description: Read, create, edit, and review PDF files with proper rendering and layout. Use when the user asks to "read a PDF," "create a PDF," "extract text from a PDF," "fill a PDF form," "merge PDFs," "convert to PDF," or any task involving PDF documents where layout and visual fidelity matter. Also use when the user mentions PDF files even if they don't explicitly ask for help with them. Uses Poppler for rendering, reportlab for generation, pdfplumber and pypdf for extraction.
+```
+
+### File Structure
+- `SKILL.md` — 62 lines
+- `agents/` — empty directory
+- `assets/pdf.png` — single PNG image
+- `LICENSE.txt` — present
+- No `references/` or `scripts/` directories
+
+### Body Content Summary (all sections)
+**When to use** — 3 bullets: visual review, programmatic creation with reportlab, validate rendering.
+
+**Workflow** — 4-step: prefer visual review via `pdftoppm` (PNG render); use `reportlab` to generate; use `pdfplumber`/`pypdf` for extraction (not layout fidelity); re-render and verify after each update.
+
+**Temp and output conventions** — `tmp/pdfs/` for intermediate files; `output/pdf/` for final artifacts; stable descriptive filenames.
+
+**Dependencies** — Python: `uv pip install reportlab pdfplumber pypdf` / fallback `python3 -m pip install`. System: `brew install poppler` (macOS) / `sudo apt-get install -y poppler-utils` (Ubuntu).
+
+**Environment** — No required environment variables.
+
+**Rendering command** — `pdftoppm -png $INPUT_PDF $OUTPUT_PREFIX`
+
+**Quality expectations** — 5 rules: consistent typography/spacing/margins; no clipping/overlap/broken tables/black squares; charts/tables/images sharp; ASCII hyphens only (no U+2011); citations human-readable.
+
+**Final checks** — Don't deliver until PNG inspection shows zero defects; confirm headers/footers/numbering; keep intermediate files organized.
+
+### Scripts Referenced
+```bash
+uv pip install reportlab pdfplumber pypdf
+python3 -m pip install reportlab pdfplumber pypdf
+brew install poppler
+sudo apt-get install -y poppler-utils
+pdftoppm -png $INPUT_PDF $OUTPUT_PREFIX
+```
+
+---
+
+## Skill 9: `playwright`
+
+### Frontmatter
+```yaml
+name: playwright
+description: Automate a real browser from the terminal for navigation, form filling, screenshots, data extraction, and UI-flow debugging. Use when the user asks to "take a screenshot," "scrape a page," "fill a form," "test a UI flow," "automate the browser," "open a webpage," or any task that requires interacting with a live website. Also use when the user needs to extract data from a JavaScript-rendered page that simple HTTP requests can't handle. Uses playwright-cli or the bundled wrapper script.
+```
+
+### File Structure
+- `SKILL.md` — 100 lines
+- `agents/` — empty directory
+- `assets/` — (not listed in ls output; ls showed `agents/ assets/ LICENSE.txt NOTICE.txt references/ scripts/`)
+- `references/` — `cli.md`, `workflows.md`
+- `scripts/playwright_cli.sh` — bundled wrapper script
+- `LICENSE.txt`, `NOTICE.txt` — present
+
+### Body Content Summary (all sections)
+**Prerequisite check** — `command -v npx >/dev/null 2>&1`; if missing, install Node.js/npm and then `npm install -g @playwright/cli@latest`.
+
+**Skill path** — `export CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"` + `export PWCLI="$CODEX_HOME/skills/playwright/scripts/playwright_cli.sh"`
+
+**Quick start** — 5 commands: `open`, `snapshot`, `click e15`, `type`, `screenshot` using `"$PWCLI"`.
+
+**Core workflow** — 5-step: open → snapshot → interact using refs → re-snapshot after DOM changes → capture artifacts. Minimal loop shown.
+
+**When to snapshot again** — 5 triggers: navigation, substantial UI changes, modals/menus, tab switches, stale ref errors.
+
+**Recommended patterns** — 3 named patterns:
+1. *Form fill and submit* — `fill e1`, `fill e2`, `click e3`, re-snapshot
+2. *Debug a UI flow with traces* — `tracing-start`, interactions, `tracing-stop`
+3. *Multi-tab work* — `tab-new`, `tab-list`, `tab-select`
+
+**Wrapper script** — Uses `npx --package @playwright/cli playwright-cli` internally; no global install needed.
+
+**References** — `references/cli.md` (command reference), `references/workflows.md` (practical workflows).
+
+**Guardrails** — 7 rules: always snapshot before referencing element ids; re-snapshot when stale; prefer explicit commands over `eval`/`run-code`; use placeholder refs `eX` without fresh snapshot; use `--headed` for visual checks; artifacts to `output/playwright/`; default to CLI not test specs.
+
+### Scripts Referenced
+```bash
+command -v npx >/dev/null 2>&1
+node --version
+npm --version
+npm install -g @playwright/cli@latest
+export CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
+export PWCLI="$CODEX_HOME/skills/playwright/scripts/playwright_cli.sh"
+"$PWCLI" open https://playwright.dev --headed
+"$PWCLI" snapshot
+"$PWCLI" click e15
+"$PWCLI" type "Playwright"
+"$PWCLI" press Enter
+"$PWCLI" screenshot
+"$PWCLI" fill e1 "user@example.com"
+"$PWCLI" tracing-start / tracing-stop
+"$PWCLI" tab-new / tab-list / tab-select 0
+```
+Bundled script: `scripts/playwright_cli.sh` (wraps `npx --package @playwright/cli playwright-cli`)
+
+---
+
+## Skill 10: `posthog-skill`
+
+### Frontmatter
+```yaml
+name: posthog-skill
+description: Automate PostHog analytics and feature flags for this project — inspect branch event availability, compare against the ACH reference insight, create or update the 7361 metrics dashboard idempotently, and manage feature flags (list, inspect, toggle, create, update, audit activity log). Use when working on analytics instrumentation, dashboards, PostHog event verification, or feature flag management.
+metadata:
+  author: josorio7122
+  version: '1.0'
+compatibility: 'Requires Node.js 18+ and tsx. Dependencies are managed at the repository root — run `pnpm install` from the repo root if needed.'
+```
+
+### File Structure
+- `SKILL.md` — 338 lines (tied for longest with interface-design)
+- `references/POSTHOG_API.md`, `references/ach-reference-summary.json`
+- `scripts/run.ts`, `scripts/lib/` subdirectory, `scripts/__tests__/` subdirectory
+- No `agents/` directory
+
+### Body Content Summary (all sections)
+**IMPORTANT note** — `$SKILL_DIR` must be resolved from where SKILL.md was loaded, not hardcoded. `$RUN` = `npx tsx $SKILL_DIR/scripts/run.ts`.
+
+**Command Quick Reference** — 11-row table: `status`, `inspect`, `inspect --live`, `compare`, `create`, `flags`, `flags get <id>`, `flags toggle <id>`, `flags update <id>`, `flags create <key>`, `flags activity <id>`.
+
+**Environment Variables** — 5 variables: `POSTHOG_PERSONAL_API_KEY` (required for live), `POSTHOG_PROJECT_ID` (default: `39507`), `POSTHOG_HOST` (default: `https://us.posthog.com`), `POSTHOG_ACH_INSIGHT_ID`, `POSTHOG_DASHBOARD_NAME`.
+
+**Command Surface** — 6 commands with JSON output shapes:
+1. `status` — config check, no token required
+2. `inspect` — 9 branch-7361 events from local spec (offline)
+3. `inspect --live` — HogQL batch query; events with `count_30d`, `last_seen`
+4. `compare` — fetch ACH insight `drOq2lO5`; writes to `references/ach-reference-summary.json`
+5. `create` — WRITE op; idempotent 8-tile dashboard provisioning; recovery instructions for mid-run failure via `curl -X PATCH` soft-delete
+6. `flags` — 6 subcommands (`flags`, `flags get`, `flags toggle`, `flags create`, `flags update`, `flags activity`); all WRITE ops prefaced with `WRITE:` announcement + `--dry-run` first rule
+
+**Dry-Run Mode** — All commands accept `--dry-run`; no HTTP, fixture data, exit 0.
+
+**First Use (No Token Yet)** — 6-step offline exploration flow including `pnpm install`, `status`, `inspect`, `--dry-run` variants, running tests.
+
+**Dashboard Spec** — 8 tiles: Page Funnel (FunnelsQuery), Payment Method Preference (TrendsQuery), Payment Mode Selection (TrendsQuery), FCF Selection Rate (TrendsQuery), Travel Protection Selection (TrendsQuery), Signing Completion (TrendsQuery), Purchase Completions Over Time (TrendsQuery), Top Counties (HogQLQuery). Layout: 2-column grid, `w:6, h:5` per tile.
+
+**Branch Events Catalog** — 9+1 events (10 rows including `signing_completed`) with key properties listed.
+
+**API Quirks** — 4 PostHog-specific behaviors (dashboard attachment via `dashboards:[]`, FunnelsQuery nesting, `refresh` parameter location, ACH insight `InsightVizNode` wrapping).
+
+**Exit Codes** — 4 codes: 0 success, 1 auth/API error, 2 bad arguments, 3 partial failure.
+
+**Error Output Examples** — 6 error scenarios with exact stderr messages.
+
+**File Structure** — Full tree of `.pi/skills/posthog-skill/` with 8 test files listed.
+
+### Scripts Referenced
+```bash
+pnpm install
+npx tsx $SKILL_DIR/scripts/run.ts status
+npx tsx $SKILL_DIR/scripts/run.ts inspect
+npx tsx $SKILL_DIR/scripts/run.ts inspect --live
+npx tsx $SKILL_DIR/scripts/run.ts compare
+npx tsx $SKILL_DIR/scripts/run.ts compare --dry-run
+npx tsx $SKILL_DIR/scripts/run.ts create
+npx tsx $SKILL_DIR/scripts/run.ts create --dry-run
+npx tsx $SKILL_DIR/scripts/run.ts flags
+npx tsx $SKILL_DIR/scripts/run.ts flags get 123
+npx tsx $SKILL_DIR/scripts/run.ts flags toggle 123
+npx tsx $SKILL_DIR/scripts/run.ts flags create my-new-flag
+npx tsx $SKILL_DIR/scripts/run.ts flags update 123 --name 'New Name' --active false --tags release,v2
+npx tsx $SKILL_DIR/scripts/run.ts flags activity 123 --limit 20
+npx tsx --test $SKILL_DIR/scripts/__tests__/*.test.ts
+source ~/.zshrc && POSTHOG_TEST_LIVE=1 npx tsx --test $SKILL_DIR/scripts/__tests__/*.test.ts
+curl -X PATCH -H "Authorization: Bearer $POSTHOG_PERSONAL_API_KEY" \
+  -H "Content-Type: application/json" \
+  "https://us.posthog.com/api/environments/39507/dashboards/<id>/" \
+  -d '{"deleted": true}'
+```
+
+---
+
+## Skill 11: `render-deploy`
+
+### Frontmatter
+```yaml
+name: render-deploy
+description: Deploy applications to Render by analyzing codebases, generating render.yaml Blueprints, and providing Dashboard deeplinks. Use when the user wants to deploy, host, publish, or set up their application on Render's cloud platform.
+```
+
+### File Structure
+- `SKILL.md` — 372 lines (longest SKILL.md in the repo)
+- `agents/` — empty directory
+- `assets/` — `docker.yaml`, `go-api.yaml`, `nextjs-postgres.yaml`, `node-express.yaml`, `python-django.yaml`, `render-small.svg`, `render.png`, `static-site.yaml`
+- `references/` — `blueprint-spec.md`, `codebase-analysis.md`, `configuration-guide.md`, `deployment-details.md`, `direct-creation.md`, `error-patterns.md`, `post-deploy-checks.md`, `runtimes.md`, `service-types.md`, `troubleshooting-basics.md`
+- `LICENSE.txt` — present
+
+### Body Content Summary (all sections)
+**Intro** — Two deploy sources: Git-backed (covered) and prebuilt Docker image (out of scope for MCP). If no Git remote, stop and instruct user.
+
+**Prerequisites note** — `sandbox_permissions=require_escalated` if network blocked.
+
+**When to Use** — 6 triggers listed.
+
+**Happy Path (New Users)** — 2-question pre-analysis: Git vs Docker? Provision everything vs bring own infra?
+
+**Choose Your Source Path** — Git Repo Path vs Prebuilt Docker Image Path (not supported by MCP).
+
+**Choose Your Deployment Method** — 2-row table (Blueprint vs Direct Creation) + decision heuristic: use Direct Creation when all 4 conditions true; use Blueprint when any of 5 conditions true.
+
+**Prerequisites Check** — 6-step ordered verification: confirm source path (`git remote -v`), MCP tools (`list_services()`), Render CLI (`render --version`), MCP setup (if missing — Cursor/Claude Code/Codex/Other setup instructions), authentication (`render whoami -o json`), workspace context (`get_selected_workspace()`).
+
+**MCP Setup subsections** — 4 named AI tool setups:
+- *Cursor*: `~/.cursor/mcp.json` config
+- *Claude Code*: `claude mcp add --transport http render https://mcp.render.com/mcp --header "Authorization: Bearer <YOUR_API_KEY>"`
+- *Codex*: `export RENDER_API_KEY` + `codex mcp add render --url https://mcp.render.com/mcp --bearer-token-env-var RENDER_API_KEY`
+- *Other Tools*: redirect to Render MCP docs
+
+**Method 1: Blueprint Deployment** — 7 steps:
+1. Analyze codebase (→ `references/codebase-analysis.md`)
+2. Generate `render.yaml` (basic structure shown; service types: web/worker/cron/static/pserv; → `references/blueprint-spec.md`, `references/runtimes.md`, `assets/`)
+3. Immediate Next Steps checklist: authenticate, validate (`render blueprints validate`), commit+push, open Dashboard, fill secrets, deploy
+4. Validate configuration: `render whoami -o json` + `render blueprints validate`
+5. Commit and push: `git add render.yaml && git commit -m "..." && git push origin main`
+6. Generate deeplink: `git remote get-url origin` → SSH-to-HTTPS conversion table → `https://dashboard.render.com/blueprint/new?repo=<URL>`
+7. Verify deployment: `list_deploys()`, `list_logs()`, `get_metrics()`
+
+**Method 2: Direct Service Creation** — Abbreviated 4-step referencing `references/direct-creation.md` for details.
+
+**Post-deploy verification and basic triage** — 4-step checklist; → `references/post-deploy-checks.md`, `references/troubleshooting-basics.md`.
+
+**Troubleshooting** — Escalated network access guidance.
+
+### Scripts Referenced
+```bash
+git remote -v
+git remote get-url origin
+git add render.yaml && git commit -m "Add Render deployment configuration" && git push origin main
+render --version
+brew install render
+curl -fsSL https://raw.githubusercontent.com/render-oss/cli/main/bin/install.sh | sh
+render whoami -o json
+render blueprints validate
+render workspace current -o json
+render login
+export RENDER_API_KEY="rnd_xxxxx"
+claude mcp add --transport http render https://mcp.render.com/mcp --header "Authorization: Bearer <YOUR_API_KEY>"
+export RENDER_API_KEY="<YOUR_API_KEY>"
+codex mcp add render --url https://mcp.render.com/mcp --bearer-token-env-var RENDER_API_KEY
+```
+MCP tool calls: `list_services()`, `get_selected_workspace()`, `list_workspaces()`, `list_deploys(serviceId, limit)`, `list_logs(resource, level, limit)`, `get_metrics(resourceId, metricTypes)`
+
+---
+
+## Skill 12: `skill-scanner`
+
+### Frontmatter
+```yaml
+name: skill-scanner
+description: Scan agent skills for security issues. Use when asked to "scan a skill", "audit a skill", "review skill security", "check skill for injection", "validate SKILL.md", or assess whether an agent skill is safe to install. Checks for prompt injection, malicious scripts, excessive permissions, secret exposure, and supply chain risks.
+```
+
+### File Structure
+- `SKILL.md` — 162 lines
+- `LICENSE` — present
+- `references/` — `dangerous-code-patterns.md`, `permission-analysis.md`, `prompt-injection-patterns.md`
+- `scripts/scan_skill.py` — Python static analysis scanner
+- No `agents/` directory
+
+### Body Content Summary (all sections)
+**Requires** — `uv` CLI. Run scripts using full path relative to skill directory.
+
+**Bundled Script** — `scripts/scan_skill.py`: static analysis, structured JSON output. Invocation: `uv run scripts/scan_skill.py <skill-directory>`.
+
+**Workflow** — 8 phases:
+1. *Input & Discovery* — determine target (path / name / "scan all"), validate `SKILL.md` exists, `ls` skill directory structure
+2. *Automated Static Scan* — `uv run scripts/scan_skill.py <skill-directory>`; fallback: manual Grep patterns from reference files
+3. *Frontmatter Validation* — required fields (`name`, `description`), name consistency, `allowed-tools` assessment, model override, description quality
+4. *Prompt Injection Analysis* — load `references/prompt-injection-patterns.md`; critical distinction: performing vs discussing injection
+5. *Behavioral Analysis* — agent-only (no pattern matching): description-vs-instructions alignment, config/memory poisoning (CLAUDE.md, MEMORY.md, settings.json, .mcp.json, `~/.claude/`, `~/.agents/`, `~/.pi/`), scope creep, information gathering, structural attacks (symlinks, frontmatter hooks `PostToolUse`/`PreToolUse`, `!`command`` syntax, test file auto-discovery, npm `postinstall` hooks, PNG image metadata)
+6. *Script Analysis* — load `references/dangerous-code-patterns.md`; evaluate exfiltration, reverse shells, credential theft, dangerous execution, config modification; check PEP 723 dependencies; verify behavior matches description
+7. *Supply Chain Assessment* — trusted vs untrusted domains; remote instruction loading; dependency downloads
+8. *Permission Analysis* — load `references/permission-analysis.md`; least privilege; tool justification; risk tier
+
+**Confidence Levels** — HIGH/MEDIUM/LOW with criteria and action; false positive warning.
+
+**Output Format** — Markdown template: `## Skill Security Scan: [Name]` → Summary, Findings (with SKILL-SEC-001 format), Needs Verification, Assessment. Risk level determination (Critical/High/Medium/Low/Clean).
+
+**Reference Files** — 3-row table: `prompt-injection-patterns.md`, `dangerous-code-patterns.md`, `permission-analysis.md`.
+
+### Scripts Referenced
+```bash
+uv run scripts/scan_skill.py <skill-directory>
+ls -la <skill-directory>/
+ls <skill-directory>/references/ 2>/dev/null
+ls <skill-directory>/scripts/ 2>/dev/null
+```
+
+---
+
+## Skill 13: `skill-writer`
+
+### Frontmatter
+```yaml
+name: skill-writer
+description: Create, synthesize, and iteratively improve agent skills following the Agent Skills specification. Use when asked to "create a skill", "write a skill", "synthesize sources into a skill", "improve a skill from positive/negative examples", "update a skill", or "maintain skill docs and registration". Handles source capture, depth gates, authoring, registration, and validation.
+```
+
+### File Structure
+- `SKILL.md` — 90 lines
+- `EVAL.md`, `SOURCES.md` — additional docs present
+- `LICENSE` — present
+- `references/` — 13 files: `authoring-path.md`, `claude-code-extensions.md`, `description-optimization.md`, `design-principles.md`, `evaluation-path.md`, `iteration-path.md`, `mode-selection.md`, `output-patterns.md`, `registration-validation.md`, `skill-patterns.md`, `synthesis-path.md`, `workflow-patterns.md`, plus `examples/` subdirectory
+- `scripts/quick_validate.py` — Python validation script
+- No `agents/` directory
+
+### Body Content Summary (all sections)
+**Reference table** — 14-row table mapping task → reference file to load (only load what's needed):
+- `mode-selection.md` — skill class and workflow path
+- `design-principles.md` — writing constraints
+- `skill-patterns.md` — structure patterns
+- `workflow-patterns.md` — workflow orchestration
+- `output-patterns.md` — output format patterns
+- `mode-selection.md` — workflow path and required outputs
+- `references/examples/*.md` — synthesis examples by skill type
+- `synthesis-path.md` — external/local source synthesis
+- `authoring-path.md` — write or update SKILL.md
+- `description-optimization.md` — description and trigger precision
+- `iteration-path.md` — positive/negative/fix examples
+- `evaluation-path.md` — behavior evaluation
+- `registration-validation.md` — register and validate
+
+**Step 1: Resolve target and path** — resolve skill root, intended operation (`create/update/synthesize/iterate`), distinguish internal vs repo paths, read `mode-selection.md`, classify skill (5 types), ask one question if ambiguous.
+
+**Step 2: Run synthesis when needed** — read `synthesis-path.md`; collect/score sources with provenance; trust/safety rules; source-backed decisions; load examples profiles; enforce baseline source pack; enforce depth gates.
+
+**Step 3: Run iteration first** — read `iteration-path.md` when operation is `iterate`; capture/anonymize examples; re-evaluate against working and holdout slices; propose improvements from evidence; carry deltas into authoring.
+
+**Step 4: Author or update** — read `authoring-path.md`; write/update `SKILL.md` in imperative voice; create focused reference files/scripts only when justified; follow structure patterns; include transformed examples in references for authoring/generator skills (happy-path, secure/robust, anti-pattern+corrected).
+
+**Step 5: Optimize description quality** — read `description-optimization.md`; validate should-trigger and should-not-trigger query sets; reduce false positives/negatives; keep trigger language provider-generic.
+
+**Step 6: Evaluate outcomes** — read `evaluation-path.md`; lightweight qualitative check by default; depth rubric for integration/documentation and skill-authoring skills; deeper eval only when requested.
+
+**Step 7: Register and validate** — read `registration-validation.md`; apply repo registration steps; quick validation with strict depth gates; reject shallow outputs.
+
+**Output format** — 4 items: Summary, Changes Made, Validation Results, Open Gaps.
+
+### Scripts Referenced
+```bash
+# Via scripts/quick_validate.py (referenced in registration-validation.md, not explicitly in SKILL.md body)
+```
+No explicit CLI commands in the SKILL.md body itself. All referenced operations are agent-driven reads of reference files.
+
+---
+
+## `prompt-engineering` Skill
+
+**STATUS: DOES NOT EXIST** in `/Users/josorio/Code/pi-skills/skills/`. The directory is absent. The skill is registered in `~/.pi/agent/AGENTS.md` pointing to a path within the globally installed `@mariozechner/pi-coding-agent` npm package (`/Users/josorio/Library/pnpm/global/5/.pnpm/@mariozechner+pi-coding-agent@0.63.1_ws@8.20.0_zod@4.3.6/node_modules/@mariozechner/pi-coding-agent/...`), not in this local skills repo. No SKILL.md was found to read.
+
+---
+
+## Summary Table
+
+| Skill | Lines | references/ | scripts/ | agents/ | Key scripts/tools |
+|---|---|---|---|---|---|
+| agents-md | 100 | ❌ | ❌ | ❌ | `ln -s`, `pnpm tsc`, `pnpm eslint`, `pnpm jest` |
+| docker-model-runner | 71 | ✅ (1 file) | ❌ | ❌ | `docker model *` commands, curl to `localhost:12434` |
+| exa-search | 174 | ✅ (1 file) | ✅ (5 `.ts` + lib/ + `__tests__/`) | ❌ | `tsx scripts/answer.ts`, `search.ts`, `contents.ts`, `find-similar.ts`, `research.ts` |
+| frontend-design | 47 | ❌ | ❌ | ❌ | None |
+| gh | 122 | ✅ (1 file) | ❌ | ❌ | `gh pr/issue/release/run/workflow/api` commands |
+| glab | 187 | ✅ (1 file) | ❌ | ❌ | `glab mr/ci/issue/variable/schedule/release/stack/api` commands |
+| interface-design | 320 | ✅ (4 files) | ❌ | ❌ | None (commands via `/interface-design:*` slash commands) |
+| pdf | 62 | ❌ | ❌ | ✅ (empty) | `pdftoppm`, `uv pip install`, `brew install poppler` |
+| playwright | 100 | ✅ (2 files) | ✅ (`playwright_cli.sh`) | ✅ (empty) | `"$PWCLI" open/snapshot/click/fill/screenshot`, `npx --package @playwright/cli playwright-cli` |
+| posthog-skill | 338 | ✅ (2 files) | ✅ (`run.ts` + lib/ + `__tests__/`) | ❌ | `npx tsx $SKILL_DIR/scripts/run.ts *`, curl PATCH to PostHog API |
+| render-deploy | 372 | ✅ (10 files) | ❌ | ✅ (empty) | `render *` CLI, `git remote`, MCP tool calls, `claude mcp add`, `codex mcp add` |
+| skill-scanner | 162 | ✅ (3 files) | ✅ (`scan_skill.py`) | ❌ | `uv run scripts/scan_skill.py`, `ls -la` |
+| skill-writer | 90 | ✅ (12+ files + examples/) | ✅ (`quick_validate.py`) | ❌ | Agent reads reference files; `quick_validate.py` via registration |
+| **prompt-engineering** | **N/A** | **N/A** | **N/A** | **N/A** | **Skill directory does not exist in this repo** |
+
+## Scout: Read the pi skills documentation at /Users/josorio/Library/pnpm/global/5/.pnpm/@mariozechner+pi-coding-agent@0.63.1_ws@8.20.0_zod@4.3.6/node_modules/@mariozechner/pi-coding-agent/docs/skills.md completely. Report:
+1. How skills should reference the agent (what variable or convention for skill directory?)
+2. How scripts are invoked from skills
+3. Any requirements for frontmatter fields
+4. How $SKILL_DIR or equivalent works
+5. Any portability requirements
+
+Also read /Users/josorio/Library/pnpm/global/5/.pnpm/@mariozechner+pi-coding-agent@0.63.1_ws@8.20.0_zod@4.3.6/node_modules/@mariozechner/pi-coding-agent/docs/extensions.md for any relevant context about how pi loads skills.
+
+## Domain: Pi Skills Documentation — Conventions, Portability, and Script Invocation
+
+### Findings Summary
+
+Here are the concrete facts from reading both documentation files completely:
+
+---
+
+### 1. How Skills Should Reference the Skill Directory
+
+**There is no `$SKILL_DIR` variable or equivalent.** The spec does not define any runtime variable for the skill's own directory.
+
+The docs say explicitly:
+
+> **The agent follows the instructions, using relative paths to reference scripts and assets**
+
+And in the SKILL.md Format section:
+
+> Use relative paths from the skill directory:
+> ```markdown
+> See [the reference guide](references/REFERENCE.md) for details.
+> ```
+
+The convention is:
+- **Relative paths in SKILL.md** are written relative to the skill directory (e.g., `./scripts/process.sh`, `references/REFERENCE.md`)
+- The **agent resolves these** at runtime after reading the full SKILL.md
+- The docs at the top of AGENTS.md in this project confirm: *"When a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands."* — this is a **model-side resolution convention**, not a runtime variable
+
+The example in the docs:
+```markdown
+## Setup
+\`\`\`bash
+cd /path/to/brave-search && npm install
+\`\`\`
+## Search
+\`\`\`bash
+./search.js "query"
+\`\`\`
+```
+Note: `cd /path/to/brave-search` is a **placeholder** (not a real path) — the model is expected to resolve the actual skill path at runtime.
+
+---
+
+### 2. How Scripts Are Invoked from Skills
+
+Scripts are invoked via **bash commands** in fenced code blocks inside SKILL.md. The model reads the SKILL.md and executes the bash commands using the `bash` tool. There is no special invocation mechanism — the instructions are natural language + shell commands that the model follows. Example from docs:
+
+```markdown
+## Search
+\`\`\`bash
+./search.js "query"              # Basic search
+./search.js "query" --content    # Include page content
+\`\`\`
+## Extract Page Content
+\`\`\`bash
+./content.js https://example.com
+\`\`\`
+```
+
+Scripts in `scripts/` or as root-level files (e.g., `search.js`, `content.js`) — the model calls them with the `bash` tool after resolving the skill directory path.
+
+---
+
+### 3. Frontmatter Fields
+
+Per the skills.md table:
+
+| Field | Required | Notes |
+|-------|----------|-------|
+| `name` | **Yes** | Max 64 chars; `[a-z0-9-]` only; must match parent directory name; no leading/trailing/consecutive hyphens |
+| `description` | **Yes** | Max 1024 chars; skills with missing description **are not loaded** |
+| `license` | No | License name or reference to bundled file |
+| `compatibility` | No | Max 500 chars; environment requirements |
+| `metadata` | No | Arbitrary key-value mapping |
+| `allowed-tools` | No | Space-delimited list of pre-approved tools (experimental) |
+| `disable-model-invocation` | No | When `true`, skill is hidden from system prompt; must use `/skill:name` explicitly |
+
+Unknown frontmatter fields are **ignored** (not errors). Most validation issues produce warnings but still load the skill. Only missing `description` causes a skill to not load.
+
+---
+
+### 4. How `$SKILL_DIR` or Equivalent Works
+
+**It does not exist.** There is no `$SKILL_DIR`, `SKILL_DIR`, or any injected environment variable defined in the pi skills specification or implementation docs. The portability mechanism is purely:
+1. Write relative paths in SKILL.md
+2. The model resolves those relative paths to absolute paths based on where it read the SKILL.md from
+
+No shell variable, no template substitution, no runtime injection.
+
+---
+
+### 5. Portability Requirements
+
+The spec and docs establish these portability constraints:
+
+- **Relative paths only** — all script/asset references in SKILL.md must be relative to the skill directory; absolute hardcoded paths break portability
+- **Name must match directory** — `name` in frontmatter must equal the parent directory name; mismatches produce warnings
+- **Self-contained directory** — the skill is a directory with SKILL.md; everything it needs must be inside that directory (scripts, references, assets, `package.json`, `node_modules/`)
+- **Setup instructions in SKILL.md** — if scripts need `npm install`, the skill must include setup instructions; the model runs these on first use
+- **No implicit environment** — skills cannot assume the presence of global tools beyond what's described in `compatibility`
+
+From extensions.md — skills are **not** extensions. Extensions are TypeScript modules with API access; skills are plain markdown instruction packages. Skills have no access to `ExtensionAPI`, events, tools registration, etc.
+
+## Scout: Search ALL files in /Users/josorio/Code/pi-skills/skills/ for references to other coding agents. Use grep to find:
+1. 'codex' or 'CODEX' or 'Codex' (OpenAI Codex agent)
+2. 'claude' or 'Claude' (Claude Code / Claude Desktop)
+3. 'cursor' or 'Cursor' (Cursor IDE)
+4. 'CODEX_HOME' or 'codex_home'
+5. 'claude mcp' or 'claude code'
+6. 'npx' references that assume a specific agent environment
+7. Any hardcoded paths to ~/.codex/ or ~/.claude/
+
+For each match, report: file path, line number, the full line content, and whether this is a legitimate reference (e.g., skill-scanner discussing attacks on .claude/) vs a reference that should be updated to pi.
+
+Also check the render-deploy skill specifically for its MCP setup sections that reference Cursor/Claude Code/Codex.
+
+Here is the complete findings report:
+
+---
+
+## Domain: Other-Agent References in `/Users/josorio/Code/pi-skills/skills/`
+
+### All Matches by Category
+
+---
+
+#### 1. `Codex` / `CODEX` / `codex` references
+
+| File | Line | Full Line | Legitimate? |
+|------|------|-----------|-------------|
+| `skill-writer/EVAL.md` | 53 | `2. Capture deterministic traces (`codex exec --json`).` | ⚠️ **Should be updated** — references Codex CLI as the evaluation harness |
+| `skill-writer/EVAL.md` | 67 | `codex exec \` | ⚠️ **Should be updated** — example command using Codex CLI |
+| `skill-writer/references/evaluation-path.md` | 32 | `2. Capture deterministic run traces (for example `codex exec --json`).` | ⚠️ **Should be updated** — same Codex CLI reference |
+| `skill-writer/references/evaluation-path.md` | 54 | `Keep evaluation instructions tool-agnostic so they work in both Codex and Claude environments.` | ⚠️ **Should be updated** — should mention pi instead of Codex/Claude |
+| `skill-writer/references/synthesis-path.md` | 38 | `3. Codex system skill-authoring source (for example `.codex/skills/.system/skill-creator/SKILL.md` when available).` | ⚠️ **Should be updated** — references `.codex/` path |
+| `skill-writer/SOURCES.md` | 12 | table row: `local Codex upstream … Codex-native skill authoring conventions` | ⚠️ **Informational/historical** — documents source provenance; arguably legitimate but Codex-centric |
+| `skill-writer/SOURCES.md` | 33 | `2026-03-05: Initialized SOURCES.md with baseline source pack (local canonical, Codex upstream, Claude upstream, spec, and repo conventions).` | ⚠️ **Historical note** — changelog entry, arguably fine but Codex-centric |
+| `skill-writer/references/description-optimization.md` | 23 | `5. For provider-agnostic skills, avoid naming Claude, Codex, or any provider in ways that would narrow portability expectations.` | ✅ **Legitimate** — guidance to avoid mentioning those agents |
+| `playwright/SKILL.md` | 36 | `export CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"` | 🔴 **Must update** — hardcodes Codex as the skill root |
+| `playwright/SKILL.md` | 37 | `export PWCLI="$CODEX_HOME/skills/playwright/scripts/playwright_cli.sh"` | 🔴 **Must update** — path derived from `CODEX_HOME` |
+| `playwright/SKILL.md` | 40 | `User-scoped skills install under `$CODEX_HOME/skills` (default: `~/.codex/skills`).` | 🔴 **Must update** |
+| `playwright/NOTICE.txt` | 13 | `- Adapted for the Codex skill collection.` | ⚠️ **Should update** — attribution note that names Codex |
+| `playwright/references/cli.md` | 6 | `export CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"` | 🔴 **Must update** |
+| `playwright/references/cli.md` | 7 | `export PWCLI="$CODEX_HOME/skills/playwright/scripts/playwright_cli.sh"` | 🔴 **Must update** |
+| `playwright/references/cli.md` | 11 | `User-scoped skills install under `$CODEX_HOME/skills` (default: `~/.codex/skills`).` | 🔴 **Must update** |
+| `render-deploy/SKILL.md` | 173 | `### Codex` | ⚠️ **Context-dependent** — MCP setup section for Codex users (see detail below) |
+| `render-deploy/SKILL.md` | 189 | `3. Add the MCP server with the Codex CLI:` | ⚠️ **Context-dependent** |
+| `render-deploy/SKILL.md` | 192 | `codex mcp add render --url https://mcp.render.com/mcp --bearer-token-env-var RENDER_API_KEY` | ⚠️ **Context-dependent** |
+| `render-deploy/SKILL.md` | 195 | `4. Restart Codex, then retry `list_services()`.` | ⚠️ **Context-dependent** |
+
+---
+
+#### 2. `Claude` / `claude` references
+
+| File | Line | Full Line | Legitimate? |
+|------|------|-----------|-------------|
+| `skill-writer/references/claude-code-extensions.md` | entire file | Documents Claude Code frontmatter extensions (disable-model-invocation, user/agent-only, shell preprocessing) | ✅ **Legitimate** — reference doc for cross-agent portability, correctly scoped to Claude-specific features |
+| `skill-writer/references/claude-code-extensions.md` | 104 | `\| Personal   \| `~/.claude/skills/<name>/SKILL.md` \|` | ✅ **Legitimate** — Claude-specific path documented in a Claude-specific doc |
+| `skill-writer/references/skill-patterns.md` | 134 | `**Note:** These features are Claude Code extensions. See `references/claude-code-extensions.md`.` | ✅ **Legitimate** — cross-reference note |
+| `skill-writer/references/evaluation-path.md` | 54 | `Keep evaluation instructions tool-agnostic so they work in both Codex and Claude environments.` | ⚠️ **Should update** — omits pi |
+| `skill-writer/SOURCES.md` | 13 | `external Claude upstream … Claude-native prior art` | ⚠️ **Historical** — source provenance |
+| `skill-writer/references/description-optimization.md` | 23 | `avoid naming Claude, Codex, or any provider` | ✅ **Legitimate** — portability guidance |
+| `skill-scanner/SKILL.md` | 94 | `Writing to agent configuration directories (`~/.claude/`, `~/.agents/`, `~/.pi/`, etc.)` | ✅ **Legitimate** — security pattern for detecting attacks on agent config dirs |
+| `skill-scanner/references/dangerous-code-patterns.md` | 125 | `Path("~/.claude/settings.json").expanduser().write_text(malicious_config)` | ✅ **Legitimate** — example of a dangerous code pattern the scanner should detect |
+| `skill-scanner/references/dangerous-code-patterns.md` | 126, 133, 195, 199 | Various `.claude/` paths and "Claude Code" headings | ✅ **Legitimate** — attack examples and classifier context for security scanning |
+| `skill-writer/scripts/quick_validate.py` | 314 | `# Claude Code extensions.` | ✅ **Legitimate** — inline comment referencing the extensions doc |
+| `render-deploy/SKILL.md` | 155 | `### Claude Code` | ⚠️ **Context-dependent** — MCP setup section for Claude Code users |
+| `render-deploy/SKILL.md` | 165 | `2. Add the MCP server with Claude Code (replace `<YOUR_API_KEY>`):` | ⚠️ **Context-dependent** |
+| `render-deploy/SKILL.md` | 168 | `claude mcp add --transport http render https://mcp.render.com/mcp --header "Authorization: Bearer <YOUR_API_KEY>"` | ⚠️ **Context-dependent** |
+| `render-deploy/SKILL.md` | 171 | `3. Restart Claude Code, then retry `list_services()`.` | ⚠️ **Context-dependent** |
+| `agents-md/SKILL.md` | 74 | `Example: `Co-Authored-By: Claude Sonnet 4 <noreply@example.com>`` | ⚠️ **Should update** — example commit trailer hardcodes Claude model name |
+| `frontend-design/SKILL.md` | 45 | `Remember: Claude is capable of extraordinary creative work...` | 🔴 **Must update** — agent identity leak; this prompt is now running in pi, not Claude |
+
+---
+
+#### 3. `Cursor` / `cursor` references
+
+| File | Line | Full Line | Legitimate? |
+|------|------|-----------|-------------|
+| `render-deploy/SKILL.md` | 128 | `### Cursor` | ⚠️ **Context-dependent** — MCP setup section for Cursor IDE users |
+| `render-deploy/SKILL.md` | 138 | `2. Add this to `~/.cursor/mcp.json` (replace `<YOUR_API_KEY>`):` | ⚠️ **Context-dependent** |
+| `render-deploy/SKILL.md` | 153 | `3. Restart Cursor, then retry `list_services()`.` | ⚠️ **Context-dependent** |
+| `exa-search/scripts/research.ts` | 42 | `"cursor": "..."` | ✅ **Legitimate** — appears to be a TypeScript object property unrelated to the IDE |
+| `frontend-design/SKILL.md` | 37 | `custom cursors` as a CSS design technique | ✅ **Legitimate** — CSS cursor property, not the IDE |
+| `glab/references/commands.md` | 251, 253, 257 | `$endCursor`, `endCursor` GraphQL pagination variable | ✅ **Legitimate** — GraphQL pagination token, not the IDE |
+
+---
+
+#### 4. `CODEX_HOME` / `codex_home` references
+
+| File | Line | Full Line | Legitimate? |
+|------|------|-----------|-------------|
+| `playwright/SKILL.md` | 36 | `export CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"` | 🔴 **Must update** — should use `PI_SKILL_DIR` or `SKILL_DIR` |
+| `playwright/SKILL.md` | 37 | `export PWCLI="$CODEX_HOME/skills/playwright/scripts/playwright_cli.sh"` | 🔴 **Must update** |
+| `playwright/SKILL.md` | 40 | `User-scoped skills install under `$CODEX_HOME/skills` (default: `~/.codex/skills`).` | 🔴 **Must update** |
+| `playwright/references/cli.md` | 6 | `export CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"` | 🔴 **Must update** |
+| `playwright/references/cli.md` | 7 | `export PWCLI="$CODEX_HOME/skills/playwright/scripts/playwright_cli.sh"` | 🔴 **Must update** |
+| `playwright/references/cli.md` | 11 | `User-scoped skills install under `$CODEX_HOME/skills` (default: `~/.codex/skills`).` | 🔴 **Must update** |
+
+---
+
+#### 5. `~/.codex/` and `~/.claude/` hardcoded paths
+
+| File | Line | Full Line | Legitimate? |
+|------|------|-----------|-------------|
+| `playwright/SKILL.md` | 36, 40 | `$HOME/.codex` and `~/.codex/skills` | 🔴 **Must update** — functional path used to resolve the wrapper script |
+| `playwright/references/cli.md` | 6, 11 | Same as above | 🔴 **Must update** |
+| `skill-writer/references/claude-code-extensions.md` | 104 | `~/.claude/skills/<name>/SKILL.md` | ✅ **Legitimate** — documenting Claude's install path in a Claude-extensions reference doc |
+| `skill-scanner/SKILL.md` | 94 | `~/.claude/` | ✅ **Legitimate** — security scanner listing attack targets |
+| `skill-scanner/references/dangerous-code-patterns.md` | 125–133 | `~/.claude/settings.json`, `.claude/settings.json`, `.claude/memory/MEMORY.md` | ✅ **Legitimate** — malicious code examples the scanner must detect |
+
+---
+
+#### 6. `npx` references
+
+| File | Line | Full Line | Legitimate? |
+|------|------|-----------|-------------|
+| `playwright/SKILL.md` | 13 | `Before proposing commands, check whether `npx` is available (the wrapper depends on it):` | ✅ **Legitimate** — runtime check for npx as a Node.js tool |
+| `playwright/SKILL.md` | 16–31 | npx availability check and fallback install steps | ✅ **Legitimate** — tool dependency, not agent-specific |
+| `playwright/SKILL.md` | 123 | `The wrapper script uses `npx --package @playwright/cli playwright-cli`` | ✅ **Legitimate** |
+| `playwright/scripts/playwright_cli.sh` | 4, 5, 19 | `command -v npx`, `npx is required`, `npx --yes --package @playwright/cli playwright-cli` | ✅ **Legitimate** — shell script using npx as a package runner |
+| `posthog-skill/SKILL.md` | 13, 17, 366, 512 | `npx tsx` commands | ✅ **Legitimate** — using npx to run tsx, a Node.js tool |
+| `render-deploy/references/configuration-guide.md` | 425 | `buildCommand: npm ci && npx prisma migrate deploy` | ✅ **Legitimate** — Render build command in a config example |
+
+All `npx` references are tool-runtime uses (running Node.js packages), not agent-environment assumptions.
+
+---
+
+### render-deploy MCP Setup Sections (lines 128–200)
+
+The skill contains three named MCP setup sections:
+
+| Section | What it does | Assessment |
+|---------|-------------|------------|
+| **`### Cursor`** (L128–153) | Instructs user to edit `~/.cursor/mcp.json` manually | ⚠️ **Context-dependent** — legitimate "help user configure their other tool" content, but the skill is deployed in pi; the user asking pi to set up Render may not be using Cursor. The section should at minimum add a `### pi` section. |
+| **`### Claude Code`** (L155–171) | Runs `claude mcp add --transport http ...` | ⚠️ **Context-dependent** — same as above |
+| **`### Codex`** (L173–195) | Runs `codex mcp add ...` | ⚠️ **Context-dependent** — same as above |
+| **`### Other Tools`** (L197–199) | Generic fallback pointing to Render MCP docs | ✅ Exists but pi is absent from the named sections |
+
+The skill's logic is: "ask which AI tool they're using, then provide the matching instructions." Since pi is the executing agent, there is no `### pi` section — a user running this skill inside pi and wanting to add the Render MCP to pi itself has no matching instructions.
+
+---
+
+### Findings Summary
+
+- **🔴 Must update (functional bugs):** `playwright/SKILL.md` lines 36–40 and `playwright/references/cli.md` lines 6–11 — `CODEX_HOME` is hardcoded as the skill root env var and resolves to `~/.codex/skills`. In pi the correct variable is `SKILL_DIR` (injected at runtime). The wrapper script path will fail for pi users.
+
+- **🔴 Must update (agent identity leak):** `frontend-design/SKILL.md` line 45 — "Remember: Claude is capable of extraordinary creative work…" is a self-referential instruction written for Claude that is now executing in pi. The model will read this as referring to itself (Claude), but the executing agent is pi.
+
+- **⚠️ render-deploy is missing a `### pi` MCP section** — the three existing MCP setup sections (Cursor, Claude Code, Codex) cover other agents. There is no `### pi` entry, so a pi user who wants to add Render MCP to their pi config gets no instructions.
+
+- **⚠️ skill-writer evaluation docs use Codex CLI** — `EVAL.md` and `references/evaluation-path.md` reference `codex exec --json` as the evaluation harness. This is not available in pi.
+
+- **✅ All skill-scanner references are legitimate** — `~/.claude/`, `.claude/settings.json`, and Claude Code frontmatter hooks appear exclusively as *attack examples* in security scanning reference material, which is correct and intentional.
+

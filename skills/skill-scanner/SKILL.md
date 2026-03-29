@@ -4,6 +4,10 @@ description: Scan agent skills for security issues. Use when asked to "scan a sk
   "audit a skill", "review skill security", "check skill for injection", "validate SKILL.md",
   or assess whether an agent skill is safe to install. Checks for prompt injection,
   malicious scripts, excessive permissions, secret exposure, and supply chain risks.
+metadata:
+  author: josorio7122
+  version: '1.0'
+compatibility: 'Requires Python 3.8+ and uv CLI for running the bundled scan script.'
 ---
 
 # Skill Security Scanner

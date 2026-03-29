@@ -1,6 +1,10 @@
 ---
 name: render-deploy
 description: Deploy applications to Render by analyzing codebases, generating render.yaml Blueprints, and providing Dashboard deeplinks. Use when the user wants to deploy, host, publish, or set up their application on Render's cloud platform.
+metadata:
+  author: josorio7122
+  version: '1.0'
+compatibility: 'Requires Git repository with remote. Optional: Render CLI (render), Render MCP tools.'
 ---
 
 # Deploy to Render
@@ -120,10 +124,22 @@ If not installed, offer to install:
 
 - macOS: `brew install render`
 - Linux/macOS: `curl -fsSL https://raw.githubusercontent.com/render-oss/cli/main/bin/install.sh | sh`
+  > ⚠️ **Security:** Piping to shell (`curl | sh`) executes remote code. Review the script at the URL before running, or use `brew install render` instead.
 
 **4. MCP Setup (if MCP isn't configured)**
 
-If `list_services()` fails, read `references/mcp-setup.md` for per-tool setup instructions (Cursor, Claude Code, Codex, etc.).
+If `list_services()` fails because MCP isn't configured, ask whether they want to set up MCP (preferred) or continue with the CLI fallback.
+
+If MCP tools are not available, see `references/mcp-setup.md` for setup instructions for various environments (pi, Claude Code, Cursor, Codex, and others).
+
+### Workspace Selection
+
+After MCP is configured, have the user set the active Render workspace with a prompt like:
+
+```
+Set my Render workspace to [WORKSPACE_NAME]
+```
+
 **5. Check Authentication (CLI fallback only)**
 
 If MCP isn't available, use the CLI instead and verify you can access your account:
