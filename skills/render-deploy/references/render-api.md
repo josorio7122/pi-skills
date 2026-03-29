@@ -78,6 +78,8 @@ curl -s -X POST https://api.render.com/v1/key-value \
 Plans: `free`, `starter`, `standard`, `pro`, `pro_plus`
 Eviction policies: `noeviction`, `allkeys-lru`, `volatile-lru`, `allkeys-random`, `volatile-random`, `volatile-ttl`, `volatile-lfu`, `allkeys-lfu`
 
+The `ownerId` is the same workspace ID used for PostgreSQL creation above — retrieve it with `GET /owners`.
+
 ## Retrieve Key-Value Connection Info
 
 ```bash

@@ -4469,3 +4469,411 @@ The SKILL.md explicitly states two CLI hard limits: *"The CLI cannot create Post
 - **Key Value vs Redis**: Render now has two namespaces — `/key-value` (new Valkey-based, preferred) and `/redis` (legacy). Both have full CRUD + connection-info + suspend/resume. The skill should prefer `/key-value` for new provisioning.
 - **Spec saved** to `skills/render-deploy/references/render-api-spec.json` (313 KB, full OpenAPI 3.x JSON) for use in skill updates.
 
+## Scout: Read the FULL contents of skills/render-deploy/SKILL.md in /Users/josorio/Code/pi-skills. Check for:
+1. Any remaining MCP references (mcp, MCP, list_services, list_deploys, list_logs, get_metrics, get_selected_workspace, list_workspaces, create_web_service, create_static_site, create_cron_job, create_postgres, create_key_value, update_environment_variables)
+2. Any remaining 'use Dashboard' or 'Visit Dashboard' notes for things the API can now do (Postgres creation, Key-Value creation, metrics)
+3. Broken or inconsistent cross-references to reference files
+4. Any mentions of 'Claude', 'Codex', 'Cursor' or other agent-specific tools
+5. Consistency between the prerequisites steps numbering
+6. Whether the Method 2 'Direct CLI Creation' section properly references render-api.md for database/KV gaps
+7. Any outdated or contradictory information
+8. Grammar, formatting, and markdown quality issues
+
+Report EVERY issue found, with exact line numbers and quoted text.
+
+Here is the full audit report for `skills/render-deploy/SKILL.md`:
+
+---
+
+## Audit Report — `skills/render-deploy/SKILL.md`
+
+### 1. MCP References
+**None found.** No MCP tool names, function names, or MCP-related identifiers appear anywhere in the file. ✅
+
+---
+
+### 2. "Use Dashboard" Notes for Things the API Can Now Do
+
+**One instance found — and it is correct:**
+
+- **Line ~246 (Method 2 Prerequisites section):**
+  > `"Note:** The CLI cannot create PostgreSQL databases or Key-Value (Redis) stores. Use the Blueprint method or the Render Dashboard for those resources."`
+
+  This note says "Blueprint method **or** Render Dashboard" — it does **not** say "use `render-api.md`." The REST API can create both Postgres and Key-Value stores. This is a **gap**: users who cannot use Blueprints and want to avoid the Dashboard are not directed to the REST API. See item 6 below for the full assessment.
+
+- **Line ~200 (Step 7 / Method 1 metrics check):**
+  > `"Metrics (CPU, memory, request count) are available via the REST API. See \`references/render-api.md\` for \`curl\` commands."`
+
+  ✅ Correctly directs to the API file — no stale "visit Dashboard" for metrics.
+
+---
+
+### 3. Cross-References to Reference Files
+
+All referenced files were verified to exist in `references/`:
+
+| Referenced path in SKILL.md | File exists? |
+|---|---|
+| `references/codebase-analysis.md` | ✅ |
+| `references/blueprint-spec.md` | ✅ |
+| `references/runtimes.md` | ✅ |
+| `references/service-types.md` | ✅ |
+| `references/configuration-guide.md` | ✅ |
+| `references/direct-creation.md` | ✅ |
+| `references/deployment-details.md` | ✅ |
+| `references/post-deploy-checks.md` | ✅ |
+| `references/troubleshooting-basics.md` | ✅ |
+| `references/render-api.md` | ✅ |
+| `assets/` | ✅ |
+
+**One inconsistency found:**
+
+- **Line ~190 (Step 7):** Uses backtick path syntax:
+  > `See \`references/render-api.md\` for \`curl\` commands.`
+
+  Every other cross-reference in the file uses Markdown link syntax:
+  > `[references/render-api.md](references/render-api.md)`
+
+  This is the only reference to `render-api.md` and the only one using raw backtick formatting instead of a Markdown link. It is inconsistent with the rest of the document's cross-reference style.
+
+- **`references/error-patterns.md`** exists on disk but is **never referenced** in `SKILL.md`. Not necessarily broken, but worth noting — if it contains useful triage content, it may be orphaned.
+
+---
+
+### 4. Agent-Specific Tool Mentions (Claude, Codex, Cursor, etc.)
+**None found.** ✅
+
+---
+
+### 5. Prerequisites Steps Numbering Consistency
+
+**Issue found — two separate "Prerequisites" sections with different structures:**
+
+- **First section (lines ~35–40), titled "## Prerequisites":** Contains two bullet points (sandbox escalation, timeout values). No numbered list.
+
+- **Second section (lines ~90–135), titled "## Prerequisites Check":** Contains a numbered list (1–4) with detailed steps.
+
+The existence of two separate prerequisites sections is confusing. A reader may miss the first one (unlabelled bullets) or be unsure which applies. The first section's content (sandbox escalation, timeout) doesn't logically belong under "Prerequisites" — it is operational guidance.
+
+Additionally, the first `## Prerequisites` section appears **before** "When to Use This Skill" and "Happy Path," but the second `## Prerequisites Check` appears much later, after method selection. This split creates a disjointed reading experience.
+
+---
+
+### 6. Method 2 "Direct CLI Creation" — API Gap for DB/KV
+
+**Issue found:**
+
+- **Line ~246:**
+  > `"Note:** The CLI cannot create PostgreSQL databases or Key-Value (Redis) stores. Use the Blueprint method or the Render Dashboard for those resources."`
+
+  The note offers only two alternatives: Blueprint or Dashboard. It does **not** mention `references/render-api.md`, which contains the REST API `curl` commands for creating Postgres and Key-Value resources. This is inconsistent with the approach taken in Step 7 (Method 1), which correctly says "use `render-api.md`" for metrics.
+
+  **Expected:** Should read something like: `"Use the Blueprint method, the Render Dashboard, or the REST API — see \`references/render-api.md\` for \`curl\` commands."`
+
+---
+
+### 7. Outdated or Contradictory Information
+
+**Issue 1 — `render-debug` skill reference at end:**
+
+- **Last paragraph:**
+  > `"Optional: If you need deeper diagnostics (DB checks, error catalog), suggest installing the \`render-debug\` skill."`
+
+  There is no `render-debug` skill in the `skills/` directory (based on the available skills listed). This is either a reference to a future/planned skill or a stale reference. If the skill doesn't exist, this is misleading guidance.
+
+**Issue 2 — "render workspaces" vs "render workspace" inconsistency:**
+
+- **Line ~121:**
+  ```bash
+  render workspaces --output json
+  ```
+  The command uses `render workspaces` (plural noun).
+
+- **Line ~117 and ~124:**
+  ```bash
+  render workspace current
+  render workspace set <WORKSPACE_ID>
+  ```
+  These use `render workspace` (singular). This may be intentional (different subcommands) but could confuse users. Worth verifying against the actual CLI.
+
+**Issue 3 — Duplicate "Prerequisites" heading creates structural confusion** (already noted in item 5).
+
+**Issue 4 — Step numbering reuse across Methods:**
+
+- Method 1 uses Steps 1–7.
+- Method 2 uses Steps 1–4.
+- They share names ("Step 1: Analyze Codebase") but contain different content. Since the method sections are clearly separated, this is not broken, but could create confusion if the user jumps between sections.
+
+---
+
+### 8. Grammar, Formatting, and Markdown Quality
+
+**Issue 1 — Malformed bold marker, line ~246:**
+```
+**Note:** The CLI cannot create PostgreSQL databases...
+```
+The `**Note:**` is preceded by a bare backtick that terminates a code block. On visual inspection, this note has no blank line separating it from the preceding code block in at least one instance. Minor, but affects readability.
+
+**Issue 2 — Inconsistent note formatting:**
+
+- Some notes use `> **Note:**` (blockquote style):
+  > `> **Note:** Database creation and metrics queries require...`
+
+- Others use bare bold: `**Note:** The CLI cannot create...`
+
+This is inconsistent. The blockquote style is used in the Prerequisites section; the bare bold style is used in Method 2. Should be unified.
+
+**Issue 3 — "Step 2.5" is an unusual step label:**
+
+- **Heading:** `### Step 2.5: Immediate Next Steps (Always Provide)`
+
+  This is unconventional numbering. It signals that content was inserted after the fact. Should be renumbered (e.g., Step 3, with subsequent steps bumped) or restructured.
+
+**Issue 4 — "render-debug" skill name uses backtick inline code but no link:**
+> `` `render-debug` skill ``
+
+If the skill existed, it should be referenced consistently (a Markdown link or at minimum match the skill reference style used elsewhere in the file).
+
+**Issue 5 — Trailing content after horizontal rule:**
+
+The file ends with the `render-debug` paragraph after an `---` separator, but without a closing section heading. This makes the paragraph feel orphaned.
+
+**Issue 6 — Minor grammar: "render blueprints validate" command listed twice:**
+
+In Step 2.5 (checklist) and Step 3 (Validate Configuration), the same `render blueprints validate` command appears with slightly different surrounding context. This is not wrong, but the duplication is redundant.
+
+---
+
+### Summary of Issues
+
+| # | Severity | Location | Issue |
+|---|---|---|---|
+| 1 | Medium | Method 2 Prerequisites (~line 246) | No reference to `render-api.md` for DB/KV creation — only Blueprint or Dashboard mentioned |
+| 2 | Medium | End of file | `render-debug` skill reference — no such skill exists in the skills directory |
+| 3 | Low | Step 7 (~line 190) | `render-api.md` referenced with backticks only, not a Markdown link — inconsistent with all other cross-references |
+| 4 | Low | Two "Prerequisites" sections | Split structure is confusing; first section belongs with operational notes, not prerequisites |
+| 5 | Low | Method 2 Prerequisites (~line 246) | `**Note:**` uses bare bold; elsewhere notes use `> **Note:**` blockquote style |
+| 6 | Low | Step 2.5 heading | Non-standard step numbering ("2.5") suggests ad-hoc insertion |
+| 7 | Low | `references/error-patterns.md` | File exists on disk but is never referenced in SKILL.md — possible orphan |
+| 8 | Info | Step 3 + Step 2.5 | `render blueprints validate` command duplicated in two adjacent sections |
+| 9 | Info | Method 1 Steps 1–7 / Method 2 Steps 1–4 | Step numbering restarts and "Step 1: Analyze Codebase" appears in both methods |
+
+## Scout: Read the FULL contents of ALL files in skills/render-deploy/references/ in /Users/josorio/Code/pi-skills. List all files first, then read each one completely. Check for:
+1. Any remaining MCP references anywhere
+2. Consistency of curl command format (auth headers, base URL, output flags)
+3. Cross-references between files — do all relative links resolve correctly?
+4. In render-api.md specifically: are the API endpoints, query parameters, and JSON payloads correct per standard REST API conventions?
+5. In direct-creation.md: do the CLI commands and API references make sense together?
+6. In deployment-details.md: is the Quick Reference section consistent with the rest of the skill?
+7. In post-deploy-checks.md: are all commands correct?
+8. In error-patterns.md: any stale references?
+9. Any 'Dashboard' fallbacks that should now point to render-api.md instead
+10. Grammar, formatting, markdown quality
+
+Report EVERY issue with exact file paths, line numbers, and quoted text.
+
+I now have a complete picture. Here is the full audit report:
+
+---
+
+## Audit Report: `skills/render-deploy/references/`
+
+### Files Audited
+
+11 files in `references/`:
+`blueprint-spec.md`, `codebase-analysis.md`, `configuration-guide.md`, `deployment-details.md`, `direct-creation.md`, `error-patterns.md`, `post-deploy-checks.md`, `render-api.md`, `runtimes.md`, `service-types.md`, `troubleshooting-basics.md`
+
+---
+
+### 1. MCP References
+
+**None found anywhere.** Clean.
+
+---
+
+### 2. Curl Command Format Consistency
+
+All curl commands in `render-api.md` are consistent:
+- Auth header: `-H "Authorization: Bearer $RENDER_API_KEY"` ✅
+- Base URL: `https://api.render.com/v1` ✅
+- Output flag: `-s` (silent) on every command ✅
+- `Content-Type: application/json` included on POST/PUT calls ✅
+- GET-only calls (connection-info, metrics, list env-vars) omit `Content-Type` — correct per REST convention ✅
+
+No curl commands appear in any other reference file (direct-creation.md delegates to render-api.md), so there are no inconsistencies across files.
+
+---
+
+### 3. Cross-References — Relative Link Resolution
+
+All relative links were traced against the actual file listing:
+
+| Source file | Link target | Resolves? |
+|---|---|---|
+| `deployment-details.md` | `configuration-guide.md` | ✅ |
+| `deployment-details.md` | `blueprint-spec.md` | ✅ |
+| `deployment-details.md` | `service-types.md` | ✅ |
+| `deployment-details.md` | `runtimes.md` | ✅ |
+| `deployment-details.md` | `../assets/node-express.yaml` | ✅ |
+| `deployment-details.md` | `../assets/nextjs-postgres.yaml` | ✅ |
+| `deployment-details.md` | `../assets/python-django.yaml` | ✅ |
+| `deployment-details.md` | `../assets/static-site.yaml` | ✅ |
+| `deployment-details.md` | `../assets/go-api.yaml` | ✅ |
+| `deployment-details.md` | `../assets/docker.yaml` | ✅ |
+| `direct-creation.md` | `codebase-analysis.md` | ✅ |
+| `direct-creation.md` | `` `references/render-api.md` `` (inline code, not a link) | N/A — see issue below |
+| `post-deploy-checks.md` | `troubleshooting-basics.md` | ✅ |
+| `post-deploy-checks.md` | `error-patterns.md` | ✅ |
+| `configuration-guide.md` | `blueprint-spec.md` | ✅ |
+| `configuration-guide.md` | `service-types.md` | ✅ |
+| `configuration-guide.md` | `runtimes.md` | ✅ |
+| `troubleshooting-basics.md` | `error-patterns.md` | ✅ |
+
+**Issue — `direct-creation.md`, lines 66, 70, 120:** The references to `render-api.md` are written as inline code (backtick path strings) rather than proper Markdown hyperlinks:
+
+> ```
+> see `references/render-api.md` for the exact `curl` command.
+> ```
+
+These are not clickable links and the path prefix `references/` is wrong when read from within the `references/` directory (the file is a sibling, not in a sub-folder). They should be:
+```md
+see [render-api.md](render-api.md)
+```
+
+Three instances:
+- Line 66: `see \`references/render-api.md\` for the exact \`curl\` command.`
+- Line 70: `see \`references/render-api.md\` for the exact \`curl\` command.`
+- Line 120: `See \`references/render-api.md\` for \`curl\` commands.`
+
+---
+
+### 4. `render-api.md` — Endpoints, Query Parameters, Payloads
+
+**Correct REST conventions:**
+- `POST /postgres`, `POST /key-value`: bodies include `name`, `ownerId`, `plan`, `region` — appropriate required fields ✅
+- `GET /postgres/<ID>/connection-info`: correct resource sub-path ✅
+- `GET /key-value/<ID>/connection-info`: correct resource sub-path ✅
+- `GET /owners`: returns array with owner IDs ✅
+- `PUT /services/<ID>/env-vars/<KEY>`: correct idempotent upsert verb ✅
+- `DELETE /services/<ID>/env-vars/<KEY>`: correct ✅
+- `GET /metrics/cpu?serviceId=...&granularity=...`: query params on GET — correct ✅
+
+**Issue — PostgreSQL version range inconsistency:**
+
+- `render-api.md`, line 43: `Versions: \`12\`–\`17\` (default: \`16\`)`
+- `blueprint-spec.md`, line 459: `- \`postgresMajorVersion\`: PostgreSQL version (11-16)`
+
+The API says versions 12–17 are supported; the Blueprint spec says 11–16. These contradict each other. One is stale. The API reference examples also use `"version": "16"` while the Blueprint examples use `postgresMajorVersion: '15'`. At minimum the two files need to agree on the supported range.
+
+**Issue — `render-api.md` missing `ownerId` retrieval note for Key-Value:**
+
+The `Create PostgreSQL Database` section has a helpful note:
+> `Get your \`ownerId\` (workspace ID):` with a curl command
+
+The `Create Key-Value Store` section requires the same `ownerId` field but provides no equivalent note or pointer. A reader creating a KV store would not know where to get the `ownerId` unless they scroll back up. Should add a cross-reference or short note after the KV payload.
+
+---
+
+### 5. `direct-creation.md` — CLI Commands and API References
+
+**Issue — `references/render-api.md` path prefix (already noted above under cross-references, lines 66, 70, 120).**
+
+**Issue — Step 3 note, line 97:**
+> `**Note:** For database connection strings, copy the internal URL from the Render Dashboard service detail page.`
+
+This contradicts the stated purpose of `render-api.md` which exists precisely so users *don't* have to use the Dashboard for connection strings. The `GET /postgres/<ID>/connection-info` endpoint returns the connection string programmatically. The note should instead say:
+> Use the REST API endpoint `GET /v1/postgres/<ID>/connection-info` (see `render-api.md`) to retrieve the internal connection string.
+
+**CLI commands are consistent and correct** — `--output json`, `--confirm`, `-r` for logs, `--level error`, all match the CLI's documented flags.
+
+---
+
+### 6. `deployment-details.md` — Quick Reference vs Rest of File
+
+**Issue — Quick Reference note vs body text inconsistency (line 168 vs lines 19–24):**
+
+Quick Reference note (line 168):
+> `**Note:** Databases (Postgres, Redis/Key-Value) and metrics are not available via the CLI. Use the Blueprint method or the Render Dashboard for those resources.`
+
+The "metrics" claim is accurate (metrics are REST-only). But saying "use the Render Dashboard" for databases is now stale — `render-api.md` exists as the documented API alternative. Should read:
+> Use the Blueprint method or the REST API (`references/render-api.md`) for those resources.
+
+The body of the Service Discovery section (lines 21–24) also says:
+> `**PostgreSQL databases and Key-Value stores:** View and manage these on the Render Dashboard — the CLI does not support listing or managing databases and Key-Value stores directly.`
+
+Same problem. No mention of the REST API path. Should point to `render-api.md`.
+
+**Blueprint validation command inconsistency:**
+
+- `deployment-details.md`, line 137: `render blueprints validate` ✅
+- `blueprint-spec.md`, line 728: `render blueprint validate` ← missing the `s` — **wrong**
+
+`render blueprints validate` is the correct subcommand (consistent with `SKILL.md` line 218 and line 231). `blueprint-spec.md` line 728 uses the singular `render blueprint validate` — this is a typo and will produce a CLI error.
+
+---
+
+### 7. `post-deploy-checks.md` — Command Correctness
+
+All commands are correct:
+- `render deploys list <SERVICE_ID> --output json` ✅
+- `render logs -r <SERVICE_ID> --level error --output json` ✅
+
+No issues.
+
+---
+
+### 8. `error-patterns.md` — Stale References
+
+No stale references. The file is self-contained with no links to other files, and all log patterns are generic and runtime-agnostic.
+
+**Minor formatting note:** The table uses inconsistent spacing in some columns (extra padding in the "Quick fix" column), but this renders fine in Markdown and is cosmetic only.
+
+---
+
+### 9. Dashboard Fallbacks That Should Point to `render-api.md`
+
+Three instances where the Dashboard is cited as the solution but `render-api.md` now covers the operation programmatically:
+
+| File | Line | Quoted text | Issue |
+|---|---|---|---|
+| `deployment-details.md` | 22–23 | `"View and manage these on the Render Dashboard — the CLI does not support listing or managing databases and Key-Value stores directly."` | Should add: `"Use the REST API — see render-api.md"` |
+| `deployment-details.md` | 168 | `"Use the Blueprint method or the Render Dashboard for those resources."` | Replace Dashboard mention with `render-api.md` reference |
+| `direct-creation.md` | 97 | `"copy the internal URL from the Render Dashboard service detail page"` | Replace with REST API call via `render-api.md` |
+
+---
+
+### 10. Grammar, Formatting, Markdown Quality
+
+**`blueprint-spec.md`:**
+- Line 443 and 714: `postgresMajorVersion: '15'` in examples while line 459 states the range is `11–16`. The default should be whichever version is current; using 15 in examples is fine but should be consistent with the stated range.
+- No grammar issues.
+
+**`configuration-guide.md`:**
+- Line 548 (in YAML comment): `# User fills in Dashboard` — minor but inconsistent; the same pattern uses both `"User fills in Dashboard"` and `"user fills this in the Dashboard"` across files. Not a functional issue.
+
+**`deployment-details.md`:**
+- Line 223: `"see the debug skill or [configuration-guide.md](configuration-guide.md)"` — linking to a configuration guide for troubleshooting is odd; this likely should link to `troubleshooting-basics.md` instead, which is the actual troubleshooting document. The `configuration-guide.md` link here appears to be a leftover from before `troubleshooting-basics.md` existed.
+
+**`runtimes.md`:**
+- Line 396 (in YAML comment): `# User provides in Dashboard` — should be inside the `sync: false` example for clarity; it currently reads as a standalone YAML comment on the `password` line without obvious connection to the `sync: false` pattern.
+
+**`blueprint-spec.md`:**
+- Line 728: `render blueprint validate` (singular) — bug, not grammar (covered above).
+
+**All files:** Clean Markdown. Headers are hierarchical, code blocks have language identifiers, tables render correctly, no broken bold/italic syntax.
+
+---
+
+### Summary of All Issues
+
+| # | File | Line(s) | Severity | Description |
+|---|---|---|---|---|
+| 1 | `direct-creation.md` | 66, 70, 120 | Medium | `references/render-api.md` written as inline code with wrong path prefix; should be a relative Markdown link `[render-api.md](render-api.md)` |
+| 2 | `render-api.md` vs `blueprint-spec.md` | 43 vs 459 | Medium | Postgres version range mismatch: API says `12–17`, Blueprint spec says `11–16` |
+| 3 | `render-api.md` | After KV payload (~line 56) | Low | No `ownerId` retrieval note after Key-Value store creation payload (present for Postgres, missing for KV) |
+| 4 | `direct-creation.md` | 97 | Medium | Step 3 note says "copy from the Dashboard" — should point to `GET /postgres/<ID>/connection-info` via `render-api.md` |
+| 5 | `deployment-details.md` | 22–23 | Medium | Dashboard-only note for database management; no mention of REST API path |
+| 6 | `deployment-details.md` | 168 | Medium | Quick Reference note says "use the Dashboard" for databases/metrics; should reference `render-api.md` |
+| 7 | `deployment-details.md` | 223 | Low | Links to `configuration-guide.md` for troubleshooting; should likely be `troubleshooting-basics.md` |
+| 8 | `blueprint-spec.md` | 728 | **High** | `render blueprint validate` missing the `s` — CLI command will fail; correct form is `render blueprints validate` |
+

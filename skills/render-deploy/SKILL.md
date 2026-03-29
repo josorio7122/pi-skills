@@ -210,7 +210,7 @@ Service type details: [references/service-types.md](references/service-types.md)
 Runtime options: [references/runtimes.md](references/runtimes.md)
 Template examples: [assets/](assets/)
 
-### Step 2.5: Immediate Next Steps (Always Provide)
+### Step 3: Immediate Next Steps (Always Provide)
 
 After creating `render.yaml`, always give the user a short, explicit checklist and run validation immediately when the CLI is available:
 
@@ -222,7 +222,7 @@ After creating `render.yaml`, always give the user a short, explicit checklist a
 5. **Fill secrets**: Set env vars marked `sync: false`
 6. **Deploy**: Click "Apply" and monitor the deploy
 
-### Step 3: Validate Configuration
+### Step 4: Validate Configuration
 
 Validate the render.yaml file to catch errors before deployment. If the CLI is installed, run the commands directly; only prompt the user if the CLI is missing:
 
@@ -240,7 +240,7 @@ Fix any validation errors before proceeding. Common issues:
 
 Configuration guide: [references/configuration-guide.md](references/configuration-guide.md)
 
-### Step 4: Commit and Push
+### Step 5: Commit and Push
 
 **IMPORTANT:** You must merge the `render.yaml` file into your repository before deploying.
 
@@ -258,7 +258,7 @@ If there is no Git remote yet, stop here and guide the user to create a GitHub/G
 
 Verify the file is in your remote repository before proceeding to the next step.
 
-### Step 5: Generate Deeplink
+### Step 6: Generate Deeplink
 
 Get the Git repository URL:
 
@@ -288,7 +288,7 @@ Example:
 https://dashboard.render.com/blueprint/new?repo=https://github.com/username/repo-name
 ```
 
-### Step 6: Guide User
+### Step 7: Guide User
 
 **CRITICAL:** Ensure the user has merged and pushed the render.yaml file to their repository before clicking the deeplink. If the file isn't in the repository, Render cannot read the Blueprint configuration and deployment will fail.
 
@@ -304,7 +304,7 @@ Provide the deeplink to the user with these instructions:
 
 The deployment will begin automatically. Users can monitor progress in the Render Dashboard.
 
-### Step 7: Verify Deployment
+### Step 8: Verify Deployment
 
 After the user deploys via Dashboard, verify everything is working.
 
@@ -324,7 +324,7 @@ render logs -r <SERVICE_ID> --level error --output json
 
 **Check service health metrics:**
 
-> Metrics (CPU, memory, request count) are available via the REST API. See `references/render-api.md` for `curl` commands.
+> Metrics (CPU, memory, request count) are available via the REST API. See [references/render-api.md](references/render-api.md) for `curl` commands.
 
 If errors are found, proceed to the **Post-deploy verification and basic triage** section below.
 
@@ -354,9 +354,9 @@ Supported providers: GitHub, GitLab, Bitbucket
 
 If no remote exists, stop and ask the user to create/push a remote or switch to Docker image deploy.
 
-**Note:** The CLI cannot create image-backed services. Use the Dashboard/API for prebuilt Docker image deploys.
+> **Note:** The CLI cannot create image-backed services. Use the Dashboard/API for prebuilt Docker image deploys.
 
-**Note:** The CLI cannot create PostgreSQL databases or Key-Value (Redis) stores. Use the Blueprint method or the Render Dashboard for those resources.
+> **Note:** The CLI cannot create PostgreSQL databases or Key-Value (Redis) stores. Use the Blueprint method or the REST API — see [references/render-api.md](references/render-api.md) for `curl` commands.
 
 ## Direct Creation Workflow
 
@@ -402,6 +402,8 @@ Detailed checklist and commands: [references/post-deploy-checks.md](references/p
 If the service fails to start or health checks time out, use the basic triage guide:
 [references/troubleshooting-basics.md](references/troubleshooting-basics.md)
 
+For a catalog of common error signatures and fixes, see [references/error-patterns.md](references/error-patterns.md).
+
 ## Troubleshooting
 
 ### Escalated Network Access
@@ -414,5 +416,4 @@ Example guidance to the user:
 The deploy needs escalated network access to deploy to Render. I can rerun the command with escalated permissions—want me to proceed?
 ```
 
-Optional: If you need deeper diagnostics (DB checks, error catalog), suggest installing the
-`render-debug` skill. It is not required for the core deploy flow.
+For deeper diagnostics, check the Render Dashboard logs and metrics.

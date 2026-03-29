@@ -36,4 +36,4 @@ Use [error-patterns.md](error-patterns.md) for a compact catalog of common log m
 ## 4) If still blocked
 
 Gather the latest build logs and runtime error logs, then consider the optional
-`render-debug` skill for deeper diagnostics (metrics, DB checks, expanded patterns).
+Render Dashboard for deeper diagnostics (metrics, DB checks, expanded error patterns), or use the REST API for metrics — see [render-api.md](render-api.md).

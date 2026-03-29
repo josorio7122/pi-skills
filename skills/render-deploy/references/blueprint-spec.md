@@ -456,7 +456,7 @@ databases:
 - `name`: Identifier for references
 - `databaseName`: Actual PostgreSQL database name
 - `user`: Database username
-- `postgresMajorVersion`: PostgreSQL version (11-16)
+- `postgresMajorVersion`: PostgreSQL version (12-17, default 16)
 - `ipAllowList`: Array of CIDR blocks (empty = internal only)
 - `diskSizeGB`: Storage size (paid plans only)
 
@@ -725,7 +725,7 @@ databases:
 Validate your Blueprint before deploying (when CLI command is available):
 
 ```bash
-render blueprint validate
+render blueprints validate
 ```
 
 **Common validation errors:**

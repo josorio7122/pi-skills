@@ -19,11 +19,7 @@ render services --output json  # Find the service ID, then:
 render deploys list <SERVICE_ID> --output json
 ```
 
-**PostgreSQL databases and Key-Value stores:** View and manage these on the Render Dashboard — the CLI does not support listing or managing databases and Key-Value stores directly.
-
-```
-https://dashboard.render.com
-```
+**PostgreSQL databases and Key-Value stores:** The CLI does not support database or Key-Value operations. Use the REST API — see [render-api.md](render-api.md) for `curl` commands.
 
 ## Configuration Details
 
@@ -165,7 +161,7 @@ render logs -r <SERVICE_ID> --level error --output json
 render deploys create <SERVICE_ID> --wait
 ```
 
-**Note:** Databases (Postgres, Redis/Key-Value) and metrics are not available via the CLI. Use the Blueprint method or the Render Dashboard for those resources.
+**Note:** Databases (Postgres, Redis/Key-Value) and metrics are not available via the CLI. Use the REST API for these — see [render-api.md](render-api.md).
 
 ### Templates by Framework
 
@@ -220,4 +216,4 @@ routes:
     destination: /index.html
 ```
 
-For more detailed troubleshooting, see the debug skill or [configuration-guide.md](configuration-guide.md).
+For more detailed troubleshooting, see [troubleshooting-basics.md](troubleshooting-basics.md).
