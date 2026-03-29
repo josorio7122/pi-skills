@@ -33,11 +33,13 @@ Keep collecting until retrieval passes no longer add meaningful new guidance.
 
 When synthesizing a skill that creates, updates, or evaluates other skills, include at minimum:
 
-1. Local canonical workflow source (`plugins/sentry-skills/skills/skill-writer/...`).
-2. Local compatibility alias/source (`plugins/sentry-skills/skills/skill-creator/SKILL.md`).
-3. System skill-authoring source (e.g., the agent's built-in skill-creator if available).
+1. This skill's own SKILL.md and references/ (the canonical workflow source).
+2. Any local compatibility alias (e.g., skill-creator if present in the repo).
+3. The agent's built-in skill-creator if available (system skill).
 4. Anthropic/Claude upstream skill-authoring source (for example `anthropics/skills/.../skill-creator` or the published GitHub path).
 5. Agent Skills specification and repository conventions.
+
+If a listed source path does not exist in this repository, skip it and proceed with available sources.
 
 Record all baseline sources in `SOURCES.md` with retrieval date and contribution notes.
 Each `SOURCES.md` source row must include trust tier, confidence, and usage constraints.

@@ -33,7 +33,7 @@ databases:
     databaseName: app_production
     user: app_user
     plan: free
-    postgresMajorVersion: '15'
+    postgresMajorVersion: '16' # Update to latest — see https://render.com/docs/postgresql-creating-connecting
     ipAllowList: []
 
   - name: redis

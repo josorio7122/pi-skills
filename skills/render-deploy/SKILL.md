@@ -1,17 +1,16 @@
 ---
 name: render-deploy
-description: Deploy applications to Render by analyzing codebases, generating render.yaml Blueprints, and providing Dashboard deeplinks. Use when the user wants to deploy, host, publish, or set up their application on Render's cloud platform.
+description: Deploy applications to Render by analyzing codebases, generating render.yaml Blueprints, and providing Dashboard deeplinks. Use when the user wants to deploy, host, publish, or set up their application on Render's cloud platform, including databases, cron jobs, and background workers.
 metadata:
   author: josorio7122
   version: '1.0'
-compatibility: 'Requires Git repository with remote. Render CLI (`render`) for deployment. RENDER_API_KEY env var for database creation and metrics.'
 ---
 
 # Deploy to Render
 
 Render supports **Git-backed** services and **prebuilt Docker image** services.
 
-This skill covers **Git-backed** flows:
+Use one of these **Git-backed** deployment flows:
 
 1. **Blueprint Method** - Generate render.yaml for Infrastructure-as-Code deployments
 2. **Direct CLI Creation** - Create services instantly via `render services create`
@@ -22,21 +21,6 @@ If there is no Git remote, stop and ask the user to either:
 
 - Create/push a Git remote (can be minimal if only the Blueprint is needed), or
 - Use the Render Dashboard/API to deploy a prebuilt Docker image (the CLI cannot create image-backed services).
-
-## Prerequisites
-
-- When sandboxing blocks the deployment network calls, rerun with `sandbox_permissions=require_escalated`.
-- The deployment might take a few minutes. Use appropriate timeout values.
-
-## When to Use This Skill
-
-Activate this skill when users want to:
-
-- Deploy an application to Render
-- Create a render.yaml Blueprint file
-- Set up Render deployment for their project
-- Host or publish their application on Render's cloud platform
-- Create databases, cron jobs, or other Render resources
 
 ## Happy Path (New Users)
 
@@ -112,8 +96,10 @@ render --version
 If not installed, offer to install:
 
 - macOS: `brew install render`
+
+> ⚠️ **Security:** Piping to shell (`curl | sh`) executes remote code. Review the script at the URL before running, or use `brew install render` instead.
+
 - Linux/macOS: `curl -fsSL https://raw.githubusercontent.com/render-oss/cli/main/bin/install.sh | sh`
-  > ⚠️ **Security:** Piping to shell (`curl | sh`) executes remote code. Review the script at the URL before running, or use `brew install render` instead.
 
 **3. Check Authentication**
 
@@ -147,6 +133,8 @@ If the user needs to switch workspaces:
 ```bash
 render workspace set <WORKSPACE_ID>
 ```
+
+> **Note:** Deployments may take a few minutes. Use appropriate timeout values when waiting for builds and health checks to complete.
 
 Once prerequisites are met, proceed with deployment workflow.
 
@@ -406,14 +394,14 @@ For a catalog of common error signatures and fixes, see [references/error-patter
 
 ## Troubleshooting
 
-### Escalated Network Access
+### Network Access
 
-If deployment fails due to network issues (timeouts, DNS errors, connection resets), rerun the deploy with escalated permissions (use `sandbox_permissions=require_escalated`). The deploy requires escalated network access when sandbox networking blocks outbound requests.
+If deployment fails due to network timeouts or DNS errors, the execution environment may be blocking outbound connections. Ensure the environment allows outbound HTTPS to `api.render.com` and `dashboard.render.com` before retrying.
 
 Example guidance to the user:
 
 ```
-The deploy needs escalated network access to deploy to Render. I can rerun the command with escalated permissions—want me to proceed?
+The deploy needs outbound network access to reach Render's API. If your environment restricts network calls, grant access to `api.render.com` and `dashboard.render.com`, then retry.
 ```
 
 For deeper diagnostics, check the Render Dashboard logs and metrics.

@@ -17,6 +17,7 @@ Output: JSON to stdout with structured findings.
 from __future__ import annotations
 
 import base64
+import fnmatch
 import json
 import re
 import sys
@@ -107,7 +108,6 @@ TRUSTED_DOMAINS = {
     "pypi.org", "npmjs.com", "crates.io",
     "docs.python.org", "docs.djangoproject.com",
     "developer.mozilla.org", "stackoverflow.com",
-    "agentskills.io",
 }
 
 
@@ -439,7 +439,6 @@ def check_structural_attacks(skill_dir: Path, content: str, frontmatter: dict[st
             continue
         name = path.name
         for pattern, desc in test_patterns.items():
-            import fnmatch
             if fnmatch.fnmatch(name, pattern):
                 findings.append({
                     "type": "Test File Auto-Discovery",

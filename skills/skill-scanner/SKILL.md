@@ -7,16 +7,17 @@ description: Scan agent skills for security issues. Use when asked to "scan a sk
 metadata:
   author: josorio7122
   version: '1.0'
-compatibility: 'Requires Python 3.8+ and uv CLI for running the bundled scan script.'
 ---
 
 # Skill Security Scanner
 
 Scan agent skills for security issues before adoption. Detects prompt injection, malicious code, excessive permissions, secret exposure, and supply chain risks.
 
-**Requires**: The `uv` CLI for python package management, install guide at https://docs.astral.sh/uv/getting-started/installation/
+## Prerequisites
 
-**Important**: Run all scripts using the full path relative to this skill's directory.
+Requires Python 3.9+ and the `uv` CLI. Install guide: https://docs.astral.sh/uv/getting-started/installation/
+
+**Important**: Run scripts from this skill's root directory, or use the absolute path to the scripts/ directory.
 
 ## Bundled Script
 
@@ -29,6 +30,18 @@ uv run scripts/scan_skill.py <skill-directory>
 ```
 
 Returns JSON with findings, URLs, structure info, and severity counts. The script catches patterns mechanically — your job is to evaluate intent and filter false positives.
+
+## Guiding Principles
+
+## Confidence Levels
+
+| Level      | Criteria                                     | Action                       |
+| ---------- | -------------------------------------------- | ---------------------------- |
+| **HIGH**   | Pattern confirmed + malicious intent evident | Report with severity         |
+| **MEDIUM** | Suspicious pattern, intent unclear           | Note as "Needs verification" |
+| **LOW**    | Theoretical, best practice only              | Do not report                |
+
+**False positive awareness is critical.** The biggest risk is flagging legitimate security skills as malicious because they reference attack patterns. Always evaluate intent before reporting.
 
 ## Workflow
 
@@ -69,6 +82,8 @@ Read the SKILL.md and check:
 - **Tool assessment**: Review `allowed-tools` — is Bash justified? Are tools unrestricted (`*`)?
 - **Model override**: Is a specific model forced? Why?
 - **Description quality**: Does the description accurately represent what the skill does?
+
+**Note**: The bundled scanner already checks required fields and name consistency. Focus this phase on what the script does NOT check: tool justification, model override rationale, and description quality.
 
 ### Phase 4: Prompt Injection Analysis
 
@@ -139,7 +154,7 @@ If the skill has a `scripts/` directory:
 
 ### Phase 7: Supply Chain Assessment
 
-Review URLs from the scanner output and any additional URLs found in scripts:
+Review URLs from the scanner output and any additional URLs found in scripts. Check the `urls.untrusted` array in the JSON output.
 
 - **Trusted domains**: GitHub, PyPI, official docs — normal
 - **Untrusted domains**: Unknown domains, personal sites, URL shorteners — flag for review
@@ -162,16 +177,6 @@ Example assessments:
 - `Read Grep Glob` — Low risk, read-only analysis skill
 - `Read Grep Glob Bash` — Medium risk, needs Bash justification (e.g., running bundled scripts)
 - `Read Grep Glob Bash Write Edit WebFetch Task` — High risk, near-full access
-
-## Confidence Levels
-
-| Level      | Criteria                                     | Action                       |
-| ---------- | -------------------------------------------- | ---------------------------- |
-| **HIGH**   | Pattern confirmed + malicious intent evident | Report with severity         |
-| **MEDIUM** | Suspicious pattern, intent unclear           | Note as "Needs verification" |
-| **LOW**    | Theoretical, best practice only              | Do not report                |
-
-**False positive awareness is critical.** The biggest risk is flagging legitimate security skills as malicious because they reference attack patterns. Always evaluate intent before reporting.
 
 ## Output Format
 

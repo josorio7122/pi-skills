@@ -306,71 +306,13 @@ Output shape: `{ results: [{ id, activity, detail, created_at, user }] }`
 
 ## Dry-Run Mode
 
-Every command accepts `--dry-run`. No HTTP calls are made. Returns the same JSON shape as the live command, populated from canned fixtures. Exit 0.
-
-```bash
-# All of these work without any env vars or token:
-$RUN status
-$RUN inspect
-$RUN inspect --dry-run
-$RUN compare --dry-run
-$RUN create --dry-run
-$RUN flags --dry-run
-$RUN flags get 123 --dry-run
-$RUN flags toggle 123 --dry-run
-$RUN flags create my-flag --dry-run
-$RUN flags update 123 --dry-run
-$RUN flags activity 123 --dry-run
-```
+Every command accepts `--dry-run` — no HTTP calls, same JSON shape, canned fixtures. No env vars required.
 
 ---
 
 ## First Use (No Token Yet)
 
-You can fully explore the skill and the dashboard spec today without a PostHog token:
-
-**Step 0: Install dependencies (first time only)**
-
-```bash
-# Dependencies are at the repo root — run from the repo root:
-pnpm install
-```
-
-**Step 1: Check what the skill knows**
-
-```bash
-$RUN status
-```
-
-**Step 2: View all 9 branch events and their properties**
-
-```bash
-$RUN inspect
-```
-
-**Step 3: Preview what the ACH compare output will look like**
-
-```bash
-$RUN compare --dry-run
-```
-
-**Step 4: Preview the full dashboard create output (8 tiles)**
-
-```bash
-$RUN create --dry-run
-```
-
-**Step 5: Run all tests (no token needed)**
-
-```bash
-npx tsx --test $SKILL_DIR/scripts/__tests__/*.test.ts
-```
-
-**Step 6: Preview feature flags list**
-
-```bash
-$RUN flags --dry-run
-```
+Run `$RUN status` to confirm config. All commands accept `--dry-run` (no token required).
 
 ---
 
@@ -398,7 +340,6 @@ All 9 events introduced or changed on branch 7361:
 | Event                        | Key Properties                                             |
 | ---------------------------- | ---------------------------------------------------------- |
 | `form_page_reached`          | `page`, `product_segment`, `county_id`, `form_type`, `uid` |
-| `purchase_started`           | `product_segment`, `county_id`, `uid`                      |
 | `soil_donation_selected`     | `product_segment`, `county_id`, `uid`                      |
 | `travel_protection_selected` | `selected`, `product_segment`, `county_id`, `uid`          |
 | `fcf_amount_selected`        | `amount`, `product_segment`, `county_id`, `uid`            |
@@ -417,7 +358,7 @@ All 9 events introduced or changed on branch 7361:
 - The `refresh` parameter for HogQL queries must be top-level in the request body, not inside the `query` object.
 - The ACH reference insight (`drOq2lO5`) uses `InsightVizNode` wrapping a `FunnelsQuery` — the skill drills into `source` to extract the actual query metadata.
 
-**Live dashboard:** [https://us.posthog.com/project/39507/dashboard/1353084](https://us.posthog.com/project/39507/dashboard/1353084)
+**Live dashboard:** The `create` command output includes `dashboard_url`.
 
 ---
 
@@ -480,7 +421,7 @@ Usage: flags get <id> [--dry-run]
 ## File Structure
 
 ```
-.pi/skills/posthog-skill/
+posthog-skill/
 ├── SKILL.md                          # This file
 ├── package.json
 ├── tsconfig.json
@@ -500,14 +441,11 @@ Usage: flags get <id> [--dry-run]
 │       ├── posthog-client.test.ts    # Unit tests for the client factory (mock fetchFn)
 │       └── live.test.ts              # Integration sequence (POSTHOG_TEST_LIVE=1 only)
 └── references/
-    ├── POSTHOG_API.md                # PostHog REST API reference (endpoints, auth, rate limits)
     └── ach-reference-summary.json    # Written by `compare` — ACH funnel insight metadata
 ```
-
-For PostHog API details, see [`references/POSTHOG_API.md`](references/POSTHOG_API.md).
 
 **Running live tests:**
 
 ```bash
-source ~/.zshrc && POSTHOG_TEST_LIVE=1 npx tsx --test $SKILL_DIR/scripts/__tests__/*.test.ts
+POSTHOG_PERSONAL_API_KEY=phx_... POSTHOG_TEST_LIVE=1 npx tsx --test $SKILL_DIR/scripts/__tests__/*.test.ts
 ```

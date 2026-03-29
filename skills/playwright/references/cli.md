@@ -1,7 +1,5 @@
 # Playwright CLI Reference
 
-The wrapper script is at `scripts/playwright_cli.sh` (relative to this skill's directory). Resolve the full path before use.
-
 ```bash
 scripts/playwright_cli.sh --help
 ```

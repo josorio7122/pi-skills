@@ -1,7 +1,6 @@
 ---
 name: docker-model-runner
 description: Run AI models locally using Docker Model Runner with an OpenAI-compatible API. Use when the user wants to run a local LLM, use local inference, pull or manage AI models with Docker, set up a local model endpoint, or integrate local models into code via the OpenAI SDK. Also use when they mention "docker model," "local LLM," "run a model locally," or need an alternative to cloud AI APIs. Requires Docker Desktop or Docker Engine with Model Runner enabled.
-compatibility: 'Requires Docker Desktop 4.40+ or Docker Engine with Model Runner. Run `docker model version` to verify.'
 metadata:
   author: josorio7122
   version: '1.0'
@@ -9,13 +8,13 @@ metadata:
 
 # Docker Model Runner
 
-Docker Model Runner (DMR) makes it easy to run AI models locally using Docker. This skill helps you effectively use Docker Model Runner for local LLM inference in your development workflow.
-
 ## Workflow
 
 When helping users with local LLM inference using Docker Model Runner:
 
 1. **Check if Docker Model Runner is available** by running `docker model version`
+
+   If `docker model version` fails, verify Docker Desktop ≥ 4.40 is running. Direct the user to https://docs.docker.com/desktop/features/model-runner/.
 
 2. **List available models** with `docker model list` to see what's already pulled
 
@@ -85,6 +84,10 @@ response = client.chat.completions.create(
 - Pre-load models with `--detach` for better performance in scripts
 - Models stay loaded until another model is requested or timeout (5 min)
 - Use the OpenAI-compatible API for integration with existing tools
+
+## Output
+
+When running inference on behalf of the user, display the model's response content directly — not the raw JSON wrapper.
 
 ## References
 

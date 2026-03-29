@@ -6,7 +6,7 @@ These are optional guidance artifacts, not required outputs for every skill.
 ## Integration/Documentation Depth Eval
 
 ```text
-Use `sentry-skills:skill-writer` to synthesize a new skill named `pi-agent-integration-eval` for working with `@mariozechner/pi-agent-core` as a consumer in downstream libraries.
+Use `skill-writer` to synthesize a new skill named `<target-skill-name>` for working with `@mariozechner/pi-agent-core` as a consumer in downstream libraries.
 
 Primary objective: produce a non-surface-level integration skill that covers API surface, known issues/workarounds, and common real-world use cases.
 
@@ -59,14 +59,18 @@ When you need stronger confidence, run this sequence:
 Run the eval in a temporary isolated workspace (copy of repo in `/tmp`):
 
 ```bash
-EVAL_DIR=/tmp/sentry-skills-eval-run
+EVAL_DIR=/tmp/skill-writer-eval-run
 rm -rf "$EVAL_DIR"
 mkdir -p "$EVAL_DIR"
-rsync -a "<repo-root>/"/ "$EVAL_DIR"/
+# Warning: /tmp is world-readable. Do not copy secrets, credentials, or .env files.
+rsync -a --exclude='.env' --exclude='.git' "<repo-root>/"/ "$EVAL_DIR"/
 
-# Invoke your agent CLI of choice in non-interactive / full-auto mode, e.g.:
-# pi --non-interactive -C "$EVAL_DIR" "$(cat <eval-prompt-file>)"
-# Adjust flags to match the agent you are using (pi, Claude Code, Codex, etc.).
+# Set AGENT_CMD to your agent CLI invocation. Examples:
+#   AGENT_CMD="pi --non-interactive -C $EVAL_DIR"
+#   AGENT_CMD="claude --no-interactive --directory $EVAL_DIR"
+#   AGENT_CMD="codex --full-auto -d $EVAL_DIR"
+# Then run:
+# $AGENT_CMD "$(cat <eval-prompt-file>)"
 ```
 
 Where `<eval-prompt-file>` contains the exact eval prompt from this file.
@@ -76,8 +80,8 @@ Validate the generated skill output:
 **Requires**: The `uv` CLI for python package management, install guide at https://docs.astral.sh/uv/getting-started/installation/
 
 ```bash
-uv run "<repo-root>/plugins/sentry-skills/skills/skill-writer/scripts/quick_validate.py" \
-  /tmp/sentry-skills-eval-run/plugins/sentry-skills/skills/pi-agent-integration-eval \
+uv run "scripts/quick_validate.py" \
+  "$EVAL_DIR/<target-skill-name>" \
   --skill-class integration-documentation \
   --strict-depth
 ```

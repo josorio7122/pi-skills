@@ -13,7 +13,7 @@
  * Subcommands:
  *   create   — Start a new research task (returns immediately with researchId)
  *   get      — Get the current status/result of a research task
- *   poll     — Create and poll until finished (blocks until complete)
+ *   poll     — Poll an existing task until finished (blocks until complete)
  *   list     — List research tasks
  *   run      — Create + poll in one step (convenience)
  *

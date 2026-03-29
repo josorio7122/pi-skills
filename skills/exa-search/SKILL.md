@@ -1,10 +1,6 @@
 ---
 name: exa-search
 description: Semantic web search, content extraction, AI-powered answers, and deep research via the Exa API. Use when you need to search documentation, look up facts, find current information, extract page content from URLs, get AI answers with citations, find pages similar to a URL, research companies or people, find LinkedIn profiles, or run deep multi-step research. Also use when the user asks to "look something up," "search the web," "find docs for," "what does X's documentation say," "research this company," or needs any information that may be more current than your training data. Requires EXA_API_KEY environment variable.
-compatibility: 'Requires Node.js 18+, tsx, and EXA_API_KEY environment variable set'
-metadata:
-  author: josorio7122
-  version: '3.0'
 ---
 
 # Exa Search
@@ -205,6 +201,8 @@ tsx scripts/find-similar.ts "https://tailwindcss.com" '{"text":true,"excludeSour
 | Research (standard)     | Varies | 2-10x more than search      |
 | Research (pro)          | Higher | Use only for complex topics |
 
+Prices as of 2025. Verify at https://exa.ai/pricing.
+
 **Cost strategies:**
 
 - **Default to ≤25 results** — 5x cheaper and sufficient for most queries
@@ -212,6 +210,15 @@ tsx scripts/find-similar.ts "https://tailwindcss.com" '{"text":true,"excludeSour
 - **Prefer `answer.ts` over `search.ts`** for direct questions — one API call instead of search + read
 - **Use `numResults`** to limit results to what you actually need
 - **Avoid `research.ts`** unless the topic genuinely requires multi-step synthesis
+
+---
+
+## When Things Go Wrong
+
+- **400 error with `company`/`people` category** — remove domain/date filters (these categories don't support them)
+- **Empty results** — broaden the query, or try `answer.ts` instead
+- **`research.ts` timeout** — use `create` + `poll` separately; the default timeout is 5 minutes
+- **`EXA_API_KEY` not set** — export it: `export EXA_API_KEY=your-key`
 
 ---
 

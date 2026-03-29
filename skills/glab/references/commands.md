@@ -164,7 +164,7 @@ Full command reference for `glab`. For workflows and decision guidance, see the 
 | Revoke a token | `glab token revoke <id>` |
 | Rotate a token | `glab token rotate <id>` |
 
-## Stacked Diffs (Experimental)
+## Stacked Diffs
 
 Stacked diffs let you break large features into small, reviewable MRs that build on each other. Each "entry" in a stack is a separate MR.
 

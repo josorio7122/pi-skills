@@ -16,23 +16,23 @@ Advanced prompt engineering techniques to maximize LLM performance, reliability,
 
 ### 1. Few-Shot Learning
 
-Teach the model by showing examples instead of explaining rules. Include 2-5 input-output pairs that demonstrate the desired behavior. More examples improve accuracy but consume tokens — balance based on task complexity.
+Include 2–5 input-output pairs that demonstrate the desired behavior. Do not explain the rule — show it.
 
 ### 2. Chain-of-Thought Prompting
 
-Request step-by-step reasoning before the final answer. Add "Let's think step by step" (zero-shot) or include example reasoning traces (few-shot). Improves accuracy on analytical tasks by 30-50%.
+Add "Let's think step by step" for zero-shot, or include example reasoning traces for few-shot. Use on multi-step analytical tasks.
 
 ### 3. Prompt Optimization
 
-Start simple, measure performance, then iterate. Test on diverse inputs including edge cases. Critical for production prompts where consistency and cost matter.
+Start with the simplest prompt that could work. Measure, then iterate. Test on diverse inputs including edge cases.
 
 ### 4. Template Systems
 
-Build reusable prompt structures with variables, conditional sections, and modular components. Reduces duplication and ensures consistency.
+Build reusable prompt structures with variables and conditional sections. Reduces duplication and ensures consistency across similar tasks.
 
 ### 5. System Prompt Design
 
-Set global behavior and constraints that persist across the conversation. Define the model's role, expertise level, output format, and safety guidelines.
+Define the model's role, expertise level, output format, and constraints in the system prompt. These persist across the conversation.
 
 ## Key Patterns
 
@@ -42,7 +42,17 @@ Set global behavior and constraints that persist across the conversation. Define
 [System Context] → [Task Instruction] → [Examples] → [Input Data] → [Output Format]
 ```
 
-### Progressive Disclosure
+**Before (flat):** "Translate the following text to Spanish and keep it formal."
+
+**After (hierarchy):**
+
+- _System_: "You are a professional translator specializing in formal business language."
+- _Task_: "Translate the input text to Spanish."
+- _Constraints_: "Use formal register (usted). Preserve paragraph structure."
+- _Input_: `{{ text }}`
+- _Output format_: "Return only the translated text, no commentary."
+
+### Incremental Complexity
 
 Start with simple prompts, add complexity only when needed:
 
@@ -80,6 +90,12 @@ python scripts/migrate.py --verify --backup
 
 - **Narrow bridge**: Only one safe way forward → specific guardrails (low freedom)
 - **Open field**: Many paths lead to success → general direction (high freedom)
+
+Before writing any prompt, classify the task:
+
+- Fragile/irreversible operations → Low freedom (strict commands, exact formats)
+- Creative/exploratory tasks → High freedom (goals and constraints only)
+- Standard workflows → Medium freedom (guidelines with examples)
 
 ## Conciseness — The Cardinal Rule
 
@@ -170,13 +186,7 @@ Shared identity for collaborative workflows.
 | Collaborative        | Unity + Commitment                    | Authority, Liking   |
 | Reference            | Clarity only                          | All persuasion      |
 
-## Token Efficiency
-
-- Remove redundant words and phrases
-- Use abbreviations after first definition
-- Consolidate similar instructions
-- Move stable content to system prompts
-- Cache common prompt prefixes
+> **Liking**: Making the prompt warmer or more complimentary to reduce pushback. **Reciprocity**: Framing instructions as favors or exchanges ("If you do X, I'll do Y").
 
 ## Common Pitfalls
 
@@ -186,6 +196,11 @@ Shared identity for collaborative workflows.
 - **Ambiguous instructions**: Room for multiple interpretations
 - **Ignoring edge cases**: Not testing on boundary inputs
 
+## When Input Is Ambiguous
+
+If no prompt is provided, ask: "Share the prompt you want to improve." Do not generate a generic example.
+If the task is unclear, ask one clarifying question — not multiple.
+
 ## Error Recovery
 
 Build prompts that handle failures gracefully:
@@ -194,3 +209,7 @@ Build prompts that handle failures gracefully:
 - Request confidence scores
 - Ask for alternative interpretations when uncertain
 - Specify how to indicate missing information
+
+## Output
+
+Deliver: (1) the rewritten prompt in a fenced code block, (2) a brief rationale for each change, (3) estimated token delta.

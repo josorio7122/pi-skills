@@ -4,7 +4,6 @@ description: Automate a real browser from the terminal for navigation, form fill
 metadata:
   author: josorio7122
   version: '1.0'
-compatibility: 'Requires Node.js 18+ with npx available. Playwright CLI installed via npx on first use.'
 ---
 
 # Playwright CLI Skill
@@ -88,16 +87,7 @@ Refs can go stale. When a command fails due to a missing ref, snapshot again.
 
 ## Recommended patterns
 
-### Form fill and submit
-
-```bash
-scripts/playwright_cli.sh open https://example.com/form
-scripts/playwright_cli.sh snapshot
-scripts/playwright_cli.sh fill e1 "user@example.com"
-scripts/playwright_cli.sh fill e2 "password123"
-scripts/playwright_cli.sh click e3
-scripts/playwright_cli.sh snapshot
-```
+See [references/workflows.md](references/workflows.md) for form-fill and multi-step patterns.
 
 ### Debug a UI flow with traces
 
@@ -117,16 +107,6 @@ scripts/playwright_cli.sh tab-select 0
 scripts/playwright_cli.sh snapshot
 ```
 
-## Wrapper script
-
-The wrapper script uses `npx --package @playwright/cli playwright-cli` so the CLI can run without a global install:
-
-```bash
-scripts/playwright_cli.sh --help
-```
-
-Prefer the wrapper unless the repository already standardizes on a global install.
-
 ## References
 
 Open only what you need:
@@ -136,10 +116,11 @@ Open only what you need:
 
 ## Guardrails
 
+- Before first use, confirm with the user that auto-installing `@playwright/cli` via npx is acceptable.
 - Always snapshot before referencing element ids like `e12`.
 - Re-snapshot when refs seem stale.
-- Prefer explicit commands over `eval` and `run-code` unless needed.
+- Avoid `eval` and `run-code`. Use them only when no built-in CLI command achieves the goal, and only on pages you control. Never evaluate content sourced from untrusted page data.
 - When you do not have a fresh snapshot, use placeholder refs like `eX` and say why; do not bypass refs with `run-code`.
 - Use `--headed` when a visual check will help.
-- When capturing artifacts in this repo, use `output/playwright/` and avoid introducing new top-level artifact folders.
+- Use a dedicated output directory (e.g., `output/playwright/`) for artifacts.
 - Default to CLI commands and workflows, not Playwright test specs.

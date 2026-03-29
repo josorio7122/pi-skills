@@ -12,8 +12,9 @@ Docker Model Runner is included in Docker Desktop. Install from: https://docs.do
 
 ### Docker Engine (Linux)
 
+See https://docs.docker.com/engine/install/ for distro-specific installation instructions.
+
 ```bash
-curl -fsSL https://get.docker.com | sudo bash
 sudo usermod -aG docker $USER
 ```
 
@@ -232,6 +233,8 @@ func main() {
 
 ## Popular Models
 
+> Run `docker model search <query>` for current availability — this table may be stale.
+
 | Model         | Size | Description                       |
 | ------------- | ---- | --------------------------------- |
 | `ai/smollm2`  | ~1GB | Fast, small model for quick tasks |
@@ -266,8 +269,7 @@ docker model inspect ai/smollm2
 # Check if Docker is from official repositories
 docker version
 
-# Reinstall from official repository if needed
-curl -fsSL https://get.docker.com | sudo bash
+# Reinstall from official repository if needed — see https://docs.docker.com/engine/install/
 ```
 
 ### Model Loading Issues
@@ -294,4 +296,4 @@ docker model df
 
 - [Official Documentation](https://docs.docker.com/desktop/features/model-runner/)
 - [Model Specification](https://github.com/docker/model-spec/blob/main/spec.md)
-- [Community Slack](https://dockercommunity.slack.com/archives/C09H9P5E57B)
+- [Community](https://www.docker.com/community/)

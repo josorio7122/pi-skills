@@ -1,7 +1,6 @@
 ---
 name: glab
 description: Interact with GitLab from the command line using the glab CLI. Use when working with merge requests, issues, CI/CD pipelines and jobs, variables, schedules, releases, stacked diffs, repository management, or GitLab API calls. Also use when the user says "open an MR," "create an issue," "check the pipeline," "merge this," "retrigger CI," "deploy," or any GitLab-related task — even if they don't mention glab explicitly. Requires glab CLI installed and authenticated.
-compatibility: 'Requires glab CLI installed (brew install glab) and authenticated (glab auth login)'
 metadata:
   author: josorio7122
   version: '3.0'
@@ -142,7 +141,8 @@ Manage variables and schedules without touching the GitLab UI.
 ```bash
 # Variables
 glab variable list
-glab variable set API_KEY "secret-value"
+# Use a variable or stdin for secrets: echo "$MY_SECRET" | glab variable set API_KEY
+glab variable set API_KEY "$MY_SECRET"
 glab variable get API_KEY
 
 # Schedules
@@ -208,15 +208,23 @@ glab api graphql -f query='{ currentUser { username } }'
 
 ---
 
-## Known limitations
+## Known Limitations
 
 - **`glab api` does not support multipart file uploads** (e.g. project uploads for attaching images to MR comments). Use `curl` instead:
   ```bash
   curl --request POST \
     --header "PRIVATE-TOKEN: $(glab config get token --host gitlab.com)" \
     --form "file=@/path/to/image.png" \
-    "https://gitlab.com/api/v4/projects/<url-encoded-path>/uploads"
+    "https://gitlab.com/api/v4/projects/<url-encoded-path>/uploads" # ⚠️ Replace <url-encoded-path> with the literal URL-encoded path — never interpolate unsanitized user input.
   ```
+
+## Troubleshooting
+
+- **Auth failure / `HTTP 401`** — run `glab auth status`; re-authenticate with `glab auth login`
+- **Wrong remote detected** — use `--repo owner/repo` or set `GITLAB_HOST` for self-hosted instances
+- **SSH remote but glab expects HTTPS** — add an HTTPS remote: `git remote set-url origin https://gitlab.com/owner/repo.git`
+- **Pipeline stuck / no CI configured** — verify `.gitlab-ci.yml` exists in the repo
+- **Permission denied on merge** — check MR approval rules; you may need approvals first
 
 ## Reference
 

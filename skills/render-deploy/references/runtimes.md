@@ -6,7 +6,7 @@ Complete guide to available runtimes on Render, including versions, configuratio
 
 ### Node.js (`runtime: node`)
 
-**Supported Versions:** 14, 16, 18, 20, 21
+**Supported Versions:** 14, 16, 18, 20, 22
 **Default Version:** 20
 
 **Version Specification:**

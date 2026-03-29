@@ -431,6 +431,8 @@ buildCommand: npm ci && npx prisma migrate deploy
 
 ### What's Included
 
+> **Note:** Pricing may change. Verify at https://render.com/pricing.
+
 **Free tier provides:**
 
 - 1 web service

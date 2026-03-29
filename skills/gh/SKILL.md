@@ -1,7 +1,6 @@
 ---
 name: gh
 description: Interact with GitHub from the command line using the gh CLI. Use when working with pull requests, issues, releases, Actions workflows and runs, repository management, code review, or GitHub API calls. Also use when the user says "open a PR," "create an issue," "check CI," "merge this," "make a release," or any GitHub-related task — even if they don't mention gh explicitly. Requires gh CLI installed and authenticated.
-compatibility: 'Requires gh CLI installed (brew install gh) and authenticated (gh auth login)'
 metadata:
   author: josorio7122
   version: '2.0'
@@ -22,7 +21,7 @@ If not authenticated:
 
 ```bash
 gh auth login                          # Interactive (browser OAuth — recommended)
-gh auth login --with-token <<< "<pat>" # With personal access token
+gh auth login --with-token <<< "<pat>" # With personal access token — Note: token appears in shell history. Prefer 'gh auth login' (browser) for interactive sessions.
 ```
 
 ---
@@ -46,6 +45,8 @@ Most GitHub work falls into a few categories. Pick the right one and you avoid w
 ## Workflows
 
 These are the sequences you'll use most. Each one is a complete flow — follow it top to bottom.
+
+For view/list commands, summarize key fields rather than printing raw output. For create/merge commands, confirm the action and provide the resulting URL.
 
 ### Create a PR
 
@@ -159,13 +160,17 @@ gh api repos/owner/repo/issues --paginate
 
 ## Tips
 
-- **`--fill`** auto-populates PR title/body from commit messages — always use it
-- **`--web`** opens any resource in the browser — `gh pr view <n> --web`
-- **`--json` + `--jq`** extracts structured data — best for scripting
-- **`--repo` / `-R`** targets a different repo — `gh pr list -R owner/other-repo`
-- **`gh run watch`** live-streams a workflow run — great for monitoring deploys
-- **`gh pr checks --watch`** blocks until all checks pass or fail
-- Most commands infer the repo from git remotes — no need to specify `--repo` unless you're working cross-repo
+Most commands infer the repo from git remotes — use `--repo` only for cross-repo operations.
+
+---
+
+## When Things Fail
+
+- **`HTTP 403` or rate limiting** — check `gh auth status`; token may be expired or lack required scopes
+- **Merge conflict on `gh pr merge`** — run `gh pr update-branch` to rebase, then retry
+- **`gh pr checks` returns nothing** — CI may not be configured for this repo; proceed with manual review
+- **Permission denied on merge** — you may not be a maintainer; open a review request instead
+- **Wrong repo detected** — use `--repo owner/repo` to specify explicitly
 
 ---
 

@@ -12,9 +12,7 @@ Don't just have "text" and "gray text." Build four levels — primary, secondary
 
 Borders aren't binary. Build a scale that matches intensity to importance — standard separation, softer separation, emphasis, maximum emphasis. Not every boundary deserves the same weight.
 
-### Control Tokens
-
-Form controls have specific needs. Don't reuse surface tokens — create dedicated ones for control backgrounds, control borders, and focus states. This lets you tune interactive elements independently from layout surfaces.
+See [principles.md](principles.md) for control token philosophy.
 
 ---
 
@@ -85,12 +83,4 @@ Every interactive element needs states: default, hover, active, focus, disabled.
 
 ---
 
-## Navigation Context
-
-Screens need grounding. A data table floating in space feels like a component demo, not a product. Include navigation showing where you are in the app, location indicators, and user context. When building sidebars, consider same background as main content with border separation rather than different colors.
-
----
-
-## Dark Mode
-
-Dark interfaces have different needs. Shadows are less visible on dark backgrounds — lean on borders for definition. Semantic colors (success, warning, error) often need slight desaturation. The hierarchy system still applies, just with inverted values.
+See [principles.md](principles.md) for navigation context and dark mode guidance.

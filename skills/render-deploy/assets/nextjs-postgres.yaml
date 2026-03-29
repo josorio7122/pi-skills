@@ -31,5 +31,5 @@ databases:
     databaseName: nextjs_production
     user: nextjs_user
     plan: free
-    postgresMajorVersion: '15'
+    postgresMajorVersion: '16' # Update to latest — see https://render.com/docs/postgresql-creating-connecting
     ipAllowList: [] # Internal access only

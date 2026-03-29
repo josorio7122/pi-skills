@@ -215,7 +215,7 @@ services:
 
 **Node.js (`runtime: node`):**
 
-- Versions: 14, 16, 18, 20, 21
+- Versions: 14, 16, 18, 20, 22
 - Default version: 20
 - Specify version in `package.json` engines field
 
@@ -291,6 +291,8 @@ services:
 ## Service Plans
 
 Available instance types:
+
+> **Note:** Pricing may change. Verify at https://render.com/pricing.
 
 | Plan       | RAM    | CPU | Price             |
 | ---------- | ------ | --- | ----------------- |
@@ -440,7 +442,7 @@ databases:
     databaseName: myapp_prod
     user: myapp_user
     plan: free
-    postgresMajorVersion: '15'
+    postgresMajorVersion: '16' # Update to latest — see https://render.com/docs/postgresql-creating-connecting
     ipAllowList: []
 ```
 
@@ -711,7 +713,7 @@ databases:
     databaseName: app_production
     user: app_user
     plan: free
-    postgresMajorVersion: '15'
+    postgresMajorVersion: '16' # Update to latest — see https://render.com/docs/postgresql-creating-connecting
     ipAllowList: []
 
   - name: redis

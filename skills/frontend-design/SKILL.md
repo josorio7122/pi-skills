@@ -5,12 +5,9 @@ license: Complete terms in LICENSE.txt
 metadata:
   author: josorio7122
   version: '1.0'
-compatibility: 'No external dependencies required'
 ---
 
-This skill guides creation of distinctive, production-grade frontend interfaces that avoid generic "AI slop" aesthetics. Implement real working code with exceptional attention to aesthetic details and creative choices.
-
-The user provides frontend requirements: a component, page, application, or interface to build. They may include context about the purpose, audience, or technical constraints.
+Create distinctive, production-grade frontend interfaces. Prioritize aesthetic quality over generic patterns. Write real, working code with exceptional attention to visual detail.
 
 ## Design Thinking
 
@@ -20,6 +17,10 @@ Before coding, understand the context and commit to a BOLD aesthetic direction:
 - **Tone**: Pick an extreme: brutally minimal, maximalist chaos, retro-futuristic, organic/natural, luxury/refined, playful/toy-like, editorial/magazine, brutalist/raw, art deco/geometric, soft/pastel, industrial/utilitarian, etc. There are so many flavors to choose from. Use these for inspiration but design one that is true to the aesthetic direction.
 - **Constraints**: Technical requirements (framework, performance, accessibility).
 - **Differentiation**: What makes this UNFORGETTABLE? What's the one thing someone will remember?
+
+State your chosen aesthetic direction in one sentence before writing any code.
+
+If requirements are ambiguous, make a decisive interpretation and state it — do not ask clarifying questions that block output.
 
 **CRITICAL**: Choose a clear conceptual direction and execute it with precision. Bold maximalism and refined minimalism both work - the key is intentionality, not intensity.
 
@@ -46,6 +47,12 @@ NEVER use generic AI-generated aesthetics like overused font families (Inter, Ro
 
 Interpret creatively and make unexpected choices that feel genuinely designed for the context. No design should be the same. Vary between light and dark themes, different fonts, different aesthetics. NEVER converge on common choices (Space Grotesk, for example) across generations.
 
+Always replace avoided patterns with a deliberate alternative — name the choice explicitly.
+
 **IMPORTANT**: Match implementation complexity to the aesthetic vision. Maximalist designs need elaborate code with extensive animations and effects. Minimalist or refined designs need restraint, precision, and careful attention to spacing, typography, and subtle details. Elegance comes from executing the vision well.
+
+## Output
+
+Produce self-contained, runnable code. For HTML/CSS/JS: single file with embedded styles. For React: single component file unless scaffolding is explicitly requested. Include inline comments only for non-obvious design decisions.
 
 Remember: you are capable of extraordinary creative work. Don't hold back, show what can truly be created when thinking outside the box and committing fully to a distinctive vision.

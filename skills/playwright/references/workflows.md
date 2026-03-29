@@ -1,7 +1,7 @@
 # Playwright CLI Workflows
 
 Use the wrapper script and snapshot often.
-Assume `PWCLI` is set and `pwcli` is an alias for `"$PWCLI"`.
+Assume `pwcli` is an alias for `scripts/playwright_cli.sh` (set via `alias pwcli="scripts/playwright_cli.sh"`).
 In this repo, run commands from `output/playwright/<label>/` to keep artifacts contained.
 
 ## Standard interaction loop

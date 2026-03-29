@@ -4,8 +4,7 @@ description: Test any prompt before deployment using RED-GREEN-REFACTOR applied 
 metadata:
   author: NeoLabHQ
   version: '1.0'
-  source: https://github.com/NeoLabHQ/context-engineering-kit/blob/master/plugins/customaize-agent/skills/test-prompt/SKILL.md
-  license: See source repository
+  license: Unknown
 ---
 
 # Testing Prompts With Subagents
@@ -14,11 +13,11 @@ Test any prompt before deployment: commands, hooks, skills, subagent instruction
 
 **Core principle:** If you didn't watch an agent fail without the prompt, you don't know what the prompt needs to fix.
 
-**Related skill:** `prompt-engineering` — provides writing techniques. This skill provides the testing methodology.
+**Related skill:** [prompt-engineering](../prompt-engineering/SKILL.md) — provides writing techniques. This skill provides the testing methodology.
 
 ## TDD Mapping for Prompt Testing
 
-| TDD Phase        | Prompt Testing    | What You Do                                       |
+| TDD Phase        | Prompt Testing    | Action                                            |
 | ---------------- | ----------------- | ------------------------------------------------- |
 | **RED**          | Baseline test     | Run scenario WITHOUT prompt, observe behavior     |
 | **Verify RED**   | Document behavior | Capture exact agent actions/reasoning verbatim    |
@@ -47,7 +46,11 @@ Test any prompt before deployment: commands, hooks, skills, subagent instruction
 4. Identify patterns — what consistently goes wrong?
 5. Note severity — which failures are critical vs minor?
 
+> If the agent passes baseline without the prompt, try harder edge cases or more ambiguous framing. If it still passes, document that the prompt may be unnecessary and proceed to REFACTOR to check for over-engineering.
+
 ### Scenario Design by Prompt Type
+
+> **How to use these scenarios:** Dispatch a subagent with the scenario text as its entire task. Do not wrap it in narration — the raw scenario IS the prompt being tested.
 
 **Instruction prompts** — test if steps are followed and edge cases handled:
 
@@ -189,6 +192,14 @@ Maximum pressure, ambiguous edge cases, contradictory constraints, minimal conte
 - [ ] Reduced tokens without losing behavior
 - [ ] Re-tested — still passes
 - [ ] No regressions on previous scenarios
+
+## Output Format
+
+Produce a test report with three sections:
+
+1. **RED results** — scenario, agent behavior verbatim, failures identified
+2. **GREEN prompt** — the rewritten/new prompt in a fenced code block
+3. **REFACTOR log** — changes made, token delta, re-test result
 
 ## Common Mistakes
 

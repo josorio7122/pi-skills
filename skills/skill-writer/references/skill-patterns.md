@@ -104,6 +104,8 @@ security-review/
 
 ## Argument-Accepting Skills
 
+> Skip this section unless authoring specifically for Claude Code.
+
 Use when the skill takes user input as parameters.
 
 **Structure:**

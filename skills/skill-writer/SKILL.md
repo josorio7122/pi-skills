@@ -4,13 +4,12 @@ description: Create, synthesize, and iteratively improve agent skills following 
 metadata:
   author: josorio7122
   version: '1.0'
-compatibility: 'No external dependencies required. Reference files are loaded on demand.'
 ---
 
 # Skill Writer
 
 Use this as the single canonical workflow for skill creation and improvement.
-Primary success condition: maximize high-value input coverage before authoring so the resulting skill has minimal blind spots.
+Maximize high-value input coverage before authoring. Minimize blind spots.
 
 Load only the path(s) required for the task:
 
@@ -29,6 +28,9 @@ Load only the path(s) required for the task:
 | Iterate using positive/negative/fix examples                               | `references/iteration-path.md`           |
 | Evaluate behavior and compare baseline vs with-skill (opt-in quantitative) | `references/evaluation-path.md`          |
 | Register and validate skill changes                                        | `references/registration-validation.md`  |
+
+> **For simple tasks** (update wording, fix structure): use the table above to load only the needed references, then jump to the relevant step.
+> **For new skill creation or full rewrites**: execute Steps 1–7 in sequence.
 
 ## Step 1: Resolve target and path
 

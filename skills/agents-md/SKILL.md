@@ -1,10 +1,9 @@
 ---
 name: agents-md
-description: Create and maintain minimal, high-signal AGENTS.md files. Use when asked to "create AGENTS.md", "update AGENTS.md", "maintain agent docs", "set up CLAUDE.md", or when agent instructions need to be kept concise. Enforces research-backed best practices for agent documentation.
+description: Create and maintain minimal, high-signal AGENTS.md files. Use when asked to "create AGENTS.md", "update AGENTS.md", "maintain agent docs", "set up agent instructions file", or when agent instructions need to be kept concise.
 metadata:
   author: josorio7122
   version: '1.0'
-compatibility: 'No external dependencies required'
 ---
 
 # Maintaining AGENTS.md
@@ -14,7 +13,7 @@ AGENTS.md is the canonical agent-facing documentation. Keep it minimal—agents 
 ## File Setup
 
 1. Create `AGENTS.md` at project root
-2. Create symlink: `ln -s AGENTS.md CLAUDE.md`
+2. Optionally create provider-specific symlinks (e.g., `ln -s AGENTS.md CLAUDE.md` for Claude-based agents)
 
 ## Before Writing
 
@@ -72,7 +71,7 @@ Always include this section. Agents should use their own identity:
 AI commits MUST include:
 ```
 
-Co-Authored-By: (the agent's name and attribution byline)
+Co-Authored-By: AI Agent <ai@noreply.example.com>
 
 ```
 Example: `Co-Authored-By: AI Assistant <noreply@example.com>`
@@ -92,49 +91,10 @@ Add only if truly needed:
 - Project structure hints (point to critical files, flag legacy code to avoid)
 - Monorepo overrides (subdirectory `AGENTS.md` files override root)
 
-## Anti-Patterns
+## Edge Cases
 
-Omit these:
+- No lock file found: ask the user which package manager to use
+- Existing AGENTS.md over 100 lines: trim to required sections first, confirm with user
+- Conflicting conventions: defer to the most recently modified config file
 
-- "Welcome to..." or "This document explains..."
-- "You should..." or "Remember to..."
-- Linter/formatter rules already in config files (`.eslintrc`, `biome.json`, `ruff.toml`)
-- Listing installed skills or plugins (agents discover these automatically)
-- Full project-wide build commands when file-scoped alternatives exist
-- Obvious instructions ("run tests", "write clean code")
-- Explanations of why (just say what)
-- Long prose paragraphs
-
-## Example Structure
-
-```markdown
-# Agent Instructions
-
-## Package Manager
-
-Use **pnpm**: `pnpm install`, `pnpm dev`
-
-## Commit Attribution
-
-AI commits MUST include:
-```
-
-Co-Authored-By: (the agent's name and attribution byline)
-
-```
-
-## File-Scoped Commands
-| Task | Command |
-|------|---------|
-| Typecheck | `pnpm tsc --noEmit path/to/file.ts` |
-| Lint | `pnpm eslint path/to/file.ts` |
-| Test | `pnpm jest path/to/file.test.ts` |
-
-## API Routes
-[Template code block]
-
-## CLI
-| Command | Description |
-|---------|-------------|
-| `pnpm cli sync` | Sync data |
-```
+See [references/example-structure.md](references/example-structure.md) for a complete template and anti-patterns to avoid.
