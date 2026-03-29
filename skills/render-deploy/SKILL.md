@@ -4,7 +4,7 @@ description: Deploy applications to Render by analyzing codebases, generating re
 metadata:
   author: josorio7122
   version: '1.0'
-compatibility: 'Requires Git repository with remote. Render CLI (`render`) for deployment operations.'
+compatibility: 'Requires Git repository with remote. Render CLI (`render`) for deployment. RENDER_API_KEY env var for database creation and metrics.'
 ---
 
 # Deploy to Render
@@ -125,6 +125,8 @@ If `render whoami` fails or returns empty data, the CLI is not authenticated. Pr
 
 - **API Key**: `export RENDER_API_KEY="rnd_xxxxx"` (Get from https://dashboard.render.com/u/*/settings#api-keys)
 - **Login**: `render login` (Opens browser for OAuth)
+
+> **Note:** Database creation and metrics queries require `RENDER_API_KEY` environment variable. See `references/render-api.md` for REST API commands.
 
 **4. Check Workspace Context**
 
@@ -322,8 +324,7 @@ render logs -r <SERVICE_ID> --level error --output json
 
 **Check service health metrics:**
 
-> Metrics (CPU, memory, request count) are not available via the CLI. Visit the Render Dashboard to
-> view them: `https://dashboard.render.com`
+> Metrics (CPU, memory, request count) are available via the REST API. See `references/render-api.md` for `curl` commands.
 
 If errors are found, proceed to the **Post-deploy verification and basic triage** section below.
 

@@ -63,13 +63,11 @@ render services create \
 
 **Create a PostgreSQL Database:**
 
-> ⚠️ **Not available via CLI.** Create via Blueprint (`render.yaml`) or the Render Dashboard:
-> `https://dashboard.render.com`
+> The Render CLI cannot create databases. Use the REST API instead — see `references/render-api.md` for the exact `curl` command.
 
 **Create a Key-Value Store (Redis):**
 
-> ⚠️ **Not available via CLI.** Create via Blueprint (`render.yaml`) or the Render Dashboard:
-> `https://dashboard.render.com`
+> The Render CLI cannot create Key-Value stores. Use the REST API instead — see `references/render-api.md` for the exact `curl` command.
 
 For apps that need a database or cache, use the Blueprint method instead so all resources are
 provisioned together.
@@ -119,6 +117,4 @@ render logs -r <SERVICE_ID> --level error --output json
 
 **Check health metrics:**
 
-> Metrics (CPU, memory, request count) are not available via the CLI. Visit the Render Dashboard to
-> view them:
-> `https://dashboard.render.com`
+> Metrics (CPU, memory, request count) are available via the REST API. See `references/render-api.md` for `curl` commands.
