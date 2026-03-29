@@ -1,6 +1,0 @@
----
-agent: "scout"
-task: "## Deep 3-Lens Review: pdf skill\n\nRead ALL files in `skills/pdf/` (SKILL.md + everything in references/). Then evaluate against three lenses:\n\n### Lens 1: Skill-Writer (spec compliance)\n- Frontmatter: ONLY `name` and `description` allowed\n- Description: imperative triggers, no topic enumeration\n- SKILL.md <150 lines router\n- Conditional load gates\n- No duplication SKILL.md↔references\n- Error Recovery + Output Format required\n- Imperative voice\n\n### Lens 2: Skill-Scanner (security)\n- Untrusted PDF handling: security warnings present\n- No eval/exec of embedded content\n- Output directory restricted\n- Dependency versions noted\n- No absolute paths\n\n### Lens 3: Prompt-Engineering (prompt quality)\n- Authority/role in first 3 lines\n- Core rule prominent\n- Concrete output format\n- Specific error recovery for each operation type\n- Stop conditions clear and consolidated\n- Token efficiency\n\n### Output Format\nFor EACH issue:\n```\n[LENS] [SEVERITY] — Title\nFile: path\nLine/Section: where\nIssue: what's wrong\nEvidence: quote\nFix: specific fix\n```\nSummary table + verdict. Read every line."
-exitCode: 0
-usage: {"input":10,"output":4520,"cacheRead":124273,"cacheWrite":3955,"cost":0.11994315,"contextTokens":22132,"turns":8}
----

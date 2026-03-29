@@ -1,6 +1,0 @@
----
-agent: "builder"
-task: "## Fix frontend-design skill\n\n**Working directory:** /Users/josorio/Code/pi-skills\n\n**File:** skills/frontend-design/SKILL.md\n\nRead the file first, then make these changes:\n\n1. **Add missing frontmatter fields:**\n```yaml\nmetadata:\n  author: josorio7122\n  version: '1.0'\ncompatibility: 'No external dependencies required'\n```\n\n2. **Add section headers** to the body. The current body is one blob of prose. Add these headers at the appropriate locations:\n   - `## Design Thinking` — before the \"Before writing any code\" paragraph\n   - `## Frontend Aesthetics` — before the typography/color/motion/spatial guidelines\n   - `## Prohibitions` — before the \"NEVER use\" paragraph\n\n3. **Fix Claude identity reference** — find the line `Remember: Claude is capable of extraordinary creative work...` and change it to `Remember: you are capable of extraordinary creative work...` (agent-agnostic).\n\nVerify: the file reads correctly with proper markdown structure."
-exitCode: 0
-usage: {"input":6,"output":1351,"cacheRead":51401,"cacheWrite":19209,"cost":0.10773705,"contextTokens":19411,"turns":4}
----

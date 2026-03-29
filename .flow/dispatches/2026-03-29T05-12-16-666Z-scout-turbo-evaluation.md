@@ -1,6 +1,0 @@
----
-agent: "scout"
-task: "Deep review of skill: posthog-skill at /Users/josorio/Code/pi-skills/skills/posthog-skill/\n\nRead ALL files (SKILL.md + references/ + scripts/lib/*.ts + scripts/__tests__/*.ts). Evaluate using THREE lenses:\n\n**LENS 1 — Skill Writer:** Frontmatter (name, description, trigger phrases, pattern compliance), imperative voice, progressive disclosure, degrees of freedom, conciseness, consistent terminology, no time-sensitive info, no machine-specific paths, no agent-specific refs, portable relative paths.\n\n**LENS 2 — Skill Scanner:** Prompt injection, dangerous code, excessive permissions, secret exposure, supply chain (external URLs, remote code exec), config poisoning.\n\n**LENS 3 — Prompt Engineering:** Instruction hierarchy, authority/commitment patterns, no over-engineering/ambiguity/overflow, token efficiency, error recovery/fallback, output format specified.\n\nReport ALL issues with severity (Critical/High/Medium/Low/Info), exact file path and line, quoted text, and suggested fix. If no issues found for a lens, state CLEAN."
-exitCode: 0
-usage: {"input":12,"output":7711,"cacheRead":243685,"cacheWrite":26037,"cost":0.28644525000000004,"contextTokens":43643,"turns":10}
----

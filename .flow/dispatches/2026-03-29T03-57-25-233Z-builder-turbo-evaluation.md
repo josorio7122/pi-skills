@@ -1,6 +1,0 @@
----
-agent: "builder"
-task: "## Fix exa-search, skill-scanner, and skill-writer skills\n\n**Working directory:** /Users/josorio/Code/pi-skills\n\n### exa-search (skills/exa-search/SKILL.md)\nRead the file first.\n1. **Fix stale install instructions** — find the Prerequisites section. It likely says something about `cd <skill-dir>/skills/exa-search && npm install`. Replace with: `Dependencies are managed at the repository root. Run \\`pnpm install\\` from the repo root if needed.`\n2. Replace any `npm install` with `pnpm install` in the file.\n\n### skill-scanner (skills/skill-scanner/SKILL.md)\nRead the file first.\n1. **Add missing frontmatter fields:**\n```yaml\nmetadata:\n  author: josorio7122\n  version: '1.0'\ncompatibility: 'Requires Python 3.8+ and uv CLI for running the bundled scan script.'\n```\n\n### skill-writer (skills/skill-writer/SKILL.md)\nRead the file first.\n1. **Add missing frontmatter fields:**\n```yaml\nmetadata:\n  author: josorio7122\n  version: '1.0'\ncompatibility: 'No external dependencies required. Reference files are loaded on demand.'\n```\n\nVerify all files read correctly."
-exitCode: 0
-usage: {"input":7,"output":1711,"cacheRead":103048,"cacheWrite":9452,"cost":0.09204540000000001,"contextTokens":25169,"turns":5}
----

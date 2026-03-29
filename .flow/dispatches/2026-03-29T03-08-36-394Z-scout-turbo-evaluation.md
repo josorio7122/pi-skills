@@ -1,6 +1,0 @@
----
-agent: "scout"
-task: "Analyze the TypeScript code in /Users/josorio/Code/pi-skills/skills/posthog-skill/scripts/ thoroughly. Read EVERY .ts file completely:\n- run.ts\n- lib/posthog-client.ts\n- lib/dashboard-spec.ts\n- lib/fixtures.ts\n- All 8 test files in __tests__/\n\nFor each file report:\n1. Full list of imports and where they come from\n2. Exported functions/types/interfaces\n3. File length and complexity\n4. Code organization patterns (how is run.ts structured as a CLI entry point?)\n5. Duplicated patterns across files\n6. Code smells (long functions, god files, tight coupling)\n7. How the lib/ files relate to each other and to run.ts\n8. Test file patterns — are they consistent? Do they share helpers?\n\nBe exhaustive — read every line of every file."
-exitCode: 0
-usage: {"input":10,"output":5124,"cacheRead":191304,"cacheWrite":58103,"cost":0.35216745000000005,"contextTokens":52466,"turns":8}
----

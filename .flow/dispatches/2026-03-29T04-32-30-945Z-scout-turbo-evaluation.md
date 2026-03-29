@@ -1,6 +1,0 @@
----
-agent: "scout"
-task: "Read the FULL contents of ALL files in skills/render-deploy/references/ in /Users/josorio/Code/pi-skills. List all files first, then read each one completely. Check for:\n1. Any remaining MCP references anywhere\n2. Consistency of curl command format (auth headers, base URL, output flags)\n3. Cross-references between files — do all relative links resolve correctly?\n4. In render-api.md specifically: are the API endpoints, query parameters, and JSON payloads correct per standard REST API conventions?\n5. In direct-creation.md: do the CLI commands and API references make sense together?\n6. In deployment-details.md: is the Quick Reference section consistent with the rest of the skill?\n7. In post-deploy-checks.md: are all commands correct?\n8. In error-patterns.md: any stale references?\n9. Any 'Dashboard' fallbacks that should now point to render-api.md instead\n10. Grammar, formatting, markdown quality\n\nReport EVERY issue with exact file paths, line numbers, and quoted text."
-exitCode: 0
-usage: {"input":14,"output":5381,"cacheRead":359502,"cacheWrite":44487,"cost":0.35543384999999994,"contextTokens":46709,"turns":12}
----
