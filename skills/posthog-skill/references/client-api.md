@@ -76,15 +76,15 @@ const insight = response.results[0]
 
 ## Error handling
 
-All client methods throw `PostHogError` on non-2xx responses. Use helpers from `scripts/lib/config.ts`:
+All client methods throw `PostHogError` on non-2xx responses. Use helpers from `scripts/lib/common.ts`:
 
 ```typescript
-import { handleApiError } from '$SKILL_DIR/scripts/lib/config.js'
+import { handleError } from '$SKILL_DIR/scripts/lib/common.js'
 
 try {
   await client.getDashboard(id)
 } catch (err) {
-  handleApiError(err, 'failed to fetch dashboard')
+  handleError(err)
 }
 ```
 

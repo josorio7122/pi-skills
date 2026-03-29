@@ -91,8 +91,8 @@ Usage: flags get <id> [--dry-run]
 **List:** `{ count: N, results: [{ id, key, name, active, created_at, tags }] }`
 
 ```bash
-$RUN flags
-$RUN flags --search checkout --active true --type boolean --limit 10
+tsx scripts/flags-list.ts
+tsx scripts/flags-list.ts '{"search":"checkout","active":"true","type":"boolean","limit":10}'
 ```
 
 **Get:** full flag object with `id, key, name, active, deleted, filters, created_at, updated_at, version, tags, evaluation_runtime, is_remote_configuration`
