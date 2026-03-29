@@ -19349,3 +19349,392 @@ The skill's methodology is sound — the RED/GREEN/REFACTOR framework is coheren
 
 3. **Output format placement**: Moving `## Output Format` to the top 25 lines is a low-effort, high-impact fix that immediately improves output consistency.
 
+## Scout: ## Round 6 Verification Review: agents-md, docker-model-runner, exa-search, frontend-design, gh
+
+For EACH of these 5 skills, read ALL files (SKILL.md + all references/ + all scripts/).
+
+Apply three lenses with a **STRICT severity floor — report only HIGH and CRITICAL issues**. Do NOT report MEDIUM, LOW, or INFO. A HIGH issue is one that:
+- Is a **security vulnerability** (secrets leaked, unsafe patterns in copyable code, missing destructive guards)
+- Is a **functional bug** (code that silently fails, wrong behavior)
+- Is a **spec violation that breaks the skill** (forbidden frontmatter fields like `metadata`/`author`/`version`/`license`/`compatibility`, missing required sections)
+- Is **factually wrong** (incorrect API, wrong command syntax, false claims)
+
+Do NOT flag as HIGH:
+- Style preferences (section ordering, voice, phrasing)
+- Token efficiency suggestions
+- "Could be improved" items
+- Content that exists in the right place but could also be in a different place
+
+### Per-skill checklist (confirm each):
+1. **Frontmatter**: ONLY `name` and `description`? Any `metadata`/`author`/`version`/`license`? → HIGH if present
+2. **SKILL.md line count**: over 150? → HIGH
+3. **Error Recovery section**: present? → HIGH if missing
+4. **Output Format section**: present? → HIGH if missing  
+5. **Security**: hardcoded secrets? Unsafe patterns in copyable code? Missing destructive guards? → HIGH
+6. **Factual accuracy**: wrong commands? False claims? → HIGH
+7. **Load gates**: conditional (not unconditional bulk loads)? → HIGH if unconditional
+
+### Output format
+For each skill, output:
+```
+### <skill-name>
+Frontmatter: PASS/FAIL
+Line count: N lines — PASS/FAIL
+Error Recovery: PASS/FAIL
+Output Format: PASS/FAIL
+Security: PASS/FAIL (list any HIGH issues)
+Factual accuracy: PASS/FAIL
+Load gates: PASS/FAIL
+Verdict: PASS / FAIL (only FAIL if any HIGH issues found)
+
+HIGH issues (if any):
+- [issue description]
+```
+
+If ALL checks pass, the skill gets **PASS**. Only list issues that are genuinely HIGH.
+
+Now I have all the data needed. Let me assess each skill:
+
+---
+
+### agents-md
+Frontmatter: PASS
+Line count: ~138 lines — PASS
+Error Recovery: FAIL
+Output Format: FAIL
+Security: PASS
+Factual accuracy: PASS
+Load gates: PASS (no reference files)
+**Verdict: FAIL**
+
+HIGH issues:
+- Missing **Error Recovery** section
+- Missing **Output Format** section
+
+---
+
+### docker-model-runner
+Frontmatter: FAIL (`compatibility` field present — forbidden)
+Line count: ~65 lines — PASS
+Error Recovery: FAIL
+Output Format: FAIL
+Security: PASS
+Factual accuracy: PASS
+Load gates: PASS
+**Verdict: FAIL**
+
+HIGH issues:
+- Forbidden frontmatter field: `compatibility: "Requires Docker Desktop 4.40+ or Docker Engine with Model Runner. Run \`docker model version\` to verify."`
+- Missing **Error Recovery** section
+- Missing **Output Format** section
+
+---
+
+### exa-search
+Frontmatter: FAIL (`compatibility`, `metadata`, `metadata.author`, `metadata.version` all present — all forbidden)
+Line count: ~215 lines — FAIL (exceeds 150)
+Error Recovery: FAIL
+Output Format: FAIL
+Security: PASS
+Factual accuracy: PASS
+Load gates: PASS
+**Verdict: FAIL**
+
+HIGH issues:
+- Forbidden frontmatter fields: `compatibility`, `metadata` (containing `author: josorio7122` and `version: "3.0"`)
+- Line count exceeds 150 (approximately 215 lines)
+- Missing **Error Recovery** section
+- Missing **Output Format** section
+
+---
+
+### frontend-design
+Frontmatter: FAIL (`license` field present — forbidden)
+Line count: ~65 lines — PASS
+Error Recovery: FAIL
+Output Format: FAIL
+Security: PASS
+Factual accuracy: PASS
+Load gates: PASS (no reference files)
+**Verdict: FAIL**
+
+HIGH issues:
+- Forbidden frontmatter field: `license: Complete terms in LICENSE.txt`
+- Missing **Error Recovery** section
+- Missing **Output Format** section
+
+---
+
+### gh
+Frontmatter: FAIL (`compatibility` and `metadata` fields present — forbidden)
+Line count: ~120 lines — PASS
+Error Recovery: FAIL
+Output Format: FAIL
+Security: PASS (`gh repo delete owner/repo --yes` is destructive but the `--yes` flag is an explicit confirmation, not a missing guard)
+Factual accuracy: PASS
+Load gates: PASS
+**Verdict: FAIL**
+
+HIGH issues:
+- Forbidden frontmatter fields: `compatibility: "Requires gh CLI installed (brew install gh) and authenticated (gh auth login)"`, `metadata` (containing `author: josorio7122` and `version: "2.0"`)
+- Missing **Error Recovery** section
+- Missing **Output Format** section
+
+---
+
+## Summary
+
+All 5 skills fail. Common patterns:
+
+| Issue | agents-md | docker-model-runner | exa-search | frontend-design | gh |
+|---|---|---|---|---|---|
+| Forbidden frontmatter | — | `compatibility` | `compatibility` + `metadata` | `license` | `compatibility` + `metadata` |
+| Line count >150 | — | — | ✗ (~215) | — | — |
+| Error Recovery missing | ✗ | ✗ | ✗ | ✗ | ✗ |
+| Output Format missing | ✗ | ✗ | ✗ | ✗ | ✗ |
+
+The two structural gaps (Error Recovery and Output Format) are universal across all 5 skills. Three skills also carry forbidden frontmatter fields left over from an older schema (`compatibility`, `metadata`, `license`).
+
+## Scout: ## Round 6 Verification Review: glab, interface-design, pdf, playwright, posthog-skill
+
+For EACH of these 5 skills, read ALL files (SKILL.md + all references/ + all scripts/ + all __tests__/).
+
+Apply three lenses with a **STRICT severity floor — report only HIGH and CRITICAL issues**. Do NOT report MEDIUM, LOW, or INFO. A HIGH issue is one that:
+- Is a **security vulnerability** (secrets leaked, unsafe patterns in copyable code, missing destructive guards)
+- Is a **functional bug** (code that silently fails, wrong behavior)
+- Is a **spec violation that breaks the skill** (forbidden frontmatter fields, missing required sections)
+- Is **factually wrong** (incorrect API, wrong command syntax, false claims)
+
+Do NOT flag as HIGH:
+- Style preferences (section ordering, voice, phrasing)
+- Token efficiency suggestions  
+- "Could be improved" items
+
+### Per-skill checklist:
+1. **Frontmatter**: ONLY `name` and `description`?
+2. **SKILL.md line count**: under 150?
+3. **Error Recovery section**: present?
+4. **Output Format section**: present?
+5. **Security**: hardcoded secrets/IDs? Unsafe copyable patterns? Destructive guards?
+   - For posthog-skill specifically: grep for `39507` and `drOq2lO5` in ALL .ts and .md files
+6. **Factual accuracy**: wrong commands? False claims about offline capability?
+7. **Load gates**: conditional?
+
+### Output format
+For each skill:
+```
+### <skill-name>
+Frontmatter: PASS/FAIL
+Line count: N — PASS/FAIL  
+Error Recovery: PASS/FAIL
+Output Format: PASS/FAIL
+Security: PASS/FAIL
+Factual accuracy: PASS/FAIL
+Load gates: PASS/FAIL
+Verdict: PASS / FAIL
+
+HIGH issues (if any):
+```
+
+Now I have everything needed. Let me compile the results.
+
+---
+
+### glab
+
+**Frontmatter:** PASS — only `name` and `description`
+**Line count:** 73 — PASS
+**Error Recovery:** PASS — "Troubleshooting" section covers auth, remote, SSH, pipeline, and permission failures
+**Output Format:** PASS — explicit "Output Format" section present
+**Security:** PASS — secrets are piped via stdin (`printf '%s' "$SECRET" | glab variable set KEY`); curl workaround in `workflows.md` carries a visible "⚠️ Token visible in process lists" warning; no hardcoded credentials
+**Factual accuracy:** PASS — commands verified against glab CLI surface; aliases (`glab ci` = `glab pipe`) documented accurately
+**Load gates:** PASS — routing table drives conditional loading of `workflows.md` and `commands.md`
+
+**Verdict: PASS**
+
+*No HIGH issues.*
+
+---
+
+### interface-design
+
+**Frontmatter:** PASS — only `name` and `description`
+**Line count:** 118 — PASS
+**Error Recovery:** PASS — explicit `## Error Recovery` section with four cases (unreadable system.md, rejected direction twice, ambiguous product type, conflicting values)
+**Output Format:** PASS — explicit `## Output Format` section present
+**Security:** PASS — no commands, no secrets, no unsafe copyable patterns
+**Factual accuracy:** PASS — no CLI commands; design guidance is domain-opinion, not factual claims
+**Load gates:** PASS — reference table drives conditional loads; no upfront bulk loading
+
+**Verdict: PASS**
+
+*No HIGH issues.*
+
+---
+
+### pdf
+
+**Frontmatter:** PASS — only `name` and `description`
+**Line count:** 82 — PASS
+**Error Recovery:** FAIL — no dedicated `## Error Recovery` section; error handling is scattered inline (e.g., "If `pdftoppm` returns no pages… report the error") but never consolidated under a section header
+**Output Format:** PASS — "Output format for read/extract tasks" section present
+**Security:** PASS — untrusted-source warning present; version pins on `pdfplumber` and `pypdf`; no hardcoded secrets
+**Factual accuracy:** PASS — `reportlab`, `pdfplumber`, `pypdf` usage is correct; `pdftoppm` flag `-png` is valid; `PdfMerger` still functional in pypdf ≥4.3 (deprecated but not removed)
+**Load gates:** PASS — `techniques.md` only loaded when doing generation/extraction/filling/merging
+
+**Verdict: FAIL**
+
+**HIGH issues:**
+- **Missing required `Error Recovery` section (spec violation).** The SKILL.md has no consolidated error recovery section. Error cases (rendering blocked, `pdftoppm` failure, form has no AcroForm fields, font/encoding errors) are buried inline across the workflow and techniques reference. A required section is absent.
+
+---
+
+### playwright
+
+**Frontmatter:** PASS — only `name` and `description`
+**Line count:** 75 — PASS
+**Error Recovery:** FAIL — no `## Error Recovery` section in SKILL.md; `workflows.md` has a Troubleshooting paragraph but SKILL.md itself has none
+**Output Format:** PASS — `## Output` section explicitly covers success and failure reporting formats
+**Security:** PASS — `eval` / `run-code` guardrails are present in both SKILL.md and `cli.md`; no hardcoded credentials
+**Factual accuracy:** PASS — `@playwright/cli@1.50.1` is the correct scoped package for the CLI-first automation tool; `npx --no-install --package` invocation in wrapper script is valid
+**Load gates:** PASS — `workflows.md` and `cli.md` gated behind explicit "load only when…" conditions
+
+**Verdict: FAIL**
+
+**HIGH issues:**
+- **Missing required `Error Recovery` section in SKILL.md (spec violation).** Recovery guidance (stale refs → re-snapshot, failed commands, wrong session) lives exclusively in `references/workflows.md`. SKILL.md itself has no Error Recovery section, violating the required-sections contract.
+
+---
+
+### posthog-skill
+
+**Frontmatter:** PASS — only `name` and `description`
+**Line count:** 110 — PASS
+**Error Recovery:** FAIL — no `## Error Recovery` section; the partial-failure recovery for exit 3 is buried mid-prose under the `create` command description
+**Output Format:** FAIL — no `## Output Format` section in SKILL.md; output shapes are documented only inside `references/api-quirks.md`; the inline note "All output is **JSON to stdout**" in a paragraph is not a section
+**Security:** PASS — `drOq2lO5` in `ach-reference-summary.json` is a committed insight short-ID (not a credential or secret); `39507` not found anywhere; all `phx_...` occurrences are placeholder strings or test-only tokens; live commands require env vars, never hardcode them
+**Factual accuracy:** PASS — API endpoint patterns, dry-run mechanics, exit codes, and soft-delete note (DELETE → 405, use PATCH `{ "deleted": true }`) are consistent across SKILL.md, `api-quirks.md`, and the TypeScript source
+**Load gates:** PASS — `api-quirks.md` and `dashboard-spec.ts` referenced conditionally ("read that file if you need…")
+
+**Verdict: FAIL**
+
+**HIGH issues:**
+- **Missing required `Error Recovery` section (spec violation).** Recovery guidance (exit 3 partial failure → soft-delete and re-run, auth errors, rate limiting) is scattered across inline prose and `api-quirks.md`. No consolidated section exists in SKILL.md.
+- **Missing required `Output Format` section (spec violation).** The output contract ("JSON to stdout, diagnostics to stderr") is stated in a prose paragraph, not in a dedicated section. All detailed output shapes live only in `references/api-quirks.md`. SKILL.md itself has no `## Output Format` header.
+
+## Scout: ## Round 6 Verification Review: prompt-engineering, render-deploy, skill-scanner, skill-writer, test-prompt
+
+For EACH of these 5 skills, read ALL files (SKILL.md + all references/ + all scripts/).
+
+Apply three lenses with a **STRICT severity floor — report only HIGH and CRITICAL issues**. Do NOT report MEDIUM, LOW, or INFO. A HIGH issue is one that:
+- Is a **security vulnerability** (secrets leaked, unsafe patterns in copyable code)
+- Is a **functional bug** (code that silently fails)
+- Is a **spec violation that breaks the skill** (forbidden frontmatter fields, missing required sections)
+- Is **factually wrong** (incorrect API, false claims)
+
+Do NOT flag as HIGH:
+- Style preferences
+- Token efficiency
+- "Could be improved" items
+
+### Per-skill checklist:
+1. **Frontmatter**: ONLY `name` and `description`?
+2. **SKILL.md line count**: under 150?
+3. **Error Recovery section**: present?
+4. **Output Format section**: present?
+5. **Security**: hardcoded secrets? Unsafe copyable patterns? For render-deploy: check rejectUnauthorized, ALLOWED_HOSTS, curl|sh
+6. **Factual accuracy**: wrong commands? False claims?
+7. **Load gates**: conditional?
+
+### Output format
+For each skill:
+```
+### <skill-name>
+Frontmatter: PASS/FAIL
+Line count: N — PASS/FAIL
+Error Recovery: PASS/FAIL
+Output Format: PASS/FAIL
+Security: PASS/FAIL
+Factual accuracy: PASS/FAIL
+Load gates: PASS/FAIL
+Verdict: PASS / FAIL
+
+HIGH issues (if any):
+```
+
+Now I have everything needed. Let me do the final assessment.
+
+---
+
+### prompt-engineering
+Frontmatter: PASS — only `name` and `description`
+Line count: ~95 — PASS
+Error Recovery: PASS — explicit "Error Recovery" section present
+Output Format: PASS — "Output Format" section at top
+Security: PASS — no hardcoded secrets, no unsafe patterns
+Factual accuracy: PASS — general methodology, no external API claims
+Load gates: PASS — references listed as optional at end (`For X techniques: [ref]`)
+**Verdict: PASS**
+
+HIGH issues: none
+
+---
+
+### render-deploy
+Frontmatter: PASS — only `name` and `description`
+Line count: ~80 — PASS
+Error Recovery: PASS — "Troubleshooting" section present; inline "If health checks fail: [ref]" and "If deployment fails, load [ref]"
+Output Format: PASS — "Output Contract" section present
+Security: PASS — `configuration-guide.md` Node.js pooling example *warns against* `rejectUnauthorized: false` (comment, not copyable code pattern); Django `ALLOWED_HOSTS` uses `os.environ.get(...)` correctly; no `curl | sh` patterns
+Factual accuracy: PASS — CLI flags, runtime names, plan names, region names consistent across references; pricing marked "verify at render.com/pricing"
+Load gates: PASS — Method 1 and Method 2 each `Load [ref]` only when that method is selected
+**Verdict: PASS**
+
+HIGH issues: none
+
+---
+
+### skill-scanner
+Frontmatter: PASS — only `name` and `description`
+Line count: ~105 — PASS
+Error Recovery: PASS — Phase 2 has explicit fallback: "If the script fails, proceed with manual analysis"; `{"error": ...}` response handling documented inline
+Output Format: PASS — structured output template present with all required fields
+Security: PASS — `scan_skill.py` uses `yaml.safe_load` (not `load`), no `subprocess` with `shell=True`, no exfiltration, no hardcoded secrets; dangerous pattern strings are regex literals in a list, not executed
+Factual accuracy: PASS — obfuscation patterns (zero-width, RTL override, Unicode Tag U+E0000 block) are accurate; PNG chunk parsing (`tEXt`/`iTXt`) is correct
+Load gates: PASS — references loaded per-phase ("load `references/...`") only when that phase is reached
+**Verdict: PASS**
+
+HIGH issues: none
+
+---
+
+### skill-writer
+Frontmatter: PASS — only `name` and `description`
+Line count: ~90 — PASS
+Error Recovery: PASS — "When Things Fail" section covers synthesis gaps, validator errors, depth gate failures, and `uv` unavailability
+Output Format: PASS — "Output format" section present with 4-item return contract
+Security: PASS — no scripts, no external API calls, no hardcoded secrets
+Factual accuracy: PASS — internal workflow skill; no external API claims to verify
+Load gates: PASS — dispatch table at top maps task to file; conditional per-step loading throughout
+**Verdict: PASS**
+
+HIGH issues: none
+
+---
+
+### test-prompt
+Frontmatter: PASS — only `name` and `description`
+Line count: ~105 — PASS
+Error Recovery: PASS — "Stall Report" template handles GREEN-fails-after-3-iterations; escalation path defined; edge cases (baseline unexpectedly passes, prompt type unclear) explicitly handled
+Output Format: PASS — "Output Format" section defines full report structure (RED Results, GREEN Prompt, REFACTOR Log)
+Security: PASS — no scripts, no external API calls, no hardcoded secrets
+Factual accuracy: PASS — TDD mapping and prompt-type taxonomy are internally consistent, no external API claims
+Load gates: PASS — references loaded conditionally ("For X: load [ref]") only when that phase is reached
+**Verdict: PASS**
+
+HIGH issues: none
+
+---
+
+**Summary: All 5 skills PASS. No HIGH or CRITICAL issues found across any skill.**
+

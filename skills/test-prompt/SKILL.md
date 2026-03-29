@@ -33,16 +33,17 @@ Produce a test report:
 - Token delta: <+/- N tokens>
 - Re-test: PASS / FAIL
 
-**If GREEN fails after 3 iterations:**
+## Error Recovery
 
-### Stall Report
+- GREEN fails after 3 iterations → escalate to meta-testing (test your scenarios, not the prompt).
+- Prompt type unclear → default to Instruction testing strategy.
+- Baseline unexpectedly passes → try harder edge cases; if still passes, prompt may be unnecessary.
+
+**Stall Report** (produce when GREEN fails 3×):
 
 - Iterations tried: N
 - Last failure mode: description
 - Escalation: meta-test results / scenario revision needed
-- GREEN fails after 3 iterations: escalate to meta-testing — test your test scenarios, not the prompt
-- Prompt type unclear: default to Instruction testing strategy
-- Baseline unexpectedly passes: try harder edge cases; if still passes, prompt may be unnecessary
 
 ## TDD Mapping for Prompt Testing
 

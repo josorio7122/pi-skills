@@ -73,9 +73,11 @@ uv run scripts/scan_skill.py <skill-directory>
 
 Parse the JSON output. The script produces findings with severity levels, URL analysis, and structure information. Use these as leads for deeper analysis.
 
-**Fallback**: If the script fails, proceed with manual analysis using Grep patterns from the reference files.
+## Error Recovery
 
-If `scan_skill.py` returns `{"error": ...}` or exits non-zero, report the error to the user. Ask whether to continue with manual analysis. Do not proceed silently.
+- Script fails or returns `{"error": ...}` → report the error to the user. Ask whether to continue with manual analysis. Do not proceed silently.
+- Script unavailable (`uv` not installed) → proceed with manual analysis using Grep patterns from the reference files.
+- Ambiguous finding (uncertain severity) → rate as LOW and note in "Needs Verification."
 
 ### Phases 3–8: Manual Review
 

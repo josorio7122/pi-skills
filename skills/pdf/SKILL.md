@@ -67,6 +67,14 @@ pdftoppm -png input.pdf output/pages/page
 # Produces: output/pages/page-1.png, output/pages/page-2.png, ...
 ```
 
+## Error Recovery
+
+- `pdftoppm` not found → install Poppler (`brew install poppler` or `sudo apt-get install -y --no-install-recommends poppler-utils`).
+- `pdftoppm` returns no pages → the PDF may be corrupt or empty. Report to user.
+- Rendering impossible and user cannot inspect locally → halt delivery. The core rule (never deliver uninspected) overrides all fallbacks.
+- reportlab font/encoding error → verify strings are UTF-8 and image paths are absolute. See [references/techniques.md](references/techniques.md).
+- `get_fields()` returns None → PDF has no AcroForm fields. Tell the user it cannot be filled programmatically.
+
 ## Output format for read/extract tasks
 
 - Return extracted text as Markdown, preserving heading hierarchy where detectable.

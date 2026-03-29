@@ -45,6 +45,14 @@ The wrapper script is at `scripts/playwright_cli.sh` (relative to this skill's d
 - Use a dedicated output directory (e.g., `output/playwright/`) for artifacts.
 - Default to CLI commands and workflows, not Playwright test specs.
 
+## Error Recovery
+
+- `ref not found` / stale element ref → run `snapshot` to refresh refs, then retry.
+- `@playwright/cli` not found → run `npm install @playwright/cli@1.50.1`.
+- Blank or crashed page → re-`open` the URL. Try `--headed` for debugging.
+- `npx` not found → Node.js is not installed. Ask the user to install it.
+- Session lost → re-`open` the original URL to start a new session.
+
 ## Output
 
 After each significant step, report: the command run, a brief summary of the result, and the path to any saved artifact.

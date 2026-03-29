@@ -42,6 +42,10 @@ When helping users with local LLM inference using Docker Model Runner:
 
 > **Output rule:** Display the model's response content directly — not the raw JSON wrapper.
 
+## Output Format
+
+Display the model's response content directly — not the raw JSON wrapper. For multi-turn conversations, show each response as plain text. If the user asks for raw API output, show the full JSON in a fenced code block.
+
 ## Reference
 
 Load [references/docker-model-guide.md](references/docker-model-guide.md) when:

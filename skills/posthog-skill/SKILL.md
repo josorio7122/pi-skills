@@ -46,6 +46,26 @@ Requires Node.js 18+ and tsx. Run `pnpm install` from the repo root.
 3. If events have data, run `compare --dry-run` then `compare`
 4. Run `create --dry-run` then `create`
 
+## Error Recovery
+
+- Exit code 1 (config error) → check `POSTHOG_PROJECT_ID` and `POSTHOG_PERSONAL_API_KEY` are set.
+- Exit code 2 (usage error) → check command syntax against the Quick Reference table.
+- Exit code 3 (partial failure on `create`) → some tiles failed. Soft-delete the dashboard (`PATCH {"deleted": true}`) and re-run.
+- `compare` returns empty → verify `POSTHOG_ACH_INSIGHT_ID` is set and the insight exists.
+- Rate limited (429) → wait 60 seconds and retry.
+
+## Output Format
+
+All commands emit **JSON to stdout** and diagnostics to stderr. Parse output with `jq` or `JSON.parse()`. Key shapes:
+
+- `status`: `{ project_id, host, token: "*** (present)", ach_insight_id }`
+- `inspect`: `{ events: [{ event, properties, count_30d? }] }`
+- `compare`: `{ id, name, query, tiles_count }`
+- `create`: `{ dashboard_id, dashboard_url, tiles: [...] }`
+- `flags list`: `{ results: [{ id, key, active }] }`
+
+For detailed output shapes, see [references/api-quirks.md](references/api-quirks.md).
+
 ---
 
 # PostHog Skill — Branch 7361 Analytics Automation
