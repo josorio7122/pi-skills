@@ -1,15 +1,11 @@
 import { PostHogError } from './posthog-client.js'
 import type { PostHogConfig } from './posthog-client.js'
-import * as spec from './dashboard-spec.js'
 
 // ---------------------------------------------------------------------------
 // Config types
 // ---------------------------------------------------------------------------
 
-export interface AppConfig extends PostHogConfig {
-  achInsightId: string | undefined
-  dashboardName: string
-}
+export interface AppConfig extends PostHogConfig {}
 
 // ---------------------------------------------------------------------------
 // Config resolution
@@ -25,8 +21,6 @@ export function resolveConfig(): AppConfig {
     host: process.env['POSTHOG_HOST'] ?? 'https://us.posthog.com',
     projectId,
     token: process.env['POSTHOG_PERSONAL_API_KEY'] ?? '',
-    achInsightId: process.env['POSTHOG_ACH_INSIGHT_ID'] ?? undefined,
-    dashboardName: process.env['POSTHOG_DASHBOARD_NAME'] ?? spec.name,
   }
 }
 

@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "description": "Personal pi skills collection",
   "scripts": {
-    "test": "tsx --test skills/posthog-skill/scripts/__tests__/*.test.ts skills/exa-search/scripts/__tests__/*.test.ts",
-    "test:live": "POSTHOG_TEST_LIVE=1 tsx --test skills/posthog-skill/scripts/__tests__/*.test.ts skills/exa-search/scripts/__tests__/*.test.ts",
+    "test": "tsx --test tests/posthog-skill/*.test.ts tests/exa-search/*.test.ts",
     "lint": "eslint skills/",
     "format": "prettier --write skills/",
     "format:check": "prettier --check skills/"

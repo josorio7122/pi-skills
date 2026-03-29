@@ -4,20 +4,19 @@ import { spawnSync } from 'node:child_process'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { requireArg } from '../lib/common.js'
-import { filterOptions } from '../lib/common.js'
-import { buildContentsOptions } from '../lib/common.js'
+import { requireArg } from '../../skills/exa-search/scripts/lib/common.js'
+import { filterOptions } from '../../skills/exa-search/scripts/lib/common.js'
+import { buildContentsOptions } from '../../skills/exa-search/scripts/lib/common.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-const TSX = path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'tsx')
-const COMMON = path.join(__dirname, '..', 'lib', 'common.ts')
+const COMMON = path.join(__dirname, '..', '..', 'skills', 'exa-search', 'scripts', 'lib', 'common.ts')
 
 function runInline(
   code: string,
   env: Record<string, string | undefined> = {},
 ): { status: number; stdout: string; stderr: string } {
-  const result = spawnSync(TSX, ['--eval', code], {
+  const result = spawnSync('npx', ['tsx', '--eval', code], {
     encoding: 'utf8',
     env: { ...process.env, ...env },
   })

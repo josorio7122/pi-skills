@@ -2,19 +2,15 @@
 
 import { resolveConfig } from './lib/config.js'
 import { cmdStatus } from './lib/cmd-status.js'
-import { cmdInspect } from './lib/cmd-inspect.js'
-import { cmdCompare } from './lib/cmd-compare.js'
-import { cmdCreate } from './lib/cmd-create.js'
 import { cmdFlags } from './lib/cmd-flags.js'
 
 function cmdHelp(): void {
   process.stderr.write(
-    'posthog-skill — PostHog analytics automation for branch 7361\n\n' +
+    'posthog-skill — PostHog automation (status, feature flags)\n\n' +
       'Usage: node scripts/run.js <command> [options]\n\n' +
-      'Commands: status | inspect [--live] | compare | create | flags [subcommand]\n' +
+      'Commands: status | flags [subcommand]\n' +
       'Options:  --dry-run  --help\n\n' +
-      'Env: POSTHOG_PERSONAL_API_KEY  POSTHOG_PROJECT_ID  POSTHOG_HOST\n' +
-      '     POSTHOG_ACH_INSIGHT_ID  POSTHOG_DASHBOARD_NAME\n',
+      'Env: POSTHOG_PERSONAL_API_KEY  POSTHOG_PROJECT_ID  POSTHOG_HOST\n',
   )
 }
 
@@ -38,15 +34,6 @@ async function main(): Promise<void> {
   switch (command) {
     case 'status':
       cmdStatus(config)
-      break
-    case 'inspect':
-      await cmdInspect(flags, config)
-      break
-    case 'compare':
-      await cmdCompare(flags, config)
-      break
-    case 'create':
-      await cmdCreate(flags, config)
       break
     case 'flags':
       await cmdFlags(flags, config)

@@ -5,8 +5,9 @@ import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const LIB = resolve(__dirname, '../lib')
-const SCRIPTS = resolve(__dirname, '..')
+const SKILL_ROOT = resolve(__dirname, '../../skills/posthog-skill')
+const LIB = resolve(SKILL_ROOT, 'scripts/lib')
+const SCRIPTS = resolve(SKILL_ROOT, 'scripts')
 
 // ---------------------------------------------------------------------------
 // Config module
@@ -14,10 +15,7 @@ const SCRIPTS = resolve(__dirname, '..')
 
 describe('cmd-modules: lib/config.ts exists', () => {
   it('lib/config.ts file exists', () => {
-    assert.ok(
-      existsSync(resolve(LIB, 'config.ts')),
-      'lib/config.ts must exist — resolveConfig and output helpers must be extracted from run.ts',
-    )
+    assert.ok(existsSync(resolve(LIB, 'config.ts')), 'lib/config.ts must exist')
   })
 })
 
@@ -26,10 +24,7 @@ describe('cmd-modules: lib/config.ts exports resolveConfig', () => {
     const src = readFileSync(resolve(LIB, 'config.ts'), 'utf8')
     const hasExport =
       src.includes('export function resolveConfig') || src.includes('export { resolveConfig')
-    assert.ok(
-      hasExport,
-      'config.ts must export resolveConfig (as "export function resolveConfig" or "export { resolveConfig }")',
-    )
+    assert.ok(hasExport, 'config.ts must export resolveConfig')
   })
 })
 
@@ -62,46 +57,13 @@ describe('cmd-modules: lib/config.ts exports handleApiError', () => {
 
 describe('cmd-modules: lib/cmd-status.ts exists', () => {
   it('lib/cmd-status.ts file exists', () => {
-    assert.ok(
-      existsSync(resolve(LIB, 'cmd-status.ts')),
-      'lib/cmd-status.ts must exist — cmdStatus must be extracted from run.ts',
-    )
-  })
-})
-
-describe('cmd-modules: lib/cmd-inspect.ts exists', () => {
-  it('lib/cmd-inspect.ts file exists', () => {
-    assert.ok(
-      existsSync(resolve(LIB, 'cmd-inspect.ts')),
-      'lib/cmd-inspect.ts must exist — cmdInspect must be extracted from run.ts',
-    )
-  })
-})
-
-describe('cmd-modules: lib/cmd-compare.ts exists', () => {
-  it('lib/cmd-compare.ts file exists', () => {
-    assert.ok(
-      existsSync(resolve(LIB, 'cmd-compare.ts')),
-      'lib/cmd-compare.ts must exist — cmdCompare must be extracted from run.ts',
-    )
-  })
-})
-
-describe('cmd-modules: lib/cmd-create.ts exists', () => {
-  it('lib/cmd-create.ts file exists', () => {
-    assert.ok(
-      existsSync(resolve(LIB, 'cmd-create.ts')),
-      'lib/cmd-create.ts must exist — cmdCreate must be extracted from run.ts',
-    )
+    assert.ok(existsSync(resolve(LIB, 'cmd-status.ts')), 'lib/cmd-status.ts must exist')
   })
 })
 
 describe('cmd-modules: lib/cmd-flags.ts exists', () => {
   it('lib/cmd-flags.ts file exists', () => {
-    assert.ok(
-      existsSync(resolve(LIB, 'cmd-flags.ts')),
-      'lib/cmd-flags.ts must exist — cmdFlags must be extracted from run.ts',
-    )
+    assert.ok(existsSync(resolve(LIB, 'cmd-flags.ts')), 'lib/cmd-flags.ts must exist')
   })
 })
 
@@ -110,12 +72,9 @@ describe('cmd-modules: lib/cmd-flags.ts exists', () => {
 // ---------------------------------------------------------------------------
 
 describe('cmd-modules: run.ts is under 80 lines', () => {
-  it('run.ts has 80 or fewer lines after extraction', () => {
+  it('run.ts has 80 or fewer lines', () => {
     const src = readFileSync(resolve(SCRIPTS, 'run.ts'), 'utf8')
     const lineCount = src.split('\n').length
-    assert.ok(
-      lineCount <= 80,
-      `run.ts must be ≤ 80 lines after splitting into modules, but has ${lineCount} lines`,
-    )
+    assert.ok(lineCount <= 80, `run.ts must be ≤ 80 lines, but has ${lineCount} lines`)
   })
 })

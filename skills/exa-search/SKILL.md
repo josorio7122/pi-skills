@@ -1,28 +1,24 @@
 ---
 name: exa-search
-description: Semantic web search, content extraction, AI-powered answers, and deep research via the Exa API. Use when you need to search documentation, look up facts, find current information, extract page content from URLs, get AI answers with citations, find pages similar to a URL, research companies or people, find LinkedIn profiles, or run deep multi-step research. Also use when the user asks to "look something up," "search the web," "find docs for," "what does X's documentation say," "research this company," or needs any information that may be more current than your training data. Requires EXA_API_KEY environment variable.
+description: Search the web, extract page content, get AI-powered answers with citations, find similar pages, and run deep multi-step research via the Exa API. Use when asked to "search the web", "look something up", "find docs for", "what does X's documentation say", "research this topic", "extract content from this URL", "find pages similar to", or when any information may be more current than training data.
 ---
 
-# Exa Search
+Run live web searches via the Exa API. All queries go to the network — results are current, not from training data. Pick the right script or you waste API credits.
 
-You run live web searches via the Exa API. All queries go to the network — results are current, not from training data. Pick the right script or you waste API credits.
+> Resolve all script paths relative to the directory containing this SKILL.md.
 
 ## Prerequisites
 
+Verify before running any script:
+
 ```bash
-node --version   # Must be 18+
+node --version    # Must be 18+
 echo $EXA_API_KEY # Must be set
 ```
 
-Run `pnpm install` from this skill's parent directory if dependencies are not yet installed.
-
 Get an API key at: https://dashboard.exa.ai/api-keys
 
----
-
 ## Choosing the Right Script
-
-Pick wrong and you waste API credits.
 
 | When...                                               | Use                                                         |
 | ----------------------------------------------------- | ----------------------------------------------------------- |
@@ -32,38 +28,32 @@ Pick wrong and you waste API credits.
 | Browse/explore results; add `includeDomains` for docs | `scripts/search.ts` with `text: true`                       |
 | Complex multi-source synthesis                        | `scripts/research.ts run` — slow + expensive; use sparingly |
 
----
-
 ## Rules
 
 - **Always check `EXA_API_KEY` is set** before running any script
-- **Prefer `answer.ts` for direct questions** — it returns a synthesized answer with citations, not just links
+- **Prefer `answer.ts` for direct questions** — returns a synthesized answer with citations, not just links
 - **Prefer `search.ts` with `includeDomains`** for documentation lookups — scopes results to official sources
-- **Use `contents.ts` only for known URLs** — don't use it to "search" (that's what `search.ts` is for)
-- **Use `research.ts` sparingly** — it's slower and more expensive; only for genuinely complex multi-faceted topics
-- **Respect category filter restrictions** — `company` and `people` categories don't support domain/date/text filters
+- **Use `contents.ts` only for known URLs** — do not use it to "search" (that's `search.ts`)
+- **Use `research.ts` sparingly** — slower and more expensive; only for genuinely complex multi-faceted topics
+- **Respect category filter restrictions** — `company` and `people` categories do not support domain/date/text filters
 - **Output is always JSON** — pipe through `jq` for filtering if needed
+- When `stream: true` is set on `answer.ts`, output is raw text chunks followed by a citations block — not valid JSON
 
 ## Output Format
 
-- `search.ts` / `find-similar.ts`: JSON array of results. Summarize top 3-5 with title + URL + snippet.
-- `answer.ts`: answer text + citations. Present answer directly, cite sources inline.
+- `search.ts` / `find-similar.ts`: JSON array of results. Summarize top 3–5 with title + URL + snippet.
+- `answer.ts`: answer text + citations. Present the answer directly, cite sources inline.
 - `contents.ts`: extracted text. Present key content, note page title and URL.
 - `research.ts`: research report. Present findings with section headers and citations.
-- When `stream: true` is set on `answer.ts`, output is NOT valid JSON — it is raw text chunks followed by a citations block. Do not pipe to `jq`.
 
----
+## Error Recovery
 
-## When Things Go Wrong
-
-- **400 error with `company`/`people` category** — remove domain/date filters (these categories don't support them)
+- **400 error with `company`/`people` category** — remove domain/date filters (these categories do not support them)
 - **Empty results** — broaden the query, or try `answer.ts` instead
 - **`research.ts` timeout** — use `create` + `poll` separately; the default timeout is 5 minutes
 - **`EXA_API_KEY` not set** — export it: `export EXA_API_KEY=your-key`
 - **Malformed JSON options** — verify the options string is valid JSON (keys must be quoted)
-- **429 / rate limit** — reduce `numResults`, add a pause between calls, or check your Exa plan
-
----
+- **429 / rate limit** — reduce `numResults`, add a pause between calls, or check the Exa plan
 
 ## References
 

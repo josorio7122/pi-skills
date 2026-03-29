@@ -4,16 +4,14 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-export const TSX = path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'tsx')
-export const RUN = path.join(__dirname, '..', 'run.ts')
-export const LIVE = Boolean(process.env['POSTHOG_TEST_LIVE'])
+export const RUN = path.join(__dirname, '..', '..', 'skills', 'posthog-skill', 'scripts', 'run.ts')
 
 export function run(
   args: string[] = [],
   env: Record<string, string> = {},
   options: { timeout?: number } = {},
 ): { status: number; stdout: string; stderr: string } {
-  const result = spawnSync(TSX, [RUN, ...args], {
+  const result = spawnSync('npx', ['tsx', RUN, ...args], {
     encoding: 'utf8',
     env: { ...process.env, ...env },
     timeout: options.timeout,

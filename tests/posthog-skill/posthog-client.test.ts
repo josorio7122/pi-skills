@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 
-import { createClient, PostHogError } from '../lib/posthog-client.js'
+import { createClient, PostHogError } from '../../skills/posthog-skill/scripts/lib/posthog-client.js'
 
 const CONFIG = {
   host: 'https://us.posthog.com',

@@ -2,26 +2,13 @@ import { describe, it } from 'node:test'
 import assert from 'node:assert/strict'
 
 describe('helpers module: constants', () => {
-  it('exports TSX constant as a string pointing to tsx binary', async () => {
-    const mod = await import('./helpers.js')
-    assert.strictEqual(typeof mod.TSX, 'string', 'TSX must be a string')
-    assert.ok(mod.TSX.includes('tsx'), `TSX must reference a tsx binary path, got: ${mod.TSX}`)
-  })
-
   it('exports RUN constant as a string ending with run.ts', async () => {
     const mod = await import('./helpers.js')
     assert.strictEqual(typeof mod.RUN, 'string', 'RUN must be a string')
     assert.ok(mod.RUN.endsWith('run.ts'), `RUN must end with run.ts, got: ${mod.RUN}`)
   })
 
-  it('exports LIVE constant as a boolean', async () => {
-    const mod = await import('./helpers.js')
-    assert.strictEqual(
-      typeof mod.LIVE,
-      'boolean',
-      `LIVE must be a boolean, got: ${typeof mod.LIVE}`,
-    )
-  })
+
 })
 
 describe('helpers module: run()', () => {

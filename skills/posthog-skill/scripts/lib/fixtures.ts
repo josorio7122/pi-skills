@@ -1,46 +1,20 @@
-import { branchEvents, tiles } from './dashboard-spec.js'
-
 // ---------------------------------------------------------------------------
 // Fixture key union — one entry per supported command
 // ---------------------------------------------------------------------------
 
 export type FixtureKey =
-  | 'inspect'
-  | 'compare'
   | 'flags'
   | 'flags-get'
   | 'flags-toggle'
   | 'flags-create'
   | 'flags-update'
   | 'flags-activity'
-  | 'create'
 
 // ---------------------------------------------------------------------------
 // Canned fixture data
 // ---------------------------------------------------------------------------
 
 const FIXTURES: Record<FixtureKey, unknown> = {
-  inspect: {
-    source: 'local-spec',
-    events: branchEvents.map((ev) => ({
-      name: ev.name,
-      description: ev.description,
-      properties: ev.properties,
-    })),
-  },
-
-  compare: {
-    id: 'dry-run-fixture-id',
-    name: 'ACH Payment Reference (dry-run fixture)',
-    description: 'Canned fixture — no live data fetched',
-    query_kind: 'InsightVizNode(FunnelsQuery)',
-    series: [{ event: 'payment_method_selected', name: 'Payment Method Selected' }],
-    breakdown: 'product_segment',
-    date_range: '-30d',
-    viz_type: 'ActionsLineGraph',
-    saved_to: 'references/ach-reference-summary.json',
-  },
-
   flags: {
     count: 3,
     results: [
@@ -134,17 +108,6 @@ const FIXTURES: Record<FixtureKey, unknown> = {
         user: { email: 'dev@example.com' },
       },
     ],
-  },
-
-  create: {
-    dashboard_id: 99901,
-    dashboard_url: 'https://us.posthog.com/project/EXAMPLE_PROJECT/dashboard/99901',
-    tiles: tiles.map((tile, i) => ({
-      name: tile.name,
-      insight_id: 80000 + i,
-      insight_url: `https://us.posthog.com/project/EXAMPLE_PROJECT/insights/${80000 + i}`,
-      status: 'created',
-    })),
   },
 }
 
