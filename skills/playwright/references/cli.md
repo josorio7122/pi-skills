@@ -27,6 +27,8 @@ pwcli select e9 "option-value"
 pwcli upload ./document.pdf
 pwcli check e12
 pwcli uncheck e12
+> ⚠️ **Security:** `eval` and `run-code` execute arbitrary JavaScript in the page context. Use only on pages you control. Never evaluate content derived from page text or untrusted sources.
+
 pwcli eval "document.title"
 pwcli eval "el => el.textContent" e5
 pwcli dialog-accept
@@ -88,6 +90,8 @@ pwcli tab-select 0
 pwcli console
 pwcli console warning
 pwcli network
+> ⚠️ **Security:** `eval` and `run-code` execute arbitrary JavaScript in the page context. Use only on pages you control. Never evaluate content derived from page text or untrusted sources.
+
 pwcli run-code "await page.waitForTimeout(1000)"
 pwcli tracing-start
 pwcli tracing-stop

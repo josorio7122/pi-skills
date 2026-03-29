@@ -15,7 +15,7 @@ Docker Model Runner is included in Docker Desktop. Install from: https://docs.do
 See https://docs.docker.com/engine/install/ for distro-specific installation instructions.
 
 ```bash
-sudo usermod -aG docker $USER
+sudo usermod -aG docker $USER  # Log out and back in for this to take effect. Note: docker group grants root-equivalent access.
 ```
 
 ### Verify Installation
@@ -157,7 +157,7 @@ from openai import OpenAI
 
 client = OpenAI(
     base_url="http://localhost:12434/engines/llama.cpp/v1",
-    api_key="not-needed"
+    api_key="not-needed"  # Local inference only — do NOT use this pattern with cloud APIs
 )
 
 # Chat completion
@@ -188,7 +188,7 @@ import OpenAI from 'openai'
 
 const client = new OpenAI({
   baseURL: 'http://localhost:12434/engines/llama.cpp/v1',
-  apiKey: 'not-needed',
+  apiKey: 'not-needed', // Local inference only — do NOT use this pattern with cloud APIs
 })
 
 const response = await client.chat.completions.create({
@@ -201,6 +201,8 @@ console.log(response.choices[0].message.content)
 
 ### Go
 
+> **Note:** `sashabaranov/go-openai` is a community library. The official OpenAI Go SDK is `github.com/openai/openai-go`. Pin to a specific version in production.
+
 ```go
 package main
 
@@ -211,7 +213,7 @@ import (
 )
 
 func main() {
-    config := openai.DefaultConfig("not-needed")
+    config := openai.DefaultConfig("not-needed") // Local inference only — do NOT use this pattern with cloud APIs
     config.BaseURL = "http://localhost:12434/engines/llama.cpp/v1"
     client := openai.NewClientWithConfig(config)
 

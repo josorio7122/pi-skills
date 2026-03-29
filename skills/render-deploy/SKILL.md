@@ -1,9 +1,6 @@
 ---
 name: render-deploy
 description: Deploy applications to Render by analyzing codebases, generating render.yaml Blueprints, and providing Dashboard deeplinks. Use when the user wants to deploy, host, publish, or set up their application on Render's cloud platform, including databases, cron jobs, and background workers.
-metadata:
-  author: josorio7122
-  version: '1.0'
 ---
 
 # Deploy to Render
@@ -27,7 +24,7 @@ If there is no Git remote, stop and ask the user to either:
 Use this short prompt sequence before deep analysis to reduce friction:
 
 1. Ask whether they want to deploy from a Git repo or a prebuilt Docker image.
-2. Ask whether Render should provision everything the app needs (based on what seems likely from the user's description) or only the app while they bring their own infra. If dependencies are unclear, ask a short follow-up to confirm whether they need a database, workers, cron, or other services.
+2. Does your app need a database, background worker, or cache? (yes / no / not sure)
 
 Then proceed with the appropriate method below.
 

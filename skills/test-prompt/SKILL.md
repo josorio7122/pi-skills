@@ -2,9 +2,8 @@
 name: test-prompt
 description: Test any prompt before deployment using RED-GREEN-REFACTOR applied to prompt engineering. Use when creating or editing commands, hooks, skills, sub-agent instructions, or production LLM prompts to verify they produce desired behavior. Also use when asked to "test this prompt", "verify prompt behavior", "stress test a skill", "check if this prompt works", or any prompt validation task. Uses subagents for isolated testing.
 metadata:
-  author: NeoLabHQ
-  version: '1.0'
-  license: Unknown
+  author: josorio7122
+  license: MIT
 ---
 
 # Testing Prompts With Subagents
@@ -14,6 +13,8 @@ Test any prompt before deployment: commands, hooks, skills, subagent instruction
 **Core principle:** If you didn't watch an agent fail without the prompt, you don't know what the prompt needs to fix.
 
 **Related skill:** [prompt-engineering](../prompt-engineering/SKILL.md) — provides writing techniques. This skill provides the testing methodology.
+
+> **Non-negotiable:** Never write a prompt before completing the RED phase. Skipping RED means you're testing nothing.
 
 ## TDD Mapping for Prompt Testing
 
@@ -51,6 +52,8 @@ Test any prompt before deployment: commands, hooks, skills, subagent instruction
 ### Scenario Design by Prompt Type
 
 > **How to use these scenarios:** Dispatch a subagent with the scenario text as its entire task. Do not wrap it in narration — the raw scenario IS the prompt being tested.
+
+> ⚠️ **Adversarial test scenario** — these deliberately test resistance to bad practices. Do not apply outside a test harness.
 
 **Instruction prompts** — test if steps are followed and edge cases handled:
 
@@ -195,11 +198,31 @@ Maximum pressure, ambiguous edge cases, contradictory constraints, minimal conte
 
 ## Output Format
 
-Produce a test report with three sections:
+Produce a test report:
 
-1. **RED results** — scenario, agent behavior verbatim, failures identified
-2. **GREEN prompt** — the rewritten/new prompt in a fenced code block
-3. **REFACTOR log** — changes made, token delta, re-test result
+### RED Results
+
+- **Scenario:** <scenario text>
+- **Agent behavior:** <verbatim output>
+- **Failures:** <list>
+
+### GREEN Prompt
+
+```
+<the prompt>
+```
+
+### REFACTOR Log
+
+- Changes: <list>
+- Token delta: <+/- N tokens>
+- Re-test: PASS / FAIL
+
+## When Testing Stalls
+
+- GREEN fails after 3 iterations: escalate to meta-testing — test your test scenarios, not the prompt
+- Prompt type unclear: default to Instruction testing strategy
+- Baseline unexpectedly passes: try harder edge cases; if it still passes, the prompt may be unnecessary
 
 ## Common Mistakes
 

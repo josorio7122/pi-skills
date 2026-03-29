@@ -2,7 +2,7 @@
 
 Use the wrapper script and snapshot often.
 Assume `pwcli` is an alias for `scripts/playwright_cli.sh` (set via `alias pwcli="scripts/playwright_cli.sh"`).
-In this repo, run commands from `output/playwright/<label>/` to keep artifacts contained.
+Run commands from a dedicated directory such as `output/playwright/<label>/` to keep artifacts contained.
 
 ## Standard interaction loop
 
@@ -19,7 +19,7 @@ pwcli snapshot
 pwcli open https://example.com/form --headed
 pwcli snapshot
 pwcli fill e1 "user@example.com"
-pwcli fill e2 "password123"
+pwcli fill e2 "<password>"
 pwcli click e3
 pwcli snapshot
 pwcli screenshot

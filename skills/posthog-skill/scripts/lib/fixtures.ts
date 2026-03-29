@@ -33,11 +33,12 @@ const FIXTURES: Record<FixtureKey, unknown> = {
     id: 'drOq2lO5',
     name: 'ACH Payment Reference (dry-run fixture)',
     description: 'Canned fixture — no live data fetched',
-    query_kind: 'TrendsQuery',
+    query_kind: 'InsightVizNode(FunnelsQuery)',
     series: [{ event: 'payment_method_selected', name: 'Payment Method Selected' }],
     breakdown: 'product_segment',
     date_range: '-30d',
     viz_type: 'ActionsLineGraph',
+    saved_to: 'references/ach-reference-summary.json',
   },
 
   flags: {

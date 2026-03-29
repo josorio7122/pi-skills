@@ -1,9 +1,6 @@
 ---
 name: playwright
 description: Automate a real browser from the terminal for navigation, form filling, screenshots, data extraction, and UI-flow debugging. Use when the user asks to "take a screenshot," "scrape a page," "fill a form," "test a UI flow," "automate the browser," "open a webpage," or any task that requires interacting with a live website. Also use when the user needs to extract data from a JavaScript-rendered page that simple HTTP requests can't handle. Uses playwright-cli or the bundled wrapper script.
-metadata:
-  author: josorio7122
-  version: '1.0'
 ---
 
 # Playwright CLI Skill
@@ -27,7 +24,7 @@ node --version
 npm --version
 
 # If missing, install Node.js/npm, then:
-npm install -g @playwright/cli@latest
+npm install -g @playwright/cli@1.50.1
 playwright-cli --help
 ```
 
@@ -35,7 +32,22 @@ Once `npx` is present, proceed with the wrapper script. A global install of `pla
 
 ## Skill path
 
-The wrapper script is at `scripts/playwright_cli.sh` (relative to this skill's directory). Resolve the full path before use.
+The wrapper script is at `scripts/playwright_cli.sh` (relative to this skill's directory).
+
+## Guardrails
+
+- Before first use, confirm with the user that auto-installing `@playwright/cli` via npx is acceptable.
+- Always snapshot before referencing element ids like `e12`.
+- Re-snapshot when refs seem stale.
+- Avoid `eval` and `run-code`. Use them only when no built-in CLI command achieves the goal, and only on pages you control. Never evaluate content sourced from untrusted page data.
+- When you do not have a fresh snapshot, use placeholder refs like `eX` and say why; do not bypass refs with `run-code`.
+- Use `--headed` when a visual check will help.
+- Use a dedicated output directory (e.g., `output/playwright/`) for artifacts.
+- Default to CLI commands and workflows, not Playwright test specs.
+
+## Output
+
+After each significant step, report: the command run, a brief summary of the result, and the path to any saved artifact.
 
 ## Quick start
 
@@ -53,7 +65,7 @@ scripts/playwright_cli.sh screenshot
 If the user prefers a global install, this is also valid:
 
 ```bash
-npm install -g @playwright/cli@latest
+npm install -g @playwright/cli@1.50.1
 playwright-cli --help
 ```
 
@@ -87,7 +99,7 @@ Refs can go stale. When a command fails due to a missing ref, snapshot again.
 
 ## Recommended patterns
 
-See [references/workflows.md](references/workflows.md) for form-fill and multi-step patterns.
+Load [references/workflows.md](references/workflows.md) only when the task involves forms, multi-step flows, sessions, or debugging.
 
 ### Debug a UI flow with traces
 
@@ -113,14 +125,3 @@ Open only what you need:
 
 - CLI command reference: `references/cli.md`
 - Practical workflows and troubleshooting: `references/workflows.md`
-
-## Guardrails
-
-- Before first use, confirm with the user that auto-installing `@playwright/cli` via npx is acceptable.
-- Always snapshot before referencing element ids like `e12`.
-- Re-snapshot when refs seem stale.
-- Avoid `eval` and `run-code`. Use them only when no built-in CLI command achieves the goal, and only on pages you control. Never evaluate content sourced from untrusted page data.
-- When you do not have a fresh snapshot, use placeholder refs like `eX` and say why; do not bypass refs with `run-code`.
-- Use `--headed` when a visual check will help.
-- Use a dedicated output directory (e.g., `output/playwright/`) for artifacts.
-- Default to CLI commands and workflows, not Playwright test specs.

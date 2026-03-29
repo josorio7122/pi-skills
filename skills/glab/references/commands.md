@@ -80,25 +80,25 @@ Full command reference for `glab`. For workflows and decision guidance, see the 
 
 ## CI/CD Pipelines
 
-| Task                                    | Command                                         |
-| --------------------------------------- | ----------------------------------------------- |
-| View current pipeline (interactive TUI) | `glab ci view`                                  |
-| View pipeline status                    | `glab ci status`                                |
-| List recent pipelines                   | `glab ci list`                                  |
-| Get pipeline JSON                       | `glab ci get`                                   |
-| Run a new pipeline                      | `glab ci run`                                   |
-| Run pipeline on branch                  | `glab ci run --branch <branch>`                 |
-| Run with variables                      | `glab ci run --variables "KEY1:val1,KEY2:val2"` |
-| Run pipeline trigger                    | `glab ci run-trig --token <token>`              |
-| Cancel running pipeline                 | `glab ci cancel`                                |
-| Delete pipeline                         | `glab ci delete <id>`                           |
-| Retry a job                             | `glab ci retry <job-id>`                        |
-| Trigger a manual job                    | `glab ci trigger <job-id>`                      |
-| Trace job log in real time              | `glab ci trace <job-id>`                        |
-| Download job artifacts                  | `glab job artifact <job-id>`                    |
-| Lint CI config                          | `glab ci lint`                                  |
-| Lint specific file                      | `glab ci lint .gitlab-ci.yml`                   |
-| View CI config                          | `glab ci config`                                |
+| Task                                    | Command                                                                                               |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| View current pipeline (interactive TUI) | `glab ci view`                                                                                        |
+| View pipeline status                    | `glab ci status`                                                                                      |
+| List recent pipelines                   | `glab ci list`                                                                                        |
+| Get pipeline JSON                       | `glab ci get`                                                                                         |
+| Run a new pipeline                      | `glab ci run`                                                                                         |
+| Run pipeline on branch                  | `glab ci run --branch <branch>`                                                                       |
+| Run with variables                      | `glab ci run --variables "KEY1:val1,KEY2:val2"`                                                       |
+| Run pipeline trigger                    | `glab ci run-trig --token <pipeline-trigger-token>  # Create in Settings → CI/CD → Pipeline triggers` |
+| Cancel running pipeline                 | `glab ci cancel`                                                                                      |
+| Delete pipeline                         | `glab ci delete <id>`                                                                                 |
+| Retry a job                             | `glab ci retry <job-id>`                                                                              |
+| Trigger a manual job                    | `glab ci trigger <job-id>`                                                                            |
+| Trace job log in real time              | `glab ci trace <job-id>`                                                                              |
+| Download job artifacts                  | `glab job artifact <job-id>`                                                                          |
+| Lint CI config                          | `glab ci lint`                                                                                        |
+| Lint specific file                      | `glab ci lint .gitlab-ci.yml`                                                                         |
+| View CI config                          | `glab ci config`                                                                                      |
 
 ## CI/CD Variables
 

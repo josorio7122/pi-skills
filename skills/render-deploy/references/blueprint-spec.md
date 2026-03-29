@@ -215,19 +215,19 @@ services:
 
 **Node.js (`runtime: node`):**
 
-- Versions: 14, 16, 18, 20, 22
+- Versions: 18, 20, 22
 - Default version: 20
 - Specify version in `package.json` engines field
 
 **Python (`runtime: python`):**
 
-- Versions: 3.8, 3.9, 3.10, 3.11, 3.12
+- Versions: 3.9, 3.10, 3.11, 3.12
 - Default version: 3.11
 - Specify version in `runtime.txt` or `Pipfile`
 
 **Go (`runtime: go`):**
 
-- Versions: 1.20, 1.21, 1.22, 1.23
+- Versions: 1.21, 1.22, 1.23
 - Uses go modules
 - Version from `go.mod`
 

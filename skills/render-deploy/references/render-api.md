@@ -8,6 +8,7 @@ All requests require `RENDER_API_KEY` as a Bearer token. Set it in your shell or
 
 ```bash
 export RENDER_API_KEY="rnd_xxxxx"
+# Store in ~/.zshrc or .env — never commit to source control
 ```
 
 Get your key from: https://dashboard.render.com/u/*/settings#api-keys

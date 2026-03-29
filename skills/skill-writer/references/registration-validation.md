@@ -4,8 +4,8 @@ Apply repository registration and quality checks before completion.
 
 ## Registration checklist
 
-1. Inspect the workspace and identify the canonical skill root for this repository before editing skill files.
-2. Create/update `<skill-root>/SKILL.md` and any bundled `references/`, `scripts/`, or `assets/` beneath that root.
+1. Inspect the workspace and identify the canonical skill directory for this repository before editing skill files.
+2. Create/update `<skill-directory>/SKILL.md` and any bundled `references/`, `scripts/`, or `assets/` beneath that directory.
 3. Add/update canonical skill in `README.md` Available Skills table (alphabetical; exclude alias/symlink entries).
 4. Register the skill in the project's settings file (e.g., `.pi/settings.json`, `.claude/settings.json`, or equivalent).
 5. Verify the skill is discoverable by the agent harness being used.
@@ -18,7 +18,7 @@ Apply repository registration and quality checks before completion.
 uv run scripts/quick_validate.py <path/to/skill-directory> --strict-depth
 ```
 
-Use the skill-root-relative form above when running from the `skill-writer` directory.
+Use the skill-directory-relative form above when running from the `skill-writer` directory.
 If you must run the validator from another working directory, convert both paths to the correct relative path from that directory instead of introducing absolute or host-specific paths into the skill docs.
 
 2. Confirm for authoring/generator skills:

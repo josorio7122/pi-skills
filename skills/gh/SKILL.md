@@ -24,6 +24,12 @@ gh auth login                          # Interactive (browser OAuth — recommen
 gh auth login --with-token <<< "<pat>" # With personal access token — Note: token appears in shell history. Prefer 'gh auth login' (browser) for interactive sessions.
 ```
 
+If `gh` is not installed:
+
+- macOS: `brew install gh`
+- Linux: see https://github.com/cli/cli/blob/trunk/docs/install_linux.md
+- Windows: `winget install --id GitHub.cli`
+
 ---
 
 ## Choosing the Right Command
@@ -42,11 +48,16 @@ Most GitHub work falls into a few categories. Pick the right one and you avoid w
 
 ---
 
+## Output Format
+
+- **List/view commands:** Summarize key fields (PR: number, title, status, author, checks, URL; Issue: number, title, state, labels; Run: ID, workflow, status, conclusion). Never dump raw JSON.
+- **Create/merge commands:** Confirm the action and return the resulting URL.
+
+---
+
 ## Workflows
 
 These are the sequences you'll use most. Each one is a complete flow — follow it top to bottom.
-
-For view/list commands, summarize key fields rather than printing raw output. For create/merge commands, confirm the action and provide the resulting URL.
 
 ### Create a PR
 

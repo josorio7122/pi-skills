@@ -1,9 +1,6 @@
 ---
 name: posthog-skill
 description: Automate PostHog analytics and feature flags for this project — inspect branch event availability, compare against the ACH reference insight, create or update the 7361 metrics dashboard idempotently, and manage feature flags (list, inspect, toggle, create, update, audit activity log). Use when working on analytics instrumentation, dashboards, PostHog event verification, or feature flag management.
-metadata:
-  author: josorio7122
-  version: '1.0'
 compatibility: 'Requires Node.js 18+ and tsx. Dependencies are managed at the repository root — run `pnpm install` from the repo root if needed.'
 ---
 
@@ -87,7 +84,7 @@ Output:
   "project_id": "39507",
   "token": "NOT SET",
   "token_present": false,
-  "ach_insight_id": "NOT SET",
+  "ach_insight_id": "drOq2lO5",
   "dashboard_name": "7361 Purchase & Insurance Flow Metrics"
 }
 ```
@@ -134,6 +131,8 @@ Output shape:
 ```
 
 Events with zero occurrences in the past 30 days are returned with `count_30d: 0, last_seen: null`.
+
+Events with `count_30d: 0` have not fired in 30 days — surface these to the user as a potential instrumentation gap before proceeding with `compare` or `create`.
 
 ### `compare`
 
@@ -426,8 +425,14 @@ posthog-skill/
 ├── package.json
 ├── tsconfig.json
 ├── scripts/
-│   ├── run.ts                        # Subcommand router + live command implementations
+│   ├── run.ts                        # Subcommand router
 │   ├── lib/
+│   │   ├── cmd-compare.ts            # compare command implementation
+│   │   ├── cmd-create.ts             # create command implementation
+│   │   ├── cmd-flags.ts              # flags command implementation
+│   │   ├── cmd-inspect.ts            # inspect command implementation
+│   │   ├── cmd-status.ts             # status command implementation
+│   │   ├── config.ts                 # Env var resolution and config shape
 │   │   ├── dashboard-spec.ts         # Static 8-tile spec + 9 branch events (no token needed)
 │   │   ├── fixtures.ts               # Canned dry-run responses for all commands
 │   │   └── posthog-client.ts         # Fetch wrapper: Bearer auth, 429 retry, PostHogError

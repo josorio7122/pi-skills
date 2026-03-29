@@ -1,9 +1,6 @@
 ---
 name: skill-writer
 description: Create, synthesize, and iteratively improve agent skills following the Agent Skills specification. Use when asked to "create a skill", "write a skill", "synthesize sources into a skill", "improve a skill from positive/negative examples", "update a skill", or "maintain skill docs and registration". Handles source capture, depth gates, authoring, registration, and validation.
-metadata:
-  author: josorio7122
-  version: '1.0'
 ---
 
 # Skill Writer
@@ -21,7 +18,7 @@ Load only the path(s) required for the task:
 | Select workflow orchestration pattern for process-heavy skills             | `references/workflow-patterns.md`        |
 | Select output format pattern for deterministic quality                     | `references/output-patterns.md`          |
 | Choose workflow path and required outputs                                  | `references/mode-selection.md`           |
-| Load representative synthesis examples by skill type                       | `references/examples/*.md`               |
+| Load the example profile matching your classified skill class              | `references/examples/<class>-skill.md`   |
 | Synthesize external/local sources with depth gates                         | `references/synthesis-path.md`           |
 | Author or update SKILL.md and supporting files                             | `references/authoring-path.md`           |
 | Optimize skill description and trigger precision                           | `references/description-optimization.md` |
@@ -72,6 +69,7 @@ Read `references/authoring-path.md`.
 2. Create focused reference files and scripts only when justified.
 3. Follow `references/skill-patterns.md`, `references/workflow-patterns.md`, and
    `references/output-patterns.md` for structure and output determinism.
+   Load all three for new skills or major rewrites. For simple wording updates, load only `references/skill-patterns.md`.
 4. For authoring/generator skills, include transformed examples in references:
    - happy-path
    - secure/robust variant

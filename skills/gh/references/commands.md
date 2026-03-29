@@ -79,43 +79,43 @@ Full command reference for `gh`. For workflows and decision guidance, see the ma
 
 ## Repository
 
-| Task                    | Command                                                 |
-| ----------------------- | ------------------------------------------------------- |
-| View repo info          | `gh repo view`                                          |
-| View repo in browser    | `gh repo view --web`                                    |
-| View repo as JSON       | `gh repo view --json name,description,defaultBranchRef` |
-| Clone a repo            | `gh repo clone owner/repo`                              |
-| Fork a repo             | `gh repo fork owner/repo`                               |
-| Fork and clone          | `gh repo fork owner/repo --clone`                       |
-| Create a new repo       | `gh repo create my-repo --public`                       |
-| Create private repo     | `gh repo create my-repo --private`                      |
-| Create from template    | `gh repo create my-repo --template owner/template`      |
-| List your repos         | `gh repo list`                                          |
-| List org repos          | `gh repo list <org>`                                    |
-| Edit repo settings      | `gh repo edit --description "New description"`          |
-| Rename repo             | `gh repo rename new-name`                               |
-| Set default repo        | `gh repo set-default owner/repo`                        |
-| Sync fork with upstream | `gh repo sync`                                          |
-| Archive repo            | `gh repo archive`                                       |
-| Delete repo             | `gh repo delete owner/repo --yes`                       |
-| Add deploy key          | `gh repo deploy-key add key.pub --title "CI key"`       |
-| List deploy keys        | `gh repo deploy-key list`                               |
+| Task                    | Command                                                                           |
+| ----------------------- | --------------------------------------------------------------------------------- |
+| View repo info          | `gh repo view`                                                                    |
+| View repo in browser    | `gh repo view --web`                                                              |
+| View repo as JSON       | `gh repo view --json name,description,defaultBranchRef`                           |
+| Clone a repo            | `gh repo clone owner/repo`                                                        |
+| Fork a repo             | `gh repo fork owner/repo`                                                         |
+| Fork and clone          | `gh repo fork owner/repo --clone`                                                 |
+| Create a new repo       | `gh repo create my-repo --public`                                                 |
+| Create private repo     | `gh repo create my-repo --private`                                                |
+| Create from template    | `gh repo create my-repo --template owner/template`                                |
+| List your repos         | `gh repo list`                                                                    |
+| List org repos          | `gh repo list <org>`                                                              |
+| Edit repo settings      | `gh repo edit --description "New description"`                                    |
+| Rename repo             | `gh repo rename new-name`                                                         |
+| Set default repo        | `gh repo set-default owner/repo`                                                  |
+| Sync fork with upstream | `gh repo sync`                                                                    |
+| Archive repo            | `gh repo archive`                                                                 |
+| Delete repo             | `gh repo delete owner/repo` # ⚠️ irreversible — requires interactive confirmation |
+| Add deploy key          | `gh repo deploy-key add key.pub --title "CI key"`                                 |
+| List deploy keys        | `gh repo deploy-key list`                                                         |
 
 ## Releases
 
-| Task                     | Command                                                  |
-| ------------------------ | -------------------------------------------------------- |
-| Create release           | `gh release create v1.0.0 --notes "Release notes"`       |
-| Create release from file | `gh release create v1.0.0 --notes-file CHANGELOG.md`     |
-| Create draft release     | `gh release create v1.0.0 --draft --notes "WIP"`         |
-| Create prerelease        | `gh release create v1.0.0-rc1 --prerelease --notes "RC"` |
-| Generate release notes   | `gh release create v1.0.0 --generate-notes`              |
-| Upload assets to release | `gh release upload v1.0.0 ./dist/*.tar.gz`               |
-| List releases            | `gh release list`                                        |
-| View release             | `gh release view v1.0.0`                                 |
-| Download release assets  | `gh release download v1.0.0`                             |
-| Edit release             | `gh release edit v1.0.0 --notes "Updated notes"`         |
-| Delete release           | `gh release delete v1.0.0 --yes`                         |
+| Task                     | Command                                                                          |
+| ------------------------ | -------------------------------------------------------------------------------- |
+| Create release           | `gh release create v1.0.0 --notes "Release notes"`                               |
+| Create release from file | `gh release create v1.0.0 --notes-file CHANGELOG.md`                             |
+| Create draft release     | `gh release create v1.0.0 --draft --notes "WIP"`                                 |
+| Create prerelease        | `gh release create v1.0.0-rc1 --prerelease --notes "RC"`                         |
+| Generate release notes   | `gh release create v1.0.0 --generate-notes`                                      |
+| Upload assets to release | `gh release upload v1.0.0 ./dist/*.tar.gz`                                       |
+| List releases            | `gh release list`                                                                |
+| View release             | `gh release view v1.0.0`                                                         |
+| Download release assets  | `gh release download v1.0.0`                                                     |
+| Edit release             | `gh release edit v1.0.0 --notes "Updated notes"`                                 |
+| Delete release           | `gh release delete v1.0.0` # ⚠️ irreversible — requires interactive confirmation |
 
 ## Actions — Workflows
 
@@ -146,11 +146,11 @@ Full command reference for `gh`. For workflows and decision guidance, see the ma
 
 ## Actions — Cache
 
-| Task              | Command                       |
-| ----------------- | ----------------------------- |
-| List caches       | `gh cache list`               |
-| Delete a cache    | `gh cache delete <id-or-key>` |
-| Delete all caches | `gh cache delete --all`       |
+| Task              | Command                                                         |
+| ----------------- | --------------------------------------------------------------- |
+| List caches       | `gh cache list`                                                 |
+| Delete a cache    | `gh cache delete <id-or-key>`                                   |
+| Delete all caches | `gh cache delete --all` # ⚠️ destructive — affects all branches |
 
 ## Search
 

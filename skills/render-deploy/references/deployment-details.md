@@ -25,79 +25,11 @@ render deploys list <SERVICE_ID> --output json
 
 ### Environment Variables
 
-**All environment variables must be declared in render.yaml.**
-
-**Three patterns for environment variables:**
-
-1. **Hardcoded values** (non-sensitive configuration):
-
-```yaml
-envVars:
-  - key: NODE_ENV
-    value: production
-  - key: API_URL
-    value: https://api.example.com
-```
-
-2. **Database connections** (auto-generated):
-
-```yaml
-envVars:
-  - key: DATABASE_URL
-    fromDatabase:
-      name: postgres
-      property: connectionString
-  - key: REDIS_URL
-    fromDatabase:
-      name: redis
-      property: connectionString
-```
-
-3. **Secrets** (user fills in Dashboard):
-
-```yaml
-envVars:
-  - key: JWT_SECRET
-    sync: false
-  - key: API_KEY
-    sync: false
-  - key: STRIPE_SECRET_KEY
-    sync: false
-```
-
-Complete environment variable guide: [configuration-guide.md](configuration-guide.md)
+For environment variable patterns and port binding examples, see [configuration-guide.md](configuration-guide.md).
 
 ### Port Binding
 
-**CRITICAL:** Web services must bind to `0.0.0.0:$PORT` (NOT `localhost`). Render sets the `PORT` environment variable.
-
-**Node.js Example:**
-
-```javascript
-const PORT = process.env.PORT || 3000
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on port ${PORT}`)
-})
-```
-
-**Python Example:**
-
-```python
-import os
-
-port = int(os.environ.get('PORT', 5000))
-app.run(host='0.0.0.0', port=port)
-```
-
-**Go Example:**
-
-```go
-port := os.Getenv("PORT")
-if port == "" {
-    port = "3000"
-}
-http.ListenAndServe(":"+port, handler)
-```
+For environment variable patterns and port binding examples, see [configuration-guide.md](configuration-guide.md).
 
 ### Plan Defaults
 

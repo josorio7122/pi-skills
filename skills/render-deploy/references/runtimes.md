@@ -1,12 +1,14 @@
 # Render Runtime Options
 
+> Version lists may be outdated — verify at https://render.com/docs for current supported versions.
+
 Complete guide to available runtimes on Render, including versions, configuration, and best practices for each language.
 
 ## Native Language Runtimes
 
 ### Node.js (`runtime: node`)
 
-**Supported Versions:** 14, 16, 18, 20, 22
+**Supported Versions:** 18, 20, 22
 **Default Version:** 20
 
 **Version Specification:**
@@ -66,7 +68,7 @@ startCommand: npm start
 
 ### Python (`runtime: python`)
 
-**Supported Versions:** 3.8, 3.9, 3.10, 3.11, 3.12
+**Supported Versions:** 3.9, 3.10, 3.11, 3.12
 **Default Version:** 3.11
 
 **Version Specification:**
@@ -129,7 +131,7 @@ startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
 
 ### Go (`runtime: go`)
 
-**Supported Versions:** 1.20, 1.21, 1.22, 1.23
+**Supported Versions:** 1.21, 1.22, 1.23
 **Default Version:** Latest stable
 
 **Version Specification:**

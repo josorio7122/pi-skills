@@ -1,11 +1,9 @@
 ---
 name: prompt-engineering
-description: Advanced prompt engineering patterns for maximizing LLM performance. Use when writing commands, hooks, skills, sub-agent prompts, system prompts, or any LLM interaction. Also use when asked to "improve this prompt", "optimize a prompt", "write a system prompt", "make this prompt more effective", or any prompt engineering task. Covers few-shot learning, chain-of-thought, template systems, persuasion principles, degrees of freedom, and token efficiency.
+description: Advanced prompt engineering patterns for maximizing LLM performance. Use when writing commands, hooks, skills, sub-agent prompts, system prompts, or any LLM interaction. Also use when asked to "improve this prompt", "optimize a prompt", "write a system prompt", "make this prompt more effective", or any prompt engineering task.
 metadata:
-  author: NeoLabHQ
-  version: '1.0'
-  source: https://github.com/NeoLabHQ/context-engineering-kit/blob/master/plugins/customaize-agent/skills/prompt-engineering/SKILL.md
-  license: See source repository
+  author: josorio7122
+  license: MIT
 ---
 
 # Prompt Engineering Patterns
@@ -20,7 +18,7 @@ Include 2–5 input-output pairs that demonstrate the desired behavior. Do not e
 
 ### 2. Chain-of-Thought Prompting
 
-Add "Let's think step by step" for zero-shot, or include example reasoning traces for few-shot. Use on multi-step analytical tasks.
+Instruct the model to reason before answering. Use "Think step by step" or a thinking block if the model supports it. Include example reasoning traces for few-shot use. Apply on multi-step analytical tasks.
 
 ### 3. Prompt Optimization
 
@@ -130,7 +128,7 @@ To extract text, you'll need a library. There are many available...
 
 ## Persuasion Principles for Agent Prompts
 
-LLMs respond to the same persuasion principles as humans. Research: Meincke et al. (2025) — persuasion techniques more than doubled compliance rates (33% → 72%, p < .001).
+LLMs respond to the same persuasion principles as humans. Persuasion research shows these techniques significantly increase compliance rates.
 
 ### Authority
 
@@ -190,11 +188,11 @@ Shared identity for collaborative workflows.
 
 ## Common Pitfalls
 
-- **Over-engineering**: Starting complex before trying simple
-- **Example pollution**: Examples that don't match target task
-- **Context overflow**: Exceeding token limits with excessive examples
-- **Ambiguous instructions**: Room for multiple interpretations
-- **Ignoring edge cases**: Not testing on boundary inputs
+- **Over-engineering**: Do not start complex — try the simplest prompt first.
+- **Example pollution**: Do not use examples from unrelated tasks.
+- **Context overflow**: Do not exceed token limits with excessive examples.
+- **Ambiguous instructions**: Eliminate room for multiple interpretations.
+- **Ignoring edge cases**: Always test on boundary inputs.
 
 ## When Input Is Ambiguous
 
@@ -212,4 +210,4 @@ Build prompts that handle failures gracefully:
 
 ## Output
 
-Deliver: (1) the rewritten prompt in a fenced code block, (2) a brief rationale for each change, (3) estimated token delta.
+Deliver: (1) the rewritten prompt in a fenced code block, (2) a one-sentence rationale per change, (3) estimated token delta.

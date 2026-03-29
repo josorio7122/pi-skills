@@ -1,12 +1,11 @@
 ---
 name: pdf
-description: Read, create, edit, and review PDF files with proper rendering and layout. Use when the user asks to "read a PDF," "create a PDF," "extract text from a PDF," "fill a PDF form," "merge PDFs," "convert to PDF," or any task involving PDF documents where layout and visual fidelity matter. Also use when the user mentions PDF files even if they don't explicitly ask for help with them.
-metadata:
-  author: josorio7122
-  version: '1.0'
+description: Read, create, and review PDF files with proper rendering and layout. Use when the user asks to "read a PDF," "create a PDF," "extract text from a PDF," "fill a PDF form," "merge PDFs," "convert to PDF," or any task involving PDF documents where layout and visual fidelity matter. Also use when the user mentions PDF files even if they don't explicitly ask for help with them.
 ---
 
 # PDF Skill
+
+> **Core rule:** Always render PDFs to PNG and inspect before delivery. Never deliver an uninspected PDF.
 
 ## When to use
 
@@ -20,8 +19,8 @@ metadata:
    - Use `pdftoppm` if available.
    - If unavailable, install Poppler or ask the user to review the output locally.
 2. Use `reportlab` to generate PDFs when creating new documents.
-3. Use `pdfplumber` for text extraction when table structure matters. Use `pypdf` for simple full-text extraction or when pdfplumber is unavailable. Do not rely on either for layout fidelity.
-4. After each meaningful update, re-render pages and verify alignment, spacing, and legibility.
+
+If reportlab raises a font or encoding error, verify all strings are UTF-8 and all image paths are absolute. 3. Use `pdfplumber` for text extraction when table structure matters. Use `pypdf` for simple full-text extraction or when pdfplumber is unavailable. Do not rely on either for layout fidelity. 4. After each meaningful update, re-render pages and verify alignment, spacing, and legibility.
 
 ## Temp and output conventions
 
@@ -91,6 +90,12 @@ merger.close()
 ## Fill PDF Forms
 
 Use `pypdf`'s form-fill API for AcroForms. Render and inspect the filled PDF before delivery.
+
+```python
+from pypdf import PdfReader
+reader = PdfReader("form.pdf")
+print(reader.get_fields())  # discover field names
+```
 
 ## Prerequisites
 

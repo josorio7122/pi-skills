@@ -21,7 +21,7 @@ services:
       - key: DJANGO_SECRET_KEY
         sync: false # User provides in Dashboard
       - key: DJANGO_ALLOWED_HOSTS
-        value: django-web.onrender.com
+        sync: false # Set to your Render service hostname after deploy
       - key: DATABASE_URL
         fromDatabase:
           name: postgres

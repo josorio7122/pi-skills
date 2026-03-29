@@ -74,7 +74,7 @@ AI commits MUST include:
 Co-Authored-By: AI Agent <ai@noreply.example.com>
 
 ```
-Example: `Co-Authored-By: AI Assistant <noreply@example.com>`
+
 ```
 
 ### Key Conventions
@@ -96,5 +96,10 @@ Add only if truly needed:
 - No lock file found: ask the user which package manager to use
 - Existing AGENTS.md over 100 lines: trim to required sections first, confirm with user
 - Conflicting conventions: defer to the most recently modified config file
+- No recognizable project structure: create a minimal AGENTS.md with only Package Manager and Commit Attribution, then ask the user what else to include
 
 See [references/example-structure.md](references/example-structure.md) for a complete template and anti-patterns to avoid.
+
+## Output
+
+Present the generated AGENTS.md in a code block. Ask the user to confirm before writing the file.

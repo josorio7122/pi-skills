@@ -8161,3 +8161,2815 @@ Here is the full three-lens review.
 2. **Remove or neutralize the `source` URL from frontmatter** — the metadata block is likely machine-readable; external URLs in it are a latent supply chain vector.
 3. **Add a RED-phase fallback for when baseline passes** — the current methodology has a blind spot that could cause an agent to loop or produce a confused report when the precondition ("agent fails without prompt") doesn't hold.
 
+## Scout: Deep review of skill: agents-md at /Users/josorio/Code/pi-skills/skills/agents-md/
+
+Read ALL files (SKILL.md + references/). Evaluate using THREE lenses:
+
+**LENS 1 — Skill Writer:** Frontmatter (name, description, trigger phrases, pattern compliance), imperative voice, progressive disclosure, degrees of freedom, conciseness, consistent terminology, no time-sensitive info, no machine-specific paths, no agent-specific refs, portable relative paths.
+
+**LENS 2 — Skill Scanner:** Prompt injection, dangerous code, excessive permissions, secret exposure, supply chain (external URLs, remote code exec), config poisoning.
+
+**LENS 3 — Prompt Engineering:** Instruction hierarchy, authority/commitment patterns, no over-engineering/ambiguity/overflow, token efficiency, error recovery/fallback, output format specified.
+
+Report ALL issues with severity (Critical/High/Medium/Low/Info), exact file path and line, quoted text, and suggested fix. If no issues found for a lens, state CLEAN.
+
+Here is the full three-lens review.
+
+---
+
+## Deep Review: `skills/agents-md`
+
+---
+
+### LENS 1 — Skill Writer
+
+| Sev | File | Line | Issue | Suggested Fix |
+|-----|------|------|-------|---------------|
+| **Medium** | `SKILL.md` | frontmatter `description` | Trigger phrases list is good, but the final trigger `"when agent instructions need to be kept concise"` is vague/passive — it describes a state, not a user utterance. Agents match on what users *say*. | Replace with an explicit utterance: `"make my agent instructions shorter"` or `"trim AGENTS.md"`. |
+| **Low** | `SKILL.md` | frontmatter `metadata` | `version: '1.0'` is string-quoted but it's a scalar — minor YAML inconsistency, not harmful. | `version: 1.0` (unquoted) or `'1.1'` when bumped. |
+| **Low** | `SKILL.md` | "Commit Attribution" section (≈ line 55–60) | The code block inside the required section template is malformed: the fenced block opens with ` ``` ` then the content `Co-Authored-By: ...` sits outside a nested fence. The second ` ``` ` closes the outer block, leaving `Example: ...` as bare prose. The rendered output will break agent reading. | Restructure as two separate code blocks or a single properly nested block. |
+| **Low** | `SKILL.md` | "File Setup" → step 2 | `ln -s AGENTS.md CLAUDE.md` is an agent-specific reference (names Claude explicitly). Skill rules say no agent-specific refs. | Generalize: `ln -s AGENTS.md <PROVIDER_INSTRUCTIONS>.md` with a note that the target filename depends on the agent platform. |
+| **Info** | `SKILL.md` | "Writing Rules" bullet list | All bullets use imperative voice correctly. Progressive disclosure is present (Required → Optional → Edge Cases). ✅ |
+| **Info** | `references/example-structure.md` | entire file | No frontmatter, which is correct for a reference file. Content is clean, consistent, and useful. ✅ |
+
+---
+
+### LENS 2 — Skill Scanner
+
+**CLEAN.**
+
+- No prompt injection patterns (no `ignore previous instructions`, `system:`, hidden Unicode, or adversarial overrides).
+- No dangerous shell commands beyond `ln -s` (benign).
+- No external URLs, no remote code execution, no `curl | bash` patterns.
+- No secrets, API keys, or credential exposure.
+- No config poisoning vectors.
+- No excessive permission grants.
+- The `ln -s` symlink instruction is scoped to creating a local file alias — no risk.
+
+---
+
+### LENS 3 — Prompt Engineering
+
+| Sev | File | Line | Issue | Suggested Fix |
+|-----|------|------|-------|---------------|
+| **High** | `SKILL.md` | "Commit Attribution" section | **Malformed code block breaks instruction delivery.** The intended output template (the `Co-Authored-By:` line) is inside a fenced block, but the structure collapses — agents parsing this section will receive ambiguous or truncated instructions. This is a prompt-rendering bug, not just a visual one. | Use a flat, unambiguous block: `` ```\nCo-Authored-By: AI Agent <ai@noreply.example.com>\n``` `` with no nesting. |
+| **Medium** | `SKILL.md` | "Required Sections" → "Commit Attribution" | The section gives *two different* example email addresses (`ai@noreply.example.com` and `noreply@example.com`). An agent following these instructions literally cannot determine which to use. This introduces ambiguity in the output. | Use a single consistent placeholder throughout, e.g. `ai@noreply.example.com`. Remove the `Example:` line, or make it identical to the template above it. |
+| **Medium** | `SKILL.md` | "Edge Cases" (last section) | No fallback is specified if the agent cannot determine the project structure at all (e.g., empty repo, non-standard layout). The skill has no "when uncertain, do X" catch-all. | Add: `- No recognizable project structure: create a minimal AGENTS.md with only the Package Manager and Commit Attribution sections, then ask the user what else to include.` |
+| **Low** | `SKILL.md` | "Before Writing" step list | Steps 1–5 are analysis steps but carry no "stop condition" — there's no guidance on what to do if conflicting signals are found *during analysis* (e.g., two lock files). The only conflict guidance is in Edge Cases, but only for conventions, not for package managers. | Add to "Before Writing": `If multiple lock files exist, stop and ask the user which package manager is canonical.` |
+| **Low** | `SKILL.md` | output format | The skill specifies the *content* of the AGENTS.md to produce but never states the **output format of the skill's own response** — should the agent write the file directly, present it for review, ask for confirmation? Without this, agents will behave inconsistently across runs. | Add a brief output protocol: e.g., `Present the generated AGENTS.md in a code block and ask the user to confirm before writing.` |
+| **Info** | `SKILL.md` | overall token efficiency | The skill is well under 100 lines and avoids padding. The hierarchy (Before Writing → Writing Rules → Required → Optional → Edge Cases) follows a clean decision tree. ✅ |
+| **Info** | `references/example-structure.md` | Anti-Patterns section | Authoritative, minimal, directly actionable. Good negative examples complement the positive template above. ✅ |
+
+---
+
+### Summary
+
+| Priority | Count | Top Issues |
+|----------|-------|-----------|
+| Critical | 0 | — |
+| High | 1 | Malformed fenced code block in Commit Attribution breaks template delivery |
+| Medium | 3 | Conflicting example emails; missing catch-all fallback; no output format specified |
+| Low | 4 | Agent-specific `CLAUDE.md` reference; broken `ln -s` note; no multi-lock-file guidance; YAML version quoting |
+| Info | 3 | Voice/structure clean; reference file clean; token efficiency fine |
+
+**Most urgent fix:** The `Commit Attribution` template block (High/Medium pair) — it's both structurally broken *and* contains contradictory placeholder values, meaning every agent that follows this skill will produce inconsistent or malformed commit footers.
+
+## Scout: Deep review of skill: docker-model-runner at /Users/josorio/Code/pi-skills/skills/docker-model-runner/
+
+Read ALL files (SKILL.md + references/). Evaluate using THREE lenses:
+
+**LENS 1 — Skill Writer:** Frontmatter (name, description, trigger phrases, pattern compliance), imperative voice, progressive disclosure, degrees of freedom, conciseness, consistent terminology, no time-sensitive info, no machine-specific paths, no agent-specific refs, portable relative paths.
+
+**LENS 2 — Skill Scanner:** Prompt injection, dangerous code, excessive permissions, secret exposure, supply chain (external URLs, remote code exec), config poisoning.
+
+**LENS 3 — Prompt Engineering:** Instruction hierarchy, authority/commitment patterns, no over-engineering/ambiguity/overflow, token efficiency, error recovery/fallback, output format specified.
+
+Report ALL issues with severity (Critical/High/Medium/Low/Info), exact file path and line, quoted text, and suggested fix. If no issues found for a lens, state CLEAN.
+
+## Deep Review: `docker-model-runner`
+
+---
+
+## LENS 1 — Skill Writer
+
+### ✅ Strengths
+- Frontmatter has `name`, `description`, and trigger phrases — well-formed and detailed.
+- Progressive disclosure: SKILL.md is concise; heavy detail deferred to references/.
+- Imperative voice used throughout (`Check`, `List`, `Pull`, `Run`).
+- Relative path in reference link is correct and portable.
+- No machine-specific absolute paths.
+- No hardcoded agent-specific refs.
+
+### Issues
+
+---
+
+**[Medium] SKILL.md — Line ~3 — Description contains a hard prerequisite that may confuse trigger matching**
+
+> `"Requires Docker Desktop or Docker Engine with Model Runner enabled."`
+
+The description field in frontmatter is used by the agent to decide *when* to activate the skill. Embedding a constraint here (rather than inside the skill body) adds no activation value and may subtly misguide the agent into thinking the skill only applies if the prerequisite is *already met* — when in fact the skill should handle the "not yet installed" case too.
+
+**Fix:** Move the constraint to the `## Workflow` step 1 fallback. Replace description tail with a softer phrase like: `"Covers installation, model management, CLI usage, and OpenAI-compatible API integration."`
+
+---
+
+**[Medium] SKILL.md — Line 1 (`metadata.version: '1.0'`) — Time-sensitive metadata in frontmatter**
+
+> `version: '1.0'`
+
+Version fields in skill frontmatter become stale and have no functional value for the agent (pi doesn't use them at runtime). They also create maintenance debt — reviewers wonder whether `1.0` is still accurate.
+
+**Fix:** Remove `metadata.author` and `metadata.version` entirely; they add noise without signal.
+
+---
+
+**[Low] SKILL.md — "Best Practices" section — passive/vague wording in one bullet**
+
+> `"Models stay loaded until another model is requested or timeout (5 min)"`
+
+This is a statement of fact, not imperative guidance. Breaks the voice pattern of the surrounding bullets.
+
+**Fix:** `"Expect models to unload after 5 minutes of inactivity — pre-load with --detach if scripting multiple calls."`
+
+---
+
+**[Low] references/docker-model-guide.md — "Popular Models" table — stale-data risk partially mitigated but inconsistently**
+
+> The table lists sizes (`~1GB`, `~5GB`, etc.) without the same caveat warning applied to model names.
+
+The note says `"this table may be stale"` for names, but sizes also drift across model versions. The sizes could mislead users making hardware decisions.
+
+**Fix:** Add `(approx.)` to every size value, or add a column note: `"Sizes approximate; check docker model inspect <model> for actual disk usage."`
+
+---
+
+**[Info] SKILL.md — No explicit "Prerequisites" or "Requires" section**
+
+The skill checks `docker model version` first, which is good, but there's no upfront signal to the user that GPU/RAM matters for larger models. A user who pulls `ai/phi4` on a 4GB RAM machine will have a bad time.
+
+**Fix:** Add a one-liner prerequisite note in the Workflow preamble: `"Note: Larger models (>4GB) require 8GB+ RAM. Check available memory before pulling."`
+
+---
+
+## LENS 2 — Skill Scanner
+
+### Issues
+
+---
+
+**[High] references/docker-model-guide.md — Go example — External third-party package without pinned version**
+
+```go
+import "github.com/sashabaranov/go-openai"
+```
+
+This imports a community Go library (`sashabaranov/go-openai`) with no version pin. An agent following this example would `go get` the latest version at runtime — which could pull a compromised or breaking release. This is a supply-chain risk.
+
+**Fix:** Add a version annotation comment:
+```go
+// go get github.com/sashabaranov/go-openai@v1.x.x  — pin to a specific release
+```
+Or replace with the official `github.com/openai/openai-go` package (the official Go SDK released in 2024), which is maintained by OpenAI directly and reduces third-party trust surface.
+
+---
+
+**[Medium] SKILL.md + references/ — Hardcoded `api_key="not-needed"` in all SDK examples**
+
+```python
+api_key="not-needed"
+```
+```javascript
+apiKey: 'not-needed',
+```
+```go
+config := openai.DefaultConfig("not-needed")
+```
+
+While functionally correct for local inference, this pattern trains users to treat API key fields as ignorable placeholders. If a user later adapts this code for a real OpenAI endpoint (copy-paste), they will get an auth error with a confusing literal string in the error log. It also normalises dummy credential patterns.
+
+**Fix:** Use a named constant or environment variable fallback with a comment:
+```python
+api_key=os.environ.get("OPENAI_API_KEY", "local-inference-no-key-required")
+```
+Or at minimum add a comment: `# Not required for local Docker Model Runner — do NOT use this pattern with cloud APIs`
+
+---
+
+**[Medium] references/docker-model-guide.md — `sudo usermod -aG docker $USER` without session restart warning**
+
+```bash
+sudo usermod -aG docker $USER
+```
+
+This command requires a logout/login or `newgrp docker` to take effect. If an agent executes this and immediately runs `docker model ...`, the permission change won't apply and the user gets a confusing "permission denied" error. Additionally, adding the current user to the `docker` group is effectively granting root-equivalent access on Linux — this deserves a security callout.
+
+**Fix:** Add inline note:
+```bash
+sudo usermod -aG docker $USER
+# Log out and back in (or run: newgrp docker) for this to take effect.
+# Note: docker group membership grants root-equivalent privileges — review your threat model.
+```
+
+---
+
+**[Low] SKILL.md — External URL embedded in workflow step 1**
+
+> `https://docs.docker.com/desktop/features/model-runner/`
+
+External URLs in skills are acceptable for reference but can break if Docker reorganises docs (already a known pattern with Docker's doc migrations). This is a dead-link risk, not a security risk.
+
+**Fix:** Make it conditional: `"See Docker's official docs (search 'Docker Model Runner') for the latest installation guide."` The references/ file can keep the URL as a point-in-time snapshot.
+
+---
+
+**[Info] No prompt injection surface detected.** The skill does not ask the agent to evaluate or relay user-provided content into shell commands without quoting, and no `eval`, `exec`, or unquoted variable interpolation patterns exist. CLEAN on injection.
+
+---
+
+## LENS 3 — Prompt Engineering
+
+### Issues
+
+---
+
+**[High] SKILL.md — "Output" section is isolated and easily ignored**
+
+```markdown
+## Output
+
+When running inference on behalf of the user, display the model's response content directly — not the raw JSON wrapper.
+```
+
+This critical instruction (don't dump raw JSON on the user) appears at the *end* of the skill after Best Practices, making it easy to overlook in a long context window. Output format instructions have the highest regression cost if skipped.
+
+**Fix:** Move this to the top of the skill as a **callout block** or embed it inside Step 5 (Run models), directly adjacent to the `docker model run` commands where the agent is most likely to capture output:
+
+```markdown
+> **Output rule:** Display the model's response text directly — never the raw JSON wrapper.
+```
+
+---
+
+**[High] SKILL.md — No error recovery path for API failures**
+
+The workflow covers "Model Runner not found" via `docker model version`, but gives no fallback for:
+- Port 12434 already in use
+- Model pulled but fails to load (OOM)
+- API returns non-200
+
+The agent has no instructions for these cases and will improvise (badly).
+
+**Fix:** Add a `## Troubleshooting` quick-reference or fold it from references/ into SKILL.md:
+
+```markdown
+## Troubleshooting
+
+- **Port conflict:** `docker model stop-runner && docker model start-runner`
+- **OOM / model won't load:** Try a smaller model (`ai/smollm2`); check `docker model df`
+- **API 500 errors:** Check `docker model logs` for the root cause
+```
+
+---
+
+**[Medium] SKILL.md — Instruction hierarchy is flat — no "always/never" anchors**
+
+The skill uses a numbered workflow but has no authority anchors (no "always", "never", "must"). For an agent with ambiguous context (e.g., user says "just run it"), there's nothing preventing the agent from skipping the prerequisite check (step 1) and attempting to use the API directly.
+
+**Fix:** Add authority signals to high-risk steps:
+
+> `"Always run docker model version first — never assume the runner is available."`
+> `"Never skip model pull before run — the runner does not auto-pull."`
+
+---
+
+**[Medium] SKILL.md — API endpoint hardcoded in two places with no canonical source**
+
+`http://localhost:12434/engines/llama.cpp/v1/...` appears in:
+- SKILL.md `## API Usage` (curl + Python)
+- references/docker-model-guide.md (curl, Python, JS, Go)
+
+If Docker changes the default port or path (it changed in early 2025 betas), both locations need updating and they can diverge.
+
+**Fix:** Define it once at the top of SKILL.md as a reference value:
+
+```markdown
+> **Default API base:** `http://localhost:12434/engines/llama.cpp/v1`
+> Override with `MODEL_RUNNER_HOST` env var if needed.
+```
+
+Then use prose references to "the API base above" in examples, or consolidate examples to SKILL.md only.
+
+---
+
+**[Medium] SKILL.md — No output format specified for `docker model search` results**
+
+Step 3 tells the agent to run `docker model search <query>` but gives no instruction on how to present the results to the user. The raw output is a table with many columns; the agent may either dump it verbatim or over-summarize.
+
+**Fix:** Add: `"Present search results as a concise list: model name, size, and description only."`
+
+---
+
+**[Low] SKILL.md — "Key Commands" table duplicates information already in the Workflow**
+
+The workflow section already covers pull, list, run, search. The table repeats them without adding new information (no flags, no usage context). This doubles token consumption for marginal value.
+
+**Fix:** Replace the table with: `"For full CLI reference, see [references/docker-model-guide.md](references/docker-model-guide.md#cli-commands)."` and remove the redundant table from SKILL.md.
+
+---
+
+**[Low] references/docker-model-guide.md — `panic(err)` in Go example — poor error handling pattern**
+
+```go
+if err != nil {
+    panic(err)
+}
+```
+
+Panics are inappropriate in production code. An agent copying this into a user's project introduces bad patterns.
+
+**Fix:**
+```go
+if err != nil {
+    log.Fatalf("inference error: %v", err)
+}
+```
+
+---
+
+**[Info] Token efficiency is generally good.** SKILL.md is lean (~80 lines). The reference file handles depth. Progressive disclosure is correctly implemented. No system prompt bloat patterns detected.
+
+---
+
+## Summary Table
+
+| # | Severity | Lens | File | Issue |
+|---|----------|------|------|-------|
+| 1 | High | Prompt Eng | SKILL.md | Output format rule buried at end — should be at top or inline with run step |
+| 2 | High | Prompt Eng | SKILL.md | No error recovery path for OOM / port conflict / API 500 |
+| 3 | High | Scanner | references/guide.md | Third-party Go package `sashabaranov/go-openai` with no version pin (supply chain) |
+| 4 | Medium | Writer | SKILL.md | Prerequisite constraint in description field reduces activation clarity |
+| 5 | Medium | Writer | SKILL.md | `metadata.version/author` — stale maintenance debt, no runtime value |
+| 6 | Medium | Scanner | SKILL.md + guide | `api_key="not-needed"` normalises dummy credential patterns without safety comment |
+| 7 | Medium | Scanner | references/guide.md | `sudo usermod` missing session-restart warning and security callout |
+| 8 | Medium | Prompt Eng | SKILL.md | No authority anchors (always/never) — agent may skip prerequisite check |
+| 9 | Medium | Prompt Eng | SKILL.md | API base URL duplicated in two files — divergence risk |
+| 10 | Medium | Prompt Eng | SKILL.md | No output format instruction for search results |
+| 11 | Low | Writer | SKILL.md | "Models stay loaded…" breaks imperative voice pattern |
+| 12 | Low | Writer | references/guide.md | Model sizes in table are not marked approximate |
+| 13 | Low | Writer | SKILL.md | External URL in workflow step 1 — dead-link risk |
+| 14 | Low | Prompt Eng | SKILL.md | Key Commands table duplicates Workflow — token waste |
+| 15 | Low | Scanner | references/guide.md | `panic(err)` in Go example — bad error handling pattern |
+| 16 | Info | Writer | SKILL.md | No RAM/hardware prerequisite note for large models |
+| 17 | Info | Scanner | — | No prompt injection surface found — CLEAN |
+
+## Scout: Deep review of skill: exa-search at /Users/josorio/Code/pi-skills/skills/exa-search/
+
+Read ALL files (SKILL.md + references/ + scripts/ including lib/ and __tests__/). Evaluate using THREE lenses:
+
+**LENS 1 — Skill Writer:** Frontmatter (name, description, trigger phrases, pattern compliance), imperative voice, progressive disclosure, degrees of freedom, conciseness, consistent terminology, no time-sensitive info, no machine-specific paths, no agent-specific refs, portable relative paths.
+
+**LENS 2 — Skill Scanner:** Prompt injection, dangerous code, excessive permissions, secret exposure, supply chain (external URLs, remote code exec), config poisoning.
+
+**LENS 3 — Prompt Engineering:** Instruction hierarchy, authority/commitment patterns, no over-engineering/ambiguity/overflow, token efficiency, error recovery/fallback, output format specified.
+
+Report ALL issues with severity (Critical/High/Medium/Low/Info), exact file path and line, quoted text, and suggested fix. If no issues found for a lens, state CLEAN.
+
+Here is the full three-lens review of the `exa-search` skill.
+
+---
+
+## Exa-Search Skill — Deep Review
+
+### LENS 1 — Skill Writer
+
+---
+
+#### Issue SW-1 · Medium · `SKILL.md` · Cost Awareness section
+
+> "Prices as of 2025."
+
+**Problem:** Hard-coded time reference. Skill writer rules prohibit time-sensitive info that will become stale.  
+**Fix:** Remove the date qualifier entirely. The "Verify at https://exa.ai/pricing" link directly below is sufficient.
+
+---
+
+#### Issue SW-2 · Low · `SKILL.md` · Quick Examples / Deep Research section
+
+> `tsx scripts/research.ts run "Best practices for building a CLI tool in Node.js in 2025"`  
+> `tsx scripts/research.ts run "Comprehensive analysis of AI chip market 2025"`
+
+**Problem:** Two example queries embed the hardcoded year `2025`. Examples age with the skill, and new agents running these exact commands in future years will get confusing results.  
+**Fix:** Remove the year from example queries, e.g., `"Best practices for building a CLI tool in Node.js"` and `"Comprehensive analysis of the AI chip market"`.
+
+---
+
+#### Issue SW-3 · Medium · `SKILL.md` · Prerequisites section
+
+> "Dependencies are managed at the repository root. Run `pnpm install` from the repo root if needed."
+
+**Problem:** This assumes the skill is deployed inside a specific monorepo layout. It is a machine/repo-specific structural assumption — portability violation. An agent in a different context will not know what "the repo root" is or how many levels up to go.  
+**Fix:** Replace with a self-contained install instruction:
+```bash
+# From the skill directory
+pnpm install   # installs exa-js and tsx
+```
+Or document this as a prerequisite handled by the parent skill repo's own setup, with a note that `exa-js` and `tsx` must be available.
+
+---
+
+#### Issue SW-4 · Medium · `references/api-reference.md` vs `scripts/research.ts` — `pollInterval` default inconsistency
+
+- `api-reference.md` Poll/Get Options table: `"pollInterval": number — Ms between polls (default: 2000)`
+- `scripts/research.ts` JSDoc comment: `"pollInterval": 1000, // ms between polls (default 1000)`
+- Actual code in `research.ts` `run` case: `pollInterval: (opts.pollInterval as number) || 2000`
+
+**Problem:** Three different sources give three answers for the default. Agents relying on docs will be misled. The code is the truth (`2000` for `run`), but the JSDoc says `1000`.  
+**Fix:** Align all three: update the JSDoc in `research.ts` to say `default 2000`, keep the api-reference at `2000`.
+
+---
+
+#### Issue SW-5 · Low · `SKILL.md` — Common Patterns section duplicates Quick Examples
+
+The "Documentation Lookup" and "Company Research" patterns in Common Patterns repeat commands already shown verbatim in Quick Examples. The `find-similar.ts` "Find Alternatives" example also appears twice.
+
+**Problem:** Redundant content inflates token cost and creates maintenance drift risk (one copy gets updated, the other doesn't — already visible with the `2025` hardcoding showing up in both sections).  
+**Fix:** Common Patterns should either reference the Quick Examples or contain only the *composite, multi-step* patterns not shown there. Remove single-command duplicates.
+
+---
+
+#### Issue SW-6 · Info · `SKILL.md` — Frontmatter missing `triggers` field
+
+The frontmatter has only `name` and `description`. If the skill spec supports an explicit `triggers:` list, the description currently carries all trigger phrases inline, which works but is non-standard.  
+**Note:** This is informational only — if the skill format does not define a `triggers:` key, this is CLEAN.
+
+---
+
+### LENS 2 — Skill Scanner
+
+**CLEAN** on:
+- No prompt injection in SKILL.md or any script
+- API key always sourced from `process.env.EXA_API_KEY`, never hardcoded
+- No remote code execution patterns
+- No shell expansion (`exec`, `eval` on user input) — all user input goes to typed API call parameters
+- External URLs are reference links only (`exa.ai`, `dashboard.exa.ai`), not fetched at runtime
+- `exa-js` is the only external package; no dynamic `require()` or remote imports
+
+---
+
+#### Issue SC-1 · Low · `scripts/lib/common.ts` · `parseArgs` function, line ~49
+
+```typescript
+const opts: Record<string, unknown> = args[1]
+  ? (JSON.parse(args[1]) as Record<string, unknown>)
+  : {}
+```
+
+**Problem:** `JSON.parse` is not wrapped in a try/catch. If an agent or user passes malformed JSON (e.g., a query that accidentally matches the second positional arg), the script throws a raw `SyntaxError` with a stack trace rather than a friendly error message and clean exit code `1`. Not a security issue, but a reliability issue that every script inherits.  
+**Fix:**
+```typescript
+let opts: Record<string, unknown> = {}
+if (args[1]) {
+  try {
+    opts = JSON.parse(args[1]) as Record<string, unknown>
+  } catch {
+    console.error('Error: options argument is not valid JSON')
+    process.exit(1)
+  }
+}
+```
+
+---
+
+#### Issue SC-2 · Info · `scripts/research.ts` — `run` subcommand writes to stderr
+
+```typescript
+console.error(`Research task created: ${createdTyped.researchId} — polling...`)
+```
+
+**Problem:** The progress message uses `console.error`, which is the conventional channel for stderr. This is intentional (keeps stdout pure JSON), but it is undocumented. An agent piping stdout to `jq` won't be affected, but this behavior should be noted in the SKILL.md "When Things Go Wrong" or the script's JSDoc so agents know the research ID will appear on stderr, not stdout.  
+**Fix:** Add a note in the `research.ts` JSDoc: `# Note: progress messages (task ID, polling status) are printed to stderr; final JSON result goes to stdout.`
+
+---
+
+### LENS 3 — Prompt Engineering
+
+---
+
+#### Issue PE-1 · Medium · `SKILL.md` — Decision tree step 3 conflicts with step 2 for documentation queries
+
+Step 2: `"How do I configure Drizzle ORM with Postgres?" → answer.ts`  
+Step 3: `"Do you need to browse/explore multiple results? Looking for documentation → search.ts with includeDomains"`
+
+**Problem:** Documentation queries match *both* step 2 and step 3. An agent following the tree top-down will correctly land on `answer.ts`, but the `systemPrompt` note in step 3 ("Looking for documentation → `search.ts`") creates ambiguity for an agent scanning non-linearly. The Common Patterns section correctly resolves this as "Option A / Option B / Option C", but the decision tree doesn't forward-reference it.  
+**Fix:** In step 2, add: *(See also: Documentation Lookup pattern below for multi-option comparison.)*  
+Or collapse the decision tree's doc guidance into one branch: "Direct question about how to do X in a library → `answer.ts`; exploring all options → `search.ts` with `includeDomains`."
+
+---
+
+#### Issue PE-2 · Low · `SKILL.md` — `systemPrompt` in search.ts examples not guarded with a clear caveat
+
+SKILL.md shows:
+```bash
+tsx scripts/search.ts "AI safety research" '{"type":"deep","systemPrompt":"..."}'
+```
+
+The api-reference correctly labels `systemPrompt` as "Deep-search-only instructions". The example does use `type:"deep"`, but the option table in the api-reference doesn't visually flag it as deep-only — an agent reading the table in isolation could try it without `type:"deep"`.  
+**Fix:** In `api-reference.md` Search Options table, add a note cell to `systemPrompt`: `"Deep search only (type: 'deep', 'deep-reasoning', 'deep-max')."` so the constraint is visible without cross-referencing.
+
+---
+
+#### Issue PE-3 · Low · `scripts/__tests__/refactor-validation.test.ts` — session-process test names
+
+```typescript
+describe('refactor: contents.ts uses common.ts helpers', ...)
+describe('refactor: research.ts uses common.ts helpers', ...)
+```
+
+**Problem:** Test descriptions and the filename `refactor-validation.test.ts` are session-process labels (referencing a past refactoring effort). Per AGENTS.md: *"No session-process comments in code — never reference bug numbers, group labels, phase markers, or regression history."* After the refactor is done these names are permanently misleading — they make the test suite look like a to-do list.  
+**Fix:** Rename file to `contract.test.ts` or `invariants.test.ts`. Rename `describe` blocks to describe the invariant being enforced, e.g.:
+- `'contents.ts delegates arg parsing to common.ts'`
+- `'research.ts delegates JSON output to executeAndPrint'`
+
+---
+
+#### Issue PE-4 · Info · `SKILL.md` — "Verify Before You Assume" pattern is a singleton with no depth
+
+The pattern box contains a single `answer.ts` example with a Stripe-specific query. It's valuable as a concept but gives no guidance on *when* to trigger this pattern vs just trusting training data.  
+**Fix (optional):** Either expand with one more example from a different domain (e.g., a CLI flag lookup), or fold it into the "Documentation Lookup" pattern as a third option: "Option D: verify a specific config value."
+
+---
+
+### Summary Table
+
+| ID | Severity | File | Problem |
+|----|----------|------|---------|
+| SW-1 | Medium | `SKILL.md` | "Prices as of 2025" — time-sensitive text |
+| SW-2 | Low | `SKILL.md` | Hardcoded `2025` year in example queries |
+| SW-3 | Medium | `SKILL.md` | Repo-structure dependency in Prerequisites (`pnpm install from repo root`) |
+| SW-4 | Medium | `api-reference.md` + `research.ts` | `pollInterval` default inconsistency: 1000 (JSDoc) vs 2000 (code + api-reference) |
+| SW-5 | Low | `SKILL.md` | Common Patterns duplicates Quick Examples — drift risk |
+| SW-6 | Info | `SKILL.md` | No `triggers:` frontmatter field (informational) |
+| SC-1 | Low | `scripts/lib/common.ts` | `JSON.parse` not wrapped in try/catch — unfriendly crash on bad input |
+| SC-2 | Info | `scripts/research.ts` | Progress messages go to stderr — undocumented behavior |
+| PE-1 | Medium | `SKILL.md` | Decision tree ambiguous for documentation queries — steps 2 and 3 both match |
+| PE-2 | Low | `references/api-reference.md` | `systemPrompt` table row doesn't mark it as deep-search-only |
+| PE-3 | Low | `scripts/__tests__/refactor-validation.test.ts` | Session-process test names (`refactor:` prefix, filename) |
+| PE-4 | Info | `SKILL.md` | "Verify Before You Assume" pattern is under-developed |
+
+**Critical issues: 0. High issues: 0. Blockers: none.** The skill is structurally sound — good progressive disclosure, clean secret handling, imperative voice throughout, and the `filterOptions`/`requireApiKey` guardrails are solid. The top three fixes to prioritize are SW-4 (docs/code inconsistency that will cause real confusion), SW-3 (portability), and PE-1 (decision tree ambiguity).
+
+## Scout: Deep review of skill: frontend-design at /Users/josorio/Code/pi-skills/skills/frontend-design/
+
+Read ALL files (SKILL.md + any references/). Evaluate using THREE lenses:
+
+**LENS 1 — Skill Writer:** Frontmatter (name, description, trigger phrases, pattern compliance), imperative voice, progressive disclosure, degrees of freedom, conciseness, consistent terminology, no time-sensitive info, no machine-specific paths, no agent-specific refs, portable relative paths.
+
+**LENS 2 — Skill Scanner:** Prompt injection, dangerous code, excessive permissions, secret exposure, supply chain (external URLs, remote code exec), config poisoning.
+
+**LENS 3 — Prompt Engineering:** Instruction hierarchy, authority/commitment patterns, no over-engineering/ambiguity/overflow, token efficiency, error recovery/fallback, output format specified.
+
+Report ALL issues with severity (Critical/High/Medium/Low/Info), exact file path and line, quoted text, and suggested fix. If no issues found for a lens, state CLEAN.
+
+Here is the full three-lens review:
+
+---
+
+## Deep Review: `frontend-design` Skill
+
+**File:** `/Users/josorio/Code/pi-skills/skills/frontend-design/SKILL.md`
+
+---
+
+## LENS 1 — Skill Writer
+
+### ✅ Passes
+- `name` and `description` are present and well-formed.
+- Description contains clear trigger phrases that align with the `available_skills` registration.
+- No machine-specific paths.
+- No agent-specific refs (no mentions of Claude, pi internals, etc.).
+- Uses imperative voice consistently ("Choose," "State," "Produce").
+- `license` field references `LICENSE.txt` using a relative reference — portable.
+- No time-sensitive info (no "as of 2024", no versioned CDN URLs).
+
+### Issues
+
+| Severity | Line | Issue | Suggested Fix |
+|----------|------|-------|---------------|
+| **Medium** | frontmatter `version: '1.0'` | Version is quoted as a string, but YAML interprets bare `1.0` as float. Some parsers may behave inconsistently. Style inconsistency vs. spec. | Change to `version: "1.0"` (double-quoted) or `version: 1.0` unquoted for consistency. |
+| **Medium** | "Motion library for React when available" (Motion section) | External library reference with no version pin or fallback instruction. If Motion is unavailable in the agent's environment, no fallback is specified. | Add: "If Motion is unavailable, use CSS transitions exclusively." |
+| **Low** | "Use Motion library for React when available" | Implies optional tooling without defining what "available" means (installed? importable? in scope?). Ambiguous trigger. | Rewrite as: "Use CSS transitions by default; use the Motion library only if it is already a declared project dependency." |
+| **Low** | Description mentions "posters" and "artifacts" but body content never addresses these; the Output section only covers HTML/CSS/JS and React components. | Either remove "posters, artifacts" from the description or add a paragraph covering non-web output formats (SVG posters, etc.). |
+| **Info** | `metadata.author: josorio7122` | Author is a personal handle. If this skill is intended for distribution, consider whether personal metadata should be in the skill or in a separate manifest. Not a functional issue. | Acceptable as-is for personal use. |
+
+---
+
+## LENS 2 — Skill Scanner
+
+### ✅ CLEAN
+
+- No prompt injection patterns (no `<system>`, `<!--`, `IGNORE PREVIOUS`, `[INST]`, or equivalent).
+- No dangerous code patterns (no `exec`, `eval`, `shell`, `subprocess`, `fetch` from remote, `import()` of remote URLs).
+- No secrets or credentials.
+- No external URLs whatsoever — no CDN links, no remote resources, no `npm install` instructions pointing to unvetted packages.
+- No config poisoning (no `.env` writes, no file system mutations instructed).
+- No excessive permissions requested.
+- No supply chain risk: "Motion library" is name-dropped but no install command or URL is provided; it is left to the agent's discretion.
+
+**Verdict: No security concerns.**
+
+---
+
+## LENS 3 — Prompt Engineering
+
+### ✅ Passes
+- Clear instruction hierarchy: Design Thinking → Frontend Aesthetics → Prohibitions → Output.
+- Commitment anchor is present and well-placed: *"State your chosen aesthetic direction in one sentence before writing any code."* This forces explicit reasoning before generation — good chain-of-thought scaffolding.
+- Authority pattern is strong: "NEVER," "CRITICAL," "IMPORTANT" used sparingly and correctly.
+- Fallback for ambiguity is explicit: *"make a decisive interpretation and state it — do not ask clarifying questions."* Good.
+- Output format is specified: single file for HTML, single component for React.
+
+### Issues
+
+| Severity | Line | Issue | Suggested Fix |
+|----------|------|-------|---------------|
+| **High** | Prohibitions section | The prohibition list is open-ended ("Inter, Roboto, Arial, system fonts", "particularly purple gradients") but uses "like" and "particularly" — these are examples, not exhaustive rules. LLMs will interpret the spirit inconsistently. | Rewrite as a rule-based constraint: "Never use: Inter, Roboto, Arial, or system-ui as primary display fonts. Never use purple gradient on white as a primary color scheme." Close-ended lists are more reliable. |
+| **High** | "No design should be the same. Vary between light and dark themes..." | This is a meta-instruction about output diversity across *multiple* generations. It has no effect on a single-shot generation and adds ambiguity about whether the agent should randomize or reason. In a single invocation, this becomes noise. | Remove or rewrite as: "Do not default to the same aesthetic across invocations. Consider the context to guide uniqueness, not randomness." Or move this framing to a comment/note outside the instruction body. |
+| **Medium** | Output section | "Include inline comments only for non-obvious design decisions" — "non-obvious" is subjective and undefined. Agents will differ on what qualifies. | Replace with: "Limit inline comments to design decisions that cannot be inferred from the visual output alone (e.g., why a specific font pairing was chosen, why an unconventional layout technique was used)." |
+| **Medium** | "Motion: Use animations for effects and micro-interactions... Focus on high-impact moments..." | Two competing instructions in the same bullet. The first says "use animations," the second says "don't over-animate." This creates tension an LLM will resolve unpredictably. | Split into two bullets: one for when to use animation, one for restraint/prioritization. |
+| **Medium** | Final paragraph: "Remember: you are capable of extraordinary creative work. Don't hold back..." | Motivational framing directed at the agent. This is a well-known prompting pattern but adds token cost with low signal. It may reinforce creativity but also risks over-generation (verbose output, excessive effects). | Replace with a concrete output quality anchor: "Bias toward specificity and execution depth over breadth. One well-executed detail outweighs ten generic ones." |
+| **Low** | "CRITICAL: Choose a clear conceptual direction..." | The word CRITICAL is used, but the instruction it precedes ("intentionality, not intensity") is mild and non-critical. Overuse of CRITICAL dilutes authority signals. | Reserve CRITICAL for genuinely blocking constraints. Rewrite as a regular paragraph or use **bold** without the ALL-CAPS prefix. |
+| **Info** | Design Thinking bullet list | Four bullets cover purpose, tone, constraints, differentiation — but the agent is never told how to *document* this reasoning. Only tone gets an explicit output step ("State your chosen aesthetic direction"). | Add: "Note briefly (1–2 sentences) your interpretation of purpose and differentiation before writing code." Keeps reasoning visible and auditable. |
+
+---
+
+## Summary
+
+| Lens | Verdict |
+|------|---------|
+| Skill Writer | ✅ Mostly solid — 2 medium, 2 low issues |
+| Skill Scanner | ✅ **CLEAN** — no security concerns |
+| Prompt Engineering | ⚠️ 2 High, 3 Medium issues — instruction conflicts and motivational bloat are the main risks |
+
+**Top 3 fixes to make immediately:**
+
+1. **(High)** Replace open-ended prohibition examples with closed, enumerable rules to reduce LLM interpretation variance.
+2. **(High)** Remove or rewrite the "No design should be the same" cross-generation diversity instruction — it has no semantic effect in single-shot invocations and introduces noise.
+3. **(Medium)** Split the Motion animation bullet into a "use" rule and a "restraint" rule to eliminate the competing-instruction conflict.
+
+## Scout: Deep review of skill: gh at /Users/josorio/Code/pi-skills/skills/gh/
+
+Read ALL files (SKILL.md + references/). Evaluate using THREE lenses:
+
+**LENS 1 — Skill Writer:** Frontmatter (name, description, trigger phrases, pattern compliance), imperative voice, progressive disclosure, degrees of freedom, conciseness, consistent terminology, no time-sensitive info, no machine-specific paths, no agent-specific refs, portable relative paths.
+
+**LENS 2 — Skill Scanner:** Prompt injection, dangerous code, excessive permissions, secret exposure, supply chain (external URLs, remote code exec), config poisoning.
+
+**LENS 3 — Prompt Engineering:** Instruction hierarchy, authority/commitment patterns, no over-engineering/ambiguity/overflow, token efficiency, error recovery/fallback, output format specified.
+
+Report ALL issues with severity (Critical/High/Medium/Low/Info), exact file path and line, quoted text, and suggested fix. If no issues found for a lens, state CLEAN.
+
+## Domain: gh skill — `/Users/josorio/Code/pi-skills/skills/gh/`
+
+---
+
+## LENS 1 — Skill Writer
+
+### Issue 1 — Medium | `SKILL.md` (Workflows section, top paragraph)
+**Quoted text:**
+```
+For view/list commands, summarize key fields rather than printing raw output. For create/merge commands, confirm the action and provide the resulting URL.
+```
+**Problem:** This is the most important behavioral directive in the skill, but it's buried as the opening sentence of the Workflows section — easy to skip on a first skim. There's no heading, no visual prominence, and it sits between a section heading and the first workflow sub-header. Agents may not process it as a rule.
+
+**Suggested fix:** Promote to a dedicated `## Agent Behavior` section at the top (after Prerequisites, before the decision table), or convert to a callout block:
+```markdown
+> **Output rules:** Summarize view/list output — do not print raw JSON. For create/merge, confirm the action and return the resulting URL.
+```
+
+---
+
+### Issue 2 — Low | `SKILL.md` line ~18
+**Quoted text:**
+```bash
+gh auth login --with-token <<< "<pat>" # With personal access token — Note: token appears in shell history...
+```
+**Problem:** The inline comment is a full sentence with a reasoning footnote. Code block comments should be minimal. The `<pat>` placeholder uses angle-bracket style inconsistently — everywhere else in the skill `<number>`, `<run-id>` etc. are used the same way, so this is consistent; the real issue is that the comment belongs outside the code block as a prose note for clarity and so it doesn't inflate the code sample.
+
+**Suggested fix:**
+```bash
+gh auth login --with-token <<< "<pat>"  # non-interactive; token visible in shell history
+```
+Move the recommendation ("Prefer browser OAuth for interactive sessions") to a prose sentence before the block.
+
+---
+
+### Issue 3 — Info | `SKILL.md` — "Tips" section
+**Quoted text:**
+```
+Most commands infer the repo from git remotes — use `--repo` only for cross-repo operations.
+```
+**Problem:** One-sentence section. Either expand with 2–3 real tips (e.g. `--json` + `--jq` for scripting, `gh alias` for shortcuts) or fold this sentence into the Prerequisites or a Behavior section to avoid a section that looks underdeveloped.
+
+---
+
+### Issue 4 — Info | `SKILL.md` — frontmatter `version: '2.0'`
+**Problem:** Version strings in frontmatter are time-sensitive maintenance burden. The skill writer spec says "no time-sensitive info." If the harness doesn't consume the version field programmatically, remove it.
+
+---
+
+## LENS 2 — Skill Scanner
+
+### Issue 5 — Medium | `references/commands.md` — Repository table
+**Quoted text:**
+```bash
+gh repo delete owner/repo --yes
+```
+**Problem:** `--yes` bypasses the interactive confirmation prompt entirely. A confused agent (or an injected instruction) could trigger permanent, irreversible repository deletion without any human gate. This is the only truly irreversible operation in the skill, and it has the bypass flag baked in.
+
+**Suggested fix:** Remove `--yes` from the documented command and add a note:
+```
+Delete repo  |  gh repo delete owner/repo  (requires interactive confirmation — do not add --yes)
+```
+
+---
+
+### Issue 6 — Medium | `references/commands.md` — Actions — Cache table
+**Quoted text:**
+```bash
+gh cache delete --all
+```
+**Problem:** Deleting all caches in a repository can destroy CI performance for the entire team and is irreversible within the current run window. No warning is present. Low likelihood of accidental trigger, but consequence is high.
+
+**Suggested fix:** Add an inline note:
+```
+Delete all caches  |  gh cache delete --all  # destructive — affects all branches
+```
+
+---
+
+### Issue 7 — Low | `SKILL.md` line ~18 — PAT in heredoc
+**Quoted text:**
+```bash
+gh auth login --with-token <<< "<pat>"
+```
+**Problem:** The pattern is safe as a placeholder but normalizes passing secrets via heredoc substitution. If an agent fills `<pat>` with an actual token value from context (e.g., from an env var it was told about), the token lands in shell history and any process-list snapshot. The existing inline warning partially mitigates this but is easy to overlook.
+
+**Suggested fix:** Prefer the documented environment variable pattern from `commands.md` as the non-interactive alternative:
+```bash
+GH_TOKEN="$GITHUB_TOKEN" gh <command>   # non-interactive; token not in shell history
+```
+Or reference `GITHUB_TOKEN` env var from the Environment Variables table in `commands.md`.
+
+---
+
+### Issue 8 — Info | `references/commands.md` — no external URLs, no remote exec
+**Verdict:** CLEAN on supply chain, prompt injection, config poisoning, and secret exposure beyond issues noted above.
+
+---
+
+## LENS 3 — Prompt Engineering
+
+### Issue 9 — High | `SKILL.md` — behavioral directive placement (same text as Issue 1, different lens)
+**Quoted text:**
+```
+For view/list commands, summarize key fields rather than printing raw output. For create/merge commands, confirm the action and provide the resulting URL.
+```
+**Problem (prompt engineering view):** In instruction hierarchy terms, this is a **formatting contract** — it governs every output the agent produces. It must appear before examples, not after a section heading where it competes with workflow content for attention. Buried instructions are treated as weak suggestions by most models; top-of-file or clearly-delineated rules sections carry stronger authority.
+
+**Suggested fix:** Same as Issue 1 — extract to `## Agent Behavior` before the decision table, or add to a `## Output Format` section. Use directive framing:
+```markdown
+## Output Format
+- **List/view commands:** Summarize key fields in prose or a short table. Never dump raw JSON.
+- **Create/merge commands:** Confirm the action, then return the resulting URL.
+```
+
+---
+
+### Issue 10 — Medium | `SKILL.md` — missing "not installed" fallback
+**Problem:** The Prerequisites section checks `gh --version` but gives no fallback instruction if `gh` is absent. An agent hitting a "command not found" error has no recovery path in the skill. The "When Things Fail" section doesn't cover it either.
+
+**Suggested fix:** Add to Prerequisites:
+```bash
+# If gh is not installed:
+# macOS:   brew install gh
+# Linux:   https://github.com/cli/cli/blob/trunk/docs/install_linux.md
+# Windows: winget install --id GitHub.cli
+```
+(These are stable install paths unlikely to go stale.)
+
+---
+
+### Issue 11 — Low | `SKILL.md` — "summarize key fields" is unspecified
+**Problem:** The output rule says "summarize key fields" without specifying what counts as key for the most common commands (`gh pr view`, `gh issue list`, `gh run list`). An agent must guess. This introduces inconsistency across sessions.
+
+**Suggested fix:** Add a brief field list:
+```
+PR: number, title, status, author, CI checks result, URL
+Issue: number, title, state, labels, assignee
+Run: run ID, workflow name, status, conclusion, duration
+```
+
+---
+
+### Issue 12 — Info | `references/commands.md` — JSON field discovery commands
+**Quoted text:**
+```bash
+gh pr view --json 2>&1 | head -5
+gh issue list --json 2>&1 | head -5
+```
+**Problem:** These commands intentionally trigger an error (`--json` without fields) to get the field list from the error message. This is a clever hack but it's also fragile — `gh` CLI output format for error messages isn't a stable API. Not a blocking issue but worth noting.
+
+---
+
+## Summary
+
+| # | Severity | Lens | File | Issue |
+|---|----------|------|------|-------|
+| 1 | Medium | Writer + PE | `SKILL.md` | Behavioral directive buried in Workflows |
+| 2 | Low | Writer | `SKILL.md` | Inline comment too verbose; note should be prose |
+| 3 | Info | Writer | `SKILL.md` | Single-sentence Tips section — expand or remove |
+| 4 | Info | Writer | `SKILL.md` | `version: '2.0'` is time-sensitive frontmatter |
+| 5 | **Medium** | Scanner | `references/commands.md` | `gh repo delete --yes` bakes in confirmation bypass |
+| 6 | Medium | Scanner | `references/commands.md` | `gh cache delete --all` — no destructive warning |
+| 7 | Low | Scanner | `SKILL.md` | PAT heredoc pattern normalizes secret injection |
+| 8 | Info | Scanner | both | No injection, no remote exec, no supply chain risk |
+| 9 | **High** | Prompt Eng | `SKILL.md` | Output format contract has weak authority placement |
+| 10 | Medium | Prompt Eng | `SKILL.md` | No fallback when `gh` not installed |
+| 11 | Low | Prompt Eng | `SKILL.md` | "Key fields" undefined — agent must guess |
+| 12 | Info | Prompt Eng | `references/commands.md` | Error-triggered field discovery is fragile |
+
+**Highest-priority fixes (in order):** Issue 9/1 (output contract placement — affects every response), Issue 5 (repo delete `--yes` — irreversible), Issue 10 (no install fallback), Issue 6 (cache delete warning).
+
+## Scout: Deep review of skill: glab at /Users/josorio/Code/pi-skills/skills/glab/
+
+Read ALL files (SKILL.md + references/). Evaluate using THREE lenses:
+
+**LENS 1 — Skill Writer:** Frontmatter (name, description, trigger phrases, pattern compliance), imperative voice, progressive disclosure, degrees of freedom, conciseness, consistent terminology, no time-sensitive info, no machine-specific paths, no agent-specific refs, portable relative paths.
+
+**LENS 2 — Skill Scanner:** Prompt injection, dangerous code, excessive permissions, secret exposure, supply chain (external URLs, remote code exec), config poisoning.
+
+**LENS 3 — Prompt Engineering:** Instruction hierarchy, authority/commitment patterns, no over-engineering/ambiguity/overflow, token efficiency, error recovery/fallback, output format specified.
+
+Report ALL issues with severity (Critical/High/Medium/Low/Info), exact file path and line, quoted text, and suggested fix. If no issues found for a lens, state CLEAN.
+
+## Domain: glab skill — `/Users/josorio/Code/pi-skills/skills/glab/`
+
+---
+
+## LENS 1 — Skill Writer
+
+### Issue SW-1 · Low · `SKILL.md` frontmatter
+```yaml
+metadata:
+  author: josorio7122
+```
+**Problem:** `author` is a user-specific identifier baked into the skill file. Skills should be portable and authorless — the git history owns provenance.  
+**Fix:** Remove the `metadata.author` field entirely, or keep only `version`.
+
+---
+
+### Issue SW-2 · Low · `SKILL.md` — CI/CD Config section
+```bash
+# Use a variable or stdin for secrets: echo "$MY_SECRET" | glab variable set API_KEY
+glab variable set API_KEY "$MY_SECRET"
+```
+**Problem:** The comment recommends the safe stdin pattern, but the very next line demonstrates the inline form anyway. An agent will follow the executable example, not the comment. Mixed signal undermines the guidance.  
+**Fix:** Remove the inline example; show only the stdin form:
+```bash
+echo "$MY_SECRET" | glab variable set API_KEY
+```
+
+---
+
+### Issue SW-3 · Low · `SKILL.md` — Stacked Diffs workflow vs `commands.md`
+**Problem:** `glab stack amend` appears in the full reference table (`commands.md`) but is absent from the Stacked Diffs workflow section in `SKILL.md`. A user wanting to revise the current stack entry won't find it in the workflow. Minor gap in progressive disclosure.  
+**Fix:** Add a line to the workflow:
+```bash
+glab stack amend                 # Revise the current entry instead of saving a new one
+```
+
+---
+
+### Issue SW-4 · Info · `commands.md` — system path in prose
+```
+(default: `~/.config/glab`)
+```
+**Problem:** Tilde-expanded home-dir path in the Environment Variables table. Not machine-specific per se (it's a CLI default value, not a hardcoded project path), but it ties the doc to Unix-style paths. Acceptable in context, flagged for awareness.  
+**Fix:** None required; acceptable as a CLI default documentation value.
+
+---
+
+## LENS 2 — Skill Scanner
+
+### Issue SS-1 · Medium · `SKILL.md` — token in command-line argument
+```bash
+--header "PRIVATE-TOKEN: $(glab config get token --host gitlab.com)"
+```
+**Problem:** Passing the PAT as a CLI flag means it appears in `/proc/<pid>/cmdline` and in `ps aux` on multi-user systems. Any process on the machine can read it during execution. The skill teaches this pattern without a caveat.  
+**Fix:** Add a warning comment and show the safer `--header @-` or environment-variable form:
+```bash
+# Safer: pass token via env variable, not a flag visible in process lists
+GITLAB_TOKEN=$(glab config get token --host gitlab.com) \
+  curl --request POST \
+    --header "PRIVATE-TOKEN: $GITLAB_TOKEN" \
+    ...
+```
+Or note: *"Token will be visible in process lists — use only on single-user machines or in CI with masked variables."*
+
+---
+
+### Issue SS-2 · Low · `SKILL.md` — inline secret value in variable example (duplication of SW-2)
+```bash
+glab variable set API_KEY "$MY_SECRET"
+```
+Already caught under SW-2; the security dimension is: shell history (`~/.bash_history`, `~/.zsh_history`) captures this command including the expanded secret value.  
+**Fix:** Same as SW-2 — use stdin pipe exclusively.
+
+---
+
+### Issue SS-3 · Info · No external URLs or remote code execution
+The skill contains no `curl | bash`, no fetches to untrusted URLs, no `eval`, no dynamic code generation. Supply chain surface is clean.
+
+---
+
+### Issue SS-4 · Info · Destructive commands undifferentiated
+```
+glab repo delete <owner/repo>
+glab mr delete <id>
+glab issue delete <id>
+```
+**Problem:** All three destructive delete commands appear in tables alongside non-destructive reads with no visual distinction or warning. Not critical (the user must explicitly invoke them), but a `⚠️` or bold marker would prevent accidental "run all table entries" mishaps.  
+**Fix:** Append `⚠️` or bold the row, or add a note: *"Permanent — GitLab does not trash-bin deleted MRs/issues."*
+
+---
+
+## LENS 3 — Prompt Engineering
+
+### Issue PE-1 · Medium · `SKILL.md` — `glab ci run-trig` undocumented parameter
+```bash
+glab ci run-trig --token <token>
+```
+**Problem:** `--token` is left unexplained. What kind of token? A pipeline trigger token (project-scoped, different from a PAT). An agent following this example will not know how to obtain or generate it, leading to hallucination or wrong token type.  
+**Fix:** Add inline context:
+```bash
+glab ci run-trig --token <pipeline-trigger-token>  # Create one in Settings → CI/CD → Pipeline triggers
+```
+
+---
+
+### Issue PE-2 · Low · `SKILL.md` — ambiguous squash flag name inconsistency
+```bash
+glab mr create --fill --squash-message-on-merge    # in Create an MR
+glab mr merge <id> --squash                        # in Merge an MR
+```
+**Problem:** Two different flags (`--squash-message-on-merge` at create time vs `--squash` at merge time) appear to do similar things with no explanation of the distinction. This will cause an agent to conflate them.  
+**Fix:** Add a brief inline comment to `--squash-message-on-merge`:
+```bash
+glab mr create --fill --squash-message-on-merge  # Sets squash commit message template; use --squash at merge time to actually squash
+```
+
+---
+
+### Issue PE-3 · Low · `SKILL.md` — no fallback instruction for failed `--fill`
+**Problem:** `--fill` is recommended universally ("always use it"), but if the branch has no commit messages yet (e.g., empty WIP commit), `--fill` produces an empty MR title and the CLI prompts interactively. There is no guidance on what to do in that case.  
+**Fix:** Add to the Tips section:
+> **`--fill` needs commits** — if your branch has no commits yet, omit `--fill` and supply `--title` manually.
+
+---
+
+### Issue PE-4 · Info · `SKILL.md` — routing table is excellent
+The "Choosing the Right Command" decision table at the top is a strong commitment/authority pattern — it anchors the agent's first action and prevents free-form exploration. No issue; noting as a positive pattern worth preserving.
+
+---
+
+### Issue PE-5 · Info · Output format not specified for agent responses
+**Problem:** The skill teaches glab commands but never specifies what format the agent should use when surfacing results (raw CLI output, summarised table, prose explanation). For a CLI tool skill, this is acceptable — the agent should reproduce CLI output faithfully — but an explicit note would tighten consistency.  
+**Fix (optional):** Add to Tips: *"Reproduce CLI output verbatim in code blocks; summarise only when the output exceeds 50 lines."*
+
+---
+
+## Findings Summary
+
+| # | Severity | Lens | Issue |
+|---|----------|------|-------|
+| SW-1 | Low | Writer | `metadata.author` ties skill to a specific user — remove for portability |
+| SW-2 / SS-2 | Low | Writer + Scanner | Inline `glab variable set API_KEY "$MY_SECRET"` contradicts the adjacent stdin guidance and leaks to shell history |
+| SS-1 | Medium | Scanner | `PRIVATE-TOKEN` passed as CLI flag exposes the PAT in process listings — needs caveat or safer form |
+| PE-1 | Medium | Prompt Eng | `glab ci run-trig --token <token>` leaves token type and source unexplained — agents will hallucinate |
+| PE-2 | Low | Prompt Eng | `--squash-message-on-merge` vs `--squash` conflation — needs disambiguation |
+| SS-4 | Info | Scanner | Destructive `delete` commands indistinguishable from reads in reference tables |
+| PE-3 | Low | Prompt Eng | No fallback when `--fill` produces empty output (branch with no commits) |
+
+**Overall:** The skill is well-structured with excellent progressive disclosure and a strong routing table. The two most actionable fixes are **(1) removing the inline secret variable example** (contradicts its own guidance and is a real security footgun) and **(2) clarifying `glab ci run-trig --token`** (will cause agent errors on every pipeline-trigger use). Everything else is polish.
+
+## Scout: Deep review of skill: interface-design at /Users/josorio/Code/pi-skills/skills/interface-design/
+
+Read ALL files (SKILL.md + ALL references/ files). Evaluate using THREE lenses:
+
+**LENS 1 — Skill Writer:** Frontmatter (name, description, trigger phrases, pattern compliance), imperative voice, progressive disclosure, degrees of freedom, conciseness, consistent terminology, no time-sensitive info, no machine-specific paths, no agent-specific refs, portable relative paths.
+
+**LENS 2 — Skill Scanner:** Prompt injection, dangerous code, excessive permissions, secret exposure, supply chain (external URLs, remote code exec), config poisoning.
+
+**LENS 3 — Prompt Engineering:** Instruction hierarchy, authority/commitment patterns, no over-engineering/ambiguity/overflow, token efficiency, error recovery/fallback, output format specified.
+
+Report ALL issues with severity (Critical/High/Medium/Low/Info), exact file path and line, quoted text, and suggested fix. If no issues found for a lens, state CLEAN.
+
+## Deep Review: `interface-design` Skill
+
+**Files reviewed:** SKILL.md, references/mindset.md, references/principles.md, references/craft-foundations.md, references/design-system.md, references/memory.md, references/critique.md, references/example.md
+
+---
+
+## LENS 1 — Skill Writer
+
+### ✅ Strengths
+- Frontmatter is well-formed: `name`, `description`, `metadata.author`, `metadata.version` all present
+- Description field doubles as trigger phrases — covers positive triggers ("design a dashboard", "build an admin panel") and redirect cases ("landing pages and marketing sites") cleanly
+- Imperative voice used throughout ("Read X", "Do not propose", "Run these checks", "Stop and think")
+- Progressive disclosure via the reference table — load only what's needed for the current task
+- No time-sensitive content, no model/version references, no machine-specific absolute paths
+- Relative paths throughout; portable
+
+---
+
+### ⚠️ Issues
+
+**[Medium] — SKILL.md, "Scope" section, line ~20**
+> `"Redirect those to \`/frontend-design\`."`
+
+The `/frontend-design` uses a leading slash, implying a URL or CLI command path. The frontmatter description says `"frontend-design"` (no slash). Inconsistent — and the slash makes it ambiguous (is it a file path? a route?).
+
+**Suggested fix:** Remove the slash: `"Redirect those to the frontend-design skill."`
+
+---
+
+**[Medium] — SKILL.md, Reference table, "Reviewing design quality" row**
+
+| When | Load |
+|------|------|
+| Reviewing design quality | `references/memory.md` |
+
+`memory.md` is about **pattern management and system.md maintenance** — not design quality review. The file for quality review is `references/critique.md`. This mismatch will cause an agent to load the wrong reference when asked to review quality.
+
+**Suggested fix:** Change the row to:
+```
+| Reviewing design quality | `references/critique.md` — mandate checks, composition, craft critique |
+```
+
+---
+
+**[Low] — SKILL.md, "Before Writing Each Component" section**
+> `"Every time you write UI code — even small additions — state: [6-dimension block]"`
+
+Forcing a full Intent/Palette/Depth/Surfaces/Typography/Spacing declaration before *every* component addition — even minor ones — is over-prescriptive. For corrections, spacing tweaks, or state additions this creates verbose noise and breaks flow. The word "mandatory" here is appropriate for initial builds but too broad as stated.
+
+**Suggested fix:** Scope it: `"Every time you write a new component or establish a new visual pattern, state:..."`
+
+---
+
+**[Low] — Content overlap between references/principles.md and references/craft-foundations.md**
+
+Both files cover:
+- Color philosophy ("Color Lives Somewhere" / "Color Carries Meaning")
+- Intent-first approach
+- Surface elevation / subtlety principle
+
+An agent loading both (which the reference table can cause) gets redundant content without a clear authority hierarchy.
+
+**Suggested fix:** Move color philosophy entirely to `craft-foundations.md` and have `principles.md` reference it. Add a note to the reference table clarifying the split.
+
+---
+
+## LENS 2 — Skill Scanner
+
+### ✅ CLEAN
+
+- No prompt injection patterns found
+- No dangerous code execution instructions (no `eval`, `exec`, shell commands, remote imports)
+- No API keys, secrets, or credentials
+- No external URLs or remote code execution
+- No config poisoning vectors
+- `.interface-design/system.md` is a read target in the user's project — appropriate scope, no privilege escalation
+- No excessive permission requests
+
+---
+
+## LENS 3 — Prompt Engineering
+
+### ✅ Strengths
+- Strong commitment anchors: `"This checkpoint is mandatory"`, `"Do not propose any direction until you produce all four"` — these reduce hedging and default behavior effectively
+- Clear error recovery: `"If direction rejected: ask what specifically felt wrong... Re-explore only the rejected dimension — do not restart from scratch."` — excellent. Prevents the agent from throwing away valid work
+- Output format fully specified for proposals (the `Suggest + Ask` template block)
+- The 4 required outputs before any proposal is a strong anti-default forcing function
+- `/interface-design:*` commands are well-scoped and unambiguous
+
+---
+
+### ⚠️ Issues
+
+**[Medium] — Token overflow risk: mandatory component checkpoint**
+
+The 6-dimension block before every component:
+```
+Intent: [...]
+Palette: [...]
+Depth: [...]
+Surfaces: [...]
+Typography: [...]
+Spacing: [...]
+```
+
+...declared before "even small additions" will compound in long sessions. Each call to add a hover state or fix a spacing value will prepend ~100 tokens of self-narration. Over a 10-component session this adds ~1,000 tokens of process overhead that repeats information already established in the direction phase.
+
+**Suggested fix:** Establish the block once at the start of a build. Add a note: `"Re-state only if direction changes mid-build."`
+
+---
+
+**[Medium] — Reference table: wrong file mapped to quality review triggers loading failure**
+
+Already noted in Lens 1, but the prompt engineering consequence is concrete: an agent asked to "review design quality" loads `memory.md` (pattern management), receives no critique guidance, and either produces wrong output or silently falls back to training defaults — defeating the purpose of the reference system.
+
+This is a silent failure mode with no error recovery path.
+
+---
+
+**[Low] — No fallback for zero-context inputs**
+
+SKILL.md says:
+> `"If you cannot answer these with specifics, stop. Ask the user. Do not guess."`
+
+But there's no guidance on *what* to ask. An agent stopping with "I need more context" is less useful than one with a structured intake prompt.
+
+**Suggested fix:** Add a minimal intake template:
+```
+"Who uses this? (role, context)
+What's the primary action?
+What should it feel like? (not 'clean' — pick a world)"
+```
+
+---
+
+**[Low] — Ambiguous authority between design-system.md and principles.md cross-references**
+
+`design-system.md` ends with:
+> `"See principles.md for control token philosophy."`
+> `"See principles.md for navigation context and dark mode guidance."`
+
+This means `design-system.md` is incomplete without `principles.md`, but the reference table treats them as separate load triggers. An agent using only `design-system.md` for "implementing specific components" will miss control token philosophy — a gap with no warning in the loading guidance.
+
+**Suggested fix:** Either inline the missing content into `design-system.md`, or update the reference table entry to note: `"Load alongside principles.md for complete component guidance."`
+
+---
+
+## Summary
+
+| # | Severity | Lens | File | Issue |
+|---|----------|------|------|-------|
+| 1 | Medium | Writer | SKILL.md | `/frontend-design` slash — ambiguous path vs name |
+| 2 | Medium | Writer + Prompt Eng | SKILL.md reference table | `memory.md` mapped to "Reviewing design quality" — should be `critique.md`; silent failure mode |
+| 3 | Medium | Prompt Eng | SKILL.md | Mandatory 6-dim checkpoint before "even small additions" — token overflow risk in long sessions |
+| 4 | Low | Writer | principles.md + craft-foundations.md | Content overlap on color philosophy and intent-first — no authority ordering |
+| 5 | Low | Prompt Eng | SKILL.md | No structured intake fallback when user provides zero product context |
+| 6 | Low | Prompt Eng | design-system.md | Incomplete without principles.md but no co-load instruction in reference table |
+
+**Most impactful fix:** Issue #2 — the `memory.md`/`critique.md` swap. It's a silent wrong-file load that bypasses the entire critique framework exactly when quality review is needed.
+
+## Scout: Deep review of skill: pdf at /Users/josorio/Code/pi-skills/skills/pdf/
+
+Read ALL files (SKILL.md + any references/). Evaluate using THREE lenses:
+
+**LENS 1 — Skill Writer:** Frontmatter (name, description, trigger phrases, pattern compliance), imperative voice, progressive disclosure, degrees of freedom, conciseness, consistent terminology, no time-sensitive info, no machine-specific paths, no agent-specific refs, portable relative paths.
+
+**LENS 2 — Skill Scanner:** Prompt injection, dangerous code, excessive permissions, secret exposure, supply chain (external URLs, remote code exec), config poisoning.
+
+**LENS 3 — Prompt Engineering:** Instruction hierarchy, authority/commitment patterns, no over-engineering/ambiguity/overflow, token efficiency, error recovery/fallback, output format specified.
+
+Report ALL issues with severity (Critical/High/Medium/Low/Info), exact file path and line, quoted text, and suggested fix. If no issues found for a lens, state CLEAN.
+
+## Domain: PDF Skill — Deep Review
+
+---
+
+## LENS 1 — Skill Writer
+
+### Frontmatter & Trigger Phrases
+
+**Info — `SKILL.md` lines 3–5 (description)**
+The description lists good trigger phrases but is missing some common variants:
+- "annotate a PDF", "split a PDF", "compress a PDF", "rotate pages" — these are natural requests the skill could handle but aren't listed as triggers.
+- Suggested fix: Add to description: `"split a PDF," "annotate a PDF,"` — or accept as-is if out of scope (but then the skill should state it doesn't handle those).
+
+**Info — `SKILL.md` line 5 (description)**
+> "Uses Poppler for rendering, reportlab for generation, pdfplumber and pypdf for extraction."
+
+This sentence is in the skill *registration description* (frontmatter). The registration description is what the dispatcher reads to decide whether to load the skill — embedding implementation detail there is low-value to routing and takes up tokens. It's not wrong, but it's noise at the trigger-selection layer.
+- Suggested fix: End description after `"...any task involving PDF documents where layout and visual fidelity matter. Also use when the user mentions PDF files even if they don't explicitly ask for help with them."` — remove the tool list from the description.
+
+---
+
+### Imperative Voice
+
+**CLEAN** — All workflow steps use imperative voice ("Use," "Prefer," "Write," "Keep"). No passive constructions found.
+
+---
+
+### Progressive Disclosure
+
+**Low — `SKILL.md` lines 18–21 (Workflow)**
+The `## Workflow` section is good at high level, but steps 1–4 mix *decision logic* ("if unavailable, install Poppler") with *action steps*. This creates a flat list where branching logic is embedded inline. A reader executing the skill must parse prose to understand conditionals.
+- Suggested fix: Express the fallback as a nested bullet or a dedicated `## Fallbacks` section, keeping the main workflow as clean imperative steps.
+
+---
+
+### Machine-Specific Paths
+
+**Low — `SKILL.md` line 28 (`tmp/pdfs/`)**
+> `Use tmp/pdfs/ for intermediate files`
+
+`tmp/pdfs/` is a relative path, which is fine — it's not absolute or machine-specific. **CLEAN** on absolute paths. However, `tmp/` may conflict with OS temp conventions on Linux. Consider `./tmp/pdfs/` explicitly or note it's relative to project root.
+- Severity: Low / Info.
+
+---
+
+### No Time-Sensitive or Version-Specific Info
+
+**Low — `SKILL.md` line 35**
+> `see https://docs.astral.sh/uv/getting-started/installation/`
+
+External URL to installation docs. If the URL changes or the tool renames the page, this instruction silently breaks. The URL is for `uv`, not a PDF library — it's a dependency installation reference. Acceptable but fragile.
+- Suggested fix: Replace with: `"or ask the user to install uv from the official astral.sh docs"` — avoids a hardcoded URL.
+
+---
+
+### Consistent Terminology
+
+**Low — `SKILL.md` lines 2–3, 23, 70**
+The skill registers as `pdf` but uses both "PDF Skill" (heading) and "pdf" (name). This is fine. However:
+- Line 2: `"Read, create, edit, and review"` — "edit" is listed in description but **never explained** in the skill body. There is no `## Edit PDFs` section, no guidance on what "edit" means (in-place modification? overlay text? form fill?). A user asking to "edit a PDF" triggers this skill, but the skill has no handler for general editing.
+- **Severity: Medium** — capability mismatch between registered description and actual skill content.
+- Suggested fix: Either add an `## Edit PDFs` section defining the editing approach (e.g., overlay with reportlab, redact, replace text), or remove "edit" from the description and trigger list.
+
+---
+
+### Portability
+
+**Info — `SKILL.md` lines 38–43**
+The `brew install poppler` / `apt-get install` blocks are OS-specific commands. This is acceptable in a setup block — it's standard practice to list platform variants. CLEAN.
+
+---
+
+### Prerequisites Section Duplication
+
+**Low — `SKILL.md` lines 73–74 (`## Prerequisites`)**
+The prerequisites section exactly restates what is already fully described in `## Dependencies`. This is pure duplication — adds token cost with zero new information.
+- Suggested fix: Remove `## Prerequisites` entirely, or replace with a one-line "See Dependencies section above."
+
+---
+
+## LENS 2 — Skill Scanner
+
+### Prompt Injection
+
+**CLEAN** — No user input is interpolated into shell commands or Python code snippets without escaping. The only variable in a shell block is `$INPUT_PDF` / `$OUTPUT_PREFIX` (line 50), which are illustrative placeholders, not live interpolations. No instruction to `eval`, no dynamic command construction from user input.
+
+---
+
+### Dangerous Code
+
+**Low — `SKILL.md` lines 38–43 (sudo)**
+> `sudo apt-get install -y poppler-utils`
+
+The skill instructs the agent to run `sudo apt-get install`. This escalates to root. In a sandboxed environment this may be acceptable, but a skill instructing agents to `sudo` without qualification is a risk surface:
+- The agent may attempt `sudo` on a host machine where it has no business doing so.
+- Suggested fix: Wrap with a note: `"Only run if operating inside a container or CI environment with appropriate permissions."` Or prefer: `"Ask the user to install poppler-utils before proceeding if sudo is not available."` — consistent with the macOS pattern of preferring Homebrew (non-root).
+
+---
+
+### Excessive Permissions
+
+**Low** — The skill instructs deletion of temp files (`delete when done`, line 27). There is no constraint on *which* files can be deleted. An agent following this instruction liberally could delete more than intended. The instruction is scoped to `tmp/pdfs/` implicitly, but not explicitly.
+- Suggested fix: Make deletion explicit: `"Delete only files under tmp/pdfs/ after final delivery."` Add a qualifier so the agent doesn't interpret "delete when done" broadly.
+
+---
+
+### External URLs / Supply Chain
+
+**Info — `SKILL.md` line 35**
+> `https://docs.astral.sh/uv/getting-started/installation/`
+
+Single external URL, pointing to a legitimate well-known tool (astral.sh / uv). Not a supply chain risk per se, but it's the only URL in the skill. No remote code execution instructions. **No risk beyond the fragility noted in Lens 1.**
+
+---
+
+### Secret Exposure
+
+**CLEAN** — Line 71 explicitly states: `"No required environment variables."` No API keys, tokens, or credentials referenced.
+
+---
+
+### Config Poisoning
+
+**CLEAN** — No instructions to modify system config files, environment files, `.bashrc`, or project config.
+
+---
+
+## LENS 3 — Prompt Engineering
+
+### Instruction Hierarchy
+
+**Medium — Missing primary directive at the top**
+The skill opens with `## When to use` — a routing/meta section — before giving the agent any behavioral grounding. A stronger opening would front-load the core mandate: *"This skill governs all PDF operations. Always render and visually inspect before delivery."* The primary non-negotiable constraint (visual inspection) is buried at line 16 and line 76.
+- Suggested fix: Add a 2-line `## Core Rule` block at the very top (before `## When to use`) stating the non-negotiable:
+  > "Always render PDFs to PNG and inspect before delivery. Never deliver an uninspected PDF."
+
+---
+
+### Authority / Commitment Patterns
+
+**Medium — `SKILL.md` line 57**
+> `If pdftoppm returns no pages or an error, report the error to the user. Do not attempt delivery of an uninspected PDF.`
+
+This is good — a hard stop. However, the final check on line 76 says:
+> `Do not deliver until the latest PNG inspection shows zero visual or formatting defects.`
+
+The commitment is present but split across two sections (Rendering command and Final checks). An agent processing top-to-bottom may treat the mid-skill instruction as the only one and overlook the final checks. Consolidating both into a single `## Delivery Gate` section would strengthen the commitment pattern.
+
+---
+
+### Ambiguity
+
+**Medium — `SKILL.md` line 2 ("edit")**
+Already flagged in Lens 1. From a prompt engineering standpoint, "edit" is an unconstrained verb. When the dispatcher routes an "edit PDF" request here, the agent has no action to follow — the skill body provides no `edit` handler. This creates a silent ambiguity where the agent must improvise, likely producing unreliable behavior.
+
+**Low — `SKILL.md` line 32 (`## Fill PDF Forms`)**
+> `Use pypdf's form-fill API for AcroForms. Render and inspect the filled PDF before delivery.`
+
+This is a single sentence for an entire task type. No code snippet, no API method name, no field-detection guidance. `pypdf`'s form-fill API requires knowing field names — the skill gives no guidance on how to discover them. Compare with `## Merge PDFs`, which provides a complete code snippet.
+- Suggested fix: Add a minimal discovery snippet:
+  ```python
+  from pypdf import PdfReader
+  reader = PdfReader("form.pdf")
+  print(reader.get_fields())  # shows field names
+  ```
+
+---
+
+### Token Efficiency
+
+**Low — `SKILL.md` lines 73–74**
+Duplicate prerequisites (already flagged in Lens 1) waste tokens. Remove.
+
+**Info — `SKILL.md` lines 1–78**
+Overall token budget: ~600 tokens. This is within a reasonable skill length. No bloat beyond the duplicate prerequisites block.
+
+---
+
+### Error Recovery / Fallback
+
+**Medium — Missing fallback for `reportlab` creation failures**
+The skill covers Poppler unavailability (lines 18–20) and pdftoppm errors (line 57), but has **no fallback for `reportlab` generation failures** (e.g., encoding errors, image path errors, font-not-found errors). These are among the most common reportlab failure modes.
+- Suggested fix: Add a brief note under `## Workflow` step 2:
+  > "If reportlab raises a font or encoding error, verify all strings are UTF-8 and all image paths are absolute."
+
+---
+
+### Output Format Specified
+
+**CLEAN** — `## Output format for read/extract tasks` (lines 60–65) clearly specifies Markdown output, table handling, page-number annotation, and summary behavior. Well-specified.
+
+---
+
+## Summary of All Issues
+
+| # | Severity | Lens | Location | Issue |
+|---|----------|------|----------|-------|
+| 1 | **Medium** | Writer + PE | Description + body | "edit" listed as capability but no handler exists in skill body |
+| 2 | **Medium** | PE | Top of skill | No primary directive / Core Rule up front; delivery gate is split |
+| 3 | **Medium** | PE | Line 32 | `Fill PDF Forms` section has no code example; field discovery not explained |
+| 4 | **Medium** | PE | Workflow | No error recovery guidance for reportlab generation failures |
+| 5 | **Low** | Scanner | Lines 38–43 | `sudo apt-get` without environment qualification — risk of root exec on host |
+| 6 | **Low** | Scanner | Line 27 | Deletion instruction not explicitly scoped to `tmp/pdfs/` |
+| 7 | **Low** | Writer | Lines 73–74 | Prerequisites section duplicates Dependencies — dead tokens |
+| 8 | **Low** | Writer | Line 35 | External URL to uv docs is fragile; prefer prose reference |
+| 9 | **Low** | Writer | Lines 18–21 | Branching logic inline with workflow steps — harder to execute |
+| 10 | **Info** | Writer | Description line 5 | Tool list in registration description is routing noise |
+| 11 | **Info** | Writer | Line 28 | `tmp/pdfs/` not explicitly relative to project root |
+
+**No Critical or High issues found across all three lenses.**
+
+## Scout: Deep review of skill: playwright at /Users/josorio/Code/pi-skills/skills/playwright/
+
+Read ALL files (SKILL.md + references/ + scripts/). Evaluate using THREE lenses:
+
+**LENS 1 — Skill Writer:** Frontmatter (name, description, trigger phrases, pattern compliance), imperative voice, progressive disclosure, degrees of freedom, conciseness, consistent terminology, no time-sensitive info, no machine-specific paths, no agent-specific refs, portable relative paths.
+
+**LENS 2 — Skill Scanner:** Prompt injection, dangerous code, excessive permissions, secret exposure, supply chain (external URLs, remote code exec), config poisoning.
+
+**LENS 3 — Prompt Engineering:** Instruction hierarchy, authority/commitment patterns, no over-engineering/ambiguity/overflow, token efficiency, error recovery/fallback, output format specified.
+
+Report ALL issues with severity (Critical/High/Medium/Low/Info), exact file path and line, quoted text, and suggested fix. If no issues found for a lens, state CLEAN.
+
+## Domain: Playwright Skill — `/Users/josorio/Code/pi-skills/skills/playwright/`
+
+---
+
+### LENS 1 — Skill Writer
+
+---
+
+**[High] `SKILL.md` line 7 — Author-specific metadata, not portable**
+```yaml
+metadata:
+  author: josorio7122
+```
+The `author` field encodes a personal identity. Skills are portable artifacts — if shared or forked, this silently misattributes. **Fix:** Remove `author` from frontmatter or replace with a generic placeholder (most skill specs don't require it).
+
+---
+
+**[Medium] `references/workflows.md` line 3 — Repo-specific path assumption**
+```
+In this repo, run commands from `output/playwright/<label>/` to keep artifacts contained.
+```
+"In this repo" is meaningless to any consumer using this skill outside `pi-skills`. This is machine/repo-specific context. **Fix:** Rewrite as a general recommendation: *"Use a dedicated output directory (e.g., `output/playwright/<label>/`) to keep artifacts contained."*
+
+---
+
+**[Medium] `SKILL.md` line 42 — Ambiguous path resolution instruction**
+```
+The wrapper script is at `scripts/playwright_cli.sh` (relative to this skill's directory). Resolve the full path before use.
+```
+"Resolve the full path before use" is an agent-directed instruction that has no consistent meaning across contexts — different agents resolve skill paths differently. The pi convention is that the skill consumer (the harness) resolves relative paths. **Fix:** Remove "Resolve the full path before use." and rely on the harness path-resolution mechanism, or give a concrete `bash` pattern: ``SKILL_DIR="$(dirname "$0")" && "$SKILL_DIR/scripts/playwright_cli.sh"``.
+
+---
+
+**[Low] `SKILL.md` version `'1.0'` — quoted string**
+```yaml
+version: '1.0'
+```
+Version should be an unquoted string (`1.0`) or semver (`1.0.0`) per YAML convention. Not a functional issue, but inconsistent with standard frontmatter style. **Fix:** `version: 1.0.0`
+
+---
+
+**[Low] `references/workflows.md` — `pwcli` alias assumed before it's established**
+`workflows.md` opens with `pwcli` as if the alias is already set, then explains it in line 2. Any agent reading top-to-bottom (or partial-loading) may not register that this is an alias for the wrapper script. **Fix:** Move the alias definition to the very first line, or make the first code example use the explicit script path.
+
+---
+
+**[Info] `SKILL.md` description — Trigger phrase overlap with generic tasks**
+```
+"open a webpage"
+```
+"Open a webpage" is extremely broad and could trigger this skill unnecessarily for tasks like "open a URL in my app." Consider tightening to "open a webpage in a browser" or "automate opening a webpage."
+
+---
+
+### LENS 2 — Skill Scanner
+
+---
+
+**[Critical] `scripts/playwright_cli.sh` line 14 — Silent auto-install via `--yes`**
+```bash
+cmd=(npx --yes --package @playwright/cli playwright-cli)
+```
+`npx --yes` **silently installs `@playwright/cli` without user confirmation** every time the script runs. This contradicts the guardrail in `SKILL.md`:
+> *"Before first use, confirm with the user that auto-installing `@playwright/cli` via npx is acceptable."*
+
+The guardrail is a dead letter — the script bypasses it. If the npm registry is compromised or the package name is typosquatted at that moment, malicious code executes without any prompt. **Fix:** Remove `--yes`. Let `npx` prompt naturally. Or add an explicit gate: check if `@playwright/cli` is already installed (`npx --no-install playwright-cli --version 2>/dev/null`) and only prompt/install if missing.
+
+---
+
+**[High] `scripts/playwright_cli.sh` — No version pinning on `@playwright/cli`**
+```bash
+npx --yes --package @playwright/cli playwright-cli
+```
+No version is pinned. Every invocation resolves `@playwright/cli@latest` from npm. A malicious or breaking publish to that package affects all users immediately. **Fix:** Pin to a known-good version: `@playwright/cli@1.50.1` (or current stable). Document the version and update policy.
+
+---
+
+**[High] `references/cli.md` lines 40–43 — `eval` and `run-code` documented without inline danger warnings**
+```bash
+pwcli eval "document.title"
+pwcli eval "el => el.textContent" e5
+pwcli run-code "await page.waitForTimeout(1000)"
+```
+The CLI reference presents `eval` and `run-code` as ordinary commands in a flat list with no inline warning. The guardrails are only in `SKILL.md` — which agents may not re-read once inside a reference file. **Fix:** Add a `> ⚠️ Warning` callout directly above these entries in `cli.md`: *"eval and run-code execute arbitrary JavaScript. Use only on pages you control and never with untrusted page content."*
+
+---
+
+**[Medium] `references/workflows.md` line 15 — Hardcoded credential in example**
+```bash
+pwcli fill e2 "password123"
+```
+Even as a placeholder, embedding a string that looks like a password trains agents to include credentials in shell commands. If a user asks the agent to "fill in my password" the agent may echo it directly into a shell command. **Fix:** Replace with `"<password>"` or `"$MY_PASSWORD"` to indicate it should be a variable or placeholder, never a literal.
+
+---
+
+**[Medium] `SKILL.md` Guardrails section — `eval`/`run-code` restriction is not strong enough**
+```
+Avoid `eval` and `run-code`. Use them only when no built-in CLI command achieves the goal, and only on pages you control.
+```
+"Pages you control" is not well-defined in an automation context — agents cannot reliably assess page trustworthiness. The instruction needs a sharper boundary. **Fix:** *"Never use `eval` or `run-code` with content derived from page text, user input, or any external data source. Only use hardcoded expressions you have written yourself."*
+
+---
+
+**[Low] `SKILL.md` prerequisite check — `npm install -g` in fallback instructions**
+```bash
+npm install -g @playwright/cli@latest
+```
+A global npm install requires elevated permissions in some environments and installs the `latest` tag (unpinned). This is in the "if npx is missing" fallback, but it still presents an unpinned install as the recommended recovery path. **Fix:** Pin the version: `npm install -g @playwright/cli@1.50.1`.
+
+---
+
+### LENS 3 — Prompt Engineering
+
+---
+
+**[High] `SKILL.md` — Guardrails section is last; safety rules are buried**
+Safety-critical instructions (avoid `eval`, re-snapshot before using refs, confirm auto-install) appear at the very bottom of `SKILL.md`, after all the usage examples. LLMs weight earlier context more heavily, and agents lazy-loading sections may never reach Guardrails. **Fix:** Move the Guardrails section immediately after the Prerequisite check — before Quick start and Core workflow.
+
+---
+
+**[Medium] `SKILL.md` — No output format specification**
+The skill specifies what to *do* (open, snapshot, click) but never specifies what to *return* to the user. Should the agent paste snapshot output inline? Show screenshot paths? Summarize extracted data? This creates inconsistent agent behavior. **Fix:** Add an "Output to user" section, e.g.: *"After each significant step, report: the command run, a brief summary of the snapshot or result, and the path to any saved artifact."*
+
+---
+
+**[Medium] `SKILL.md` line 49 — Ambiguous lazy-load instruction**
+```
+See references/workflows.md for form-fill and multi-step patterns.
+```
+This is a cross-reference, but there is no instruction telling the agent *when* to open it vs. rely on the inline examples. Agents may either always load it (wasteful) or never load it (defeating its purpose). **Fix:** Add a gate: *"Load `references/workflows.md` only when the task involves forms, multi-step flows, sessions, or debugging."*
+
+---
+
+**[Medium] `SKILL.md` — Prerequisite check uses a bare shell test but no fallback branching**
+```bash
+command -v npx >/dev/null 2>&1
+```
+The skill says "if it is not available, pause and ask" but gives no instruction for what to do if the user *cannot* install Node.js (e.g., restricted environment). There is no graceful degradation path. **Fix:** Add: *"If Node.js cannot be installed, inform the user this skill requires Node.js and cannot proceed — do not attempt workarounds."*
+
+---
+
+**[Low] `SKILL.md` — "Treat this skill as CLI-first" authority statement placement**
+```
+Treat this skill as CLI-first automation. Do not pivot to @playwright/test unless the user explicitly asks for test files.
+```
+This high-authority constraint is the last sentence of the intro paragraph — easy to miss. **Fix:** Make it a standalone line or bold callout immediately after the opening sentence.
+
+---
+
+**[Low] `references/cli.md` — No hierarchy or grouping labels distinguish safe vs. advanced commands**
+The reference is a flat alphabetical-ish list. Safe commands (`snapshot`, `click`) and dangerous commands (`eval`, `run-code`) have identical visual weight. **Fix:** Group sections as "Core / Navigation / Keyboard / Mouse / DevTools (advanced)" and add a header note on the DevTools section flagging `eval` and `run-code` as advanced/dangerous.
+
+---
+
+**[Info] `SKILL.md` — "When to snapshot again" section is good progressive disclosure**
+This is well-structured: it uses a concrete condition list and a recovery instruction for stale refs. No changes needed. ✓
+
+---
+
+### Summary Table
+
+| # | Severity | Lens | File | Issue |
+|---|----------|------|------|-------|
+| 1 | **Critical** | Scanner | `scripts/playwright_cli.sh:14` | `npx --yes` silently auto-installs without consent |
+| 2 | **High** | Scanner | `scripts/playwright_cli.sh` | No version pinning on `@playwright/cli` |
+| 3 | **High** | Prompt Eng | `SKILL.md` | Guardrails buried at bottom — should be near top |
+| 4 | **High** | Skill Writer | `SKILL.md:7` | `author: josorio7122` — personal identity, not portable |
+| 5 | **High** | Scanner | `references/cli.md:40-43` | `eval`/`run-code` have no inline danger warnings |
+| 6 | **Medium** | Scanner | `references/workflows.md:15` | `"password123"` hardcoded in example |
+| 7 | **Medium** | Scanner | `SKILL.md` Guardrails | `eval`/`run-code` restriction too weak — "pages you control" undefined |
+| 8 | **Medium** | Prompt Eng | `SKILL.md` | No output format specified for agent responses |
+| 9 | **Medium** | Prompt Eng | `SKILL.md:49` | Lazy-load reference missing a trigger condition gate |
+| 10 | **Medium** | Skill Writer | `references/workflows.md:3` | "In this repo" — repo-specific, not portable |
+| 11 | **Medium** | Skill Writer | `SKILL.md:42` | "Resolve the full path before use" — vague, agent-specific |
+| 12 | **Medium** | Prompt Eng | `SKILL.md` prerequisite | No graceful degradation if Node.js can't be installed |
+| 13 | **Low** | Scanner | `SKILL.md` prerequisite | `npm install -g @playwright/cli@latest` unpinned in fallback |
+| 14 | **Low** | Prompt Eng | `SKILL.md` | CLI-first authority statement buried in intro paragraph |
+| 15 | **Low** | Prompt Eng | `references/cli.md` | Flat command list — safe and dangerous commands have equal visual weight |
+| 16 | **Low** | Skill Writer | `SKILL.md:6` | `version: '1.0'` — quoted, non-semver |
+| 17 | **Low** | Skill Writer | `references/workflows.md` | `pwcli` alias used before definition |
+| 18 | **Info** | Skill Writer | `SKILL.md` description | "open a webpage" trigger too broad |
+
+## Scout: Deep review of skill: posthog-skill at /Users/josorio/Code/pi-skills/skills/posthog-skill/
+
+Read ALL files (SKILL.md + references/ + scripts/lib/*.ts + scripts/__tests__/*.ts). Evaluate using THREE lenses:
+
+**LENS 1 — Skill Writer:** Frontmatter (name, description, trigger phrases, pattern compliance), imperative voice, progressive disclosure, degrees of freedom, conciseness, consistent terminology, no time-sensitive info, no machine-specific paths, no agent-specific refs, portable relative paths.
+
+**LENS 2 — Skill Scanner:** Prompt injection, dangerous code, excessive permissions, secret exposure, supply chain (external URLs, remote code exec), config poisoning.
+
+**LENS 3 — Prompt Engineering:** Instruction hierarchy, authority/commitment patterns, no over-engineering/ambiguity/overflow, token efficiency, error recovery/fallback, output format specified.
+
+Report ALL issues with severity (Critical/High/Medium/Low/Info), exact file path and line, quoted text, and suggested fix. If no issues found for a lens, state CLEAN.
+
+Now I have read all relevant files. Here is the full three-lens review.
+
+---
+
+## Domain: posthog-skill — Deep Review
+
+### LENS 1 — Skill Writer
+
+---
+
+#### Issue SW-1 — `status` example output documents a value that can never appear at runtime
+**Severity: Medium**
+**File: `SKILL.md`, ~line 65**
+
+```json
+"ach_insight_id": "NOT SET"
+```
+
+`config.ts` (`resolveConfig()`) defaults `achInsightId` to `'drOq2lO5'` when `POSTHOG_ACH_INSIGHT_ID` is unset. Running `status` with no env vars always shows `drOq2lO5`, not `NOT SET`. A user following the documented example will never see this output.
+
+**Fix:** Replace `"NOT SET"` with `"drOq2lO5"` in the example, or add a note that `NOT SET` only appears when `POSTHOG_ACH_INSIGHT_ID` is explicitly cleared.
+
+---
+
+#### Issue SW-2 — `compare` dry-run fixture `query_kind` contradicts the SKILL.md documented shape
+**Severity: Medium**
+**Files: `SKILL.md` (~line 95), `scripts/lib/fixtures.ts` (line 37)**
+
+SKILL.md documents:
+```json
+"query_kind": "InsightVizNode(FunnelsQuery)"
+```
+
+The dry-run fixture in `fixtures.ts` returns:
+```json
+"query_kind": "TrendsQuery"
+```
+
+An agent following the skill and running `compare --dry-run` gets a contradictory response vs. the documented output shape. The real ACH insight (`ach-reference-summary.json`) confirms `"query_kind": "InsightVizNode(FunnelsQuery)"` — so the documentation is correct but the fixture is wrong.
+
+**Fix:** Update the `compare` fixture in `fixtures.ts` to use `"query_kind": "InsightVizNode(FunnelsQuery)"`.
+
+---
+
+#### Issue SW-3 — `compare` dry-run fixture is missing `saved_to` field
+**Severity: Low**
+**Files: `SKILL.md` (~line 103), `scripts/lib/fixtures.ts` (line 36–45)**
+
+SKILL.md shows the `compare` output includes:
+```json
+"saved_to": "references/ach-reference-summary.json"
+```
+
+The `compare` fixture has no `saved_to` field. `cmdCompareLive` (the live path) does include it. A dry-run response won't match the documented shape, which could confuse an agent validating output.
+
+**Fix:** Add `"saved_to": "references/ach-reference-summary.json"` to the `compare` fixture in `fixtures.ts`.
+
+---
+
+#### Issue SW-4 — File Structure section is stale and incomplete
+**Severity: Medium**
+**File: `SKILL.md`, "File Structure" section (~line 195)**
+
+SKILL.md documents `scripts/lib/` as containing only 3 files:
+```
+dashboard-spec.ts
+fixtures.ts
+posthog-client.ts
+```
+
+Actual contents of `scripts/lib/`:
+```
+cmd-compare.ts
+cmd-create.ts
+cmd-flags.ts
+cmd-inspect.ts
+cmd-status.ts
+config.ts          ← not mentioned anywhere in SKILL.md
+dashboard-spec.ts
+fixtures.ts
+posthog-client.ts
+```
+
+And SKILL.md describes `run.ts` as `"Subcommand router + live command implementations"` — but live implementations live in the `cmd-*.ts` modules; `run.ts` is only a router.
+
+The `__tests__/` section also omits: `cmd-modules.test.ts`, `dead-exports.test.ts`, `helpers.test.ts`, `helpers.ts`, `insight-types.test.ts`.
+
+**Fix:** Update the File Structure section to reflect the actual directory tree. Correct `run.ts` description to `"Subcommand router"`.
+
+---
+
+#### Issue SW-5 — Time-sensitive value in `inspect --live` example output
+**Severity: Low**
+**File: `SKILL.md`, ~line 118**
+
+```json
+"queried_at": "2026-03-11T20:27:20.354Z"
+```
+
+This is a hard-coded timestamp in a documentation example, violating the "no time-sensitive info" principle. As time passes it will look increasingly stale.
+
+**Fix:** Replace with a placeholder: `"queried_at": "<ISO timestamp>"`.
+
+---
+
+#### Issue SW-6 — Description trigger phrases are ticket-scoped and will lose meaning
+**Severity: Low**
+**File: `SKILL.md`, frontmatter**
+
+```yaml
+description: "...compare against the ACH reference insight, create or update the 7361 metrics dashboard idempotently..."
+```
+
+`7361` is a ticket/branch number. After the branch ships and the ticket is closed, these phrases become noise and won't match any natural trigger. A future user of the project's PostHog skill would not phrase it "7361 metrics dashboard."
+
+**Fix (for a project-local skill):** After the branch ships, update the description to drop the ticket number and use functional terms only — e.g., "purchase and insurance flow metrics dashboard."
+
+---
+
+#### Issue SW-7 — `run.ts` shebang will fail on direct execution
+**Severity: Info**
+**File: `scripts/run.ts`, line 1**
+
+```ts
+#!/usr/bin/env node
+```
+
+The file is TypeScript and all documented invocations use `npx tsx`. If executed directly (e.g., `./scripts/run.ts`), the shebang launches `node` which cannot parse TypeScript. The shebang is misleading.
+
+**Fix:** Remove the shebang, or change to `#!/usr/bin/env npx tsx`.
+
+---
+
+### LENS 2 — Skill Scanner
+
+---
+
+#### Issue SC-1 — Hardcoded directory depth in test helper is fragile
+**Severity: Medium**
+**File: `scripts/__tests__/helpers.ts`, line 7**
+
+```ts
+export const TSX = path.join(__dirname, '..', '..', '..', '..', 'node_modules', '.bin', 'tsx')
+```
+
+This resolves 4 directories up from `__tests__/` to find `node_modules/.bin/tsx`. This silently assumes the skill always lives at exactly depth 4 in the repo (i.e., `skills/posthog-skill/scripts/__tests__`). If the skill is relocated or the repo structure changes, all tests break with a cryptic "not found" error. It also assumes `tsx` is installed at the repo root, not locally within the skill.
+
+This is not a security issue but is a high-fragility structural dependency.
+
+**Fix:** Use `require.resolve('tsx')` or add a local `devDependency` on `tsx` in the skill's own `package.json` and resolve it from there.
+
+---
+
+#### Issue SC-2 — `cmd-compare.ts` writes to a path within the skill directory at runtime
+**Severity: Low**
+**File: `scripts/lib/cmd-compare.ts`, lines 88–94**
+
+```ts
+const summaryPath = path.join(__dirname, '..', '..', 'references', 'ach-reference-summary.json')
+fs.writeFileSync(summaryPath, ...)
+```
+
+The `compare` command mutates `references/ach-reference-summary.json` inside the skill's own directory on every live run. In a read-only deployment (e.g., skill installed in a globally shared location), this will fail silently (the code catches the error as a warning). This is documented in SKILL.md, so it is intentional, but it makes the skill impure as a side-effect of a read command.
+
+**Fix:** Document clearly in the "First Use" section that `compare` requires write access to the skill directory, or write the file to a project-local path outside the skill.
+
+---
+
+#### Issue SC-3 — Token not masked in `PostHogError` message if it leaks through a URL
+**Severity: Info**
+**File: `scripts/lib/posthog-client.ts`, lines ~175–180**
+
+```ts
+const endpoint = url.replace(host, '').split('?')[0] ?? url
+```
+
+The `endpoint` field strips the host and query string before including it in error messages, which is good. The token is only in the `Authorization` header, not in the URL, so no exposure risk. CLEAN.
+
+---
+
+#### Remaining scanner items: CLEAN
+
+- No `eval`, `new Function`, dynamic `require`, or remote code execution anywhere.
+- No secrets hardcoded — `POSTHOG_PERSONAL_API_KEY` is always read from `process.env`.
+- No external URLs for script loading — all HTTP calls target `POSTHOG_HOST` (configurable, defaulting to `https://us.posthog.com`).
+- No dependency on untrusted input in `spawnSync` — test `helpers.ts` passes only fixed literal args from test files.
+- `POSTHOG_PROJECT_ID` default `39507` is project metadata, not a credential.
+
+---
+
+### LENS 3 — Prompt Engineering
+
+---
+
+#### Issue PE-1 — `inspect --live` provides no agent-actionable threshold for zero-count events
+**Severity: Medium**
+**File: `SKILL.md`, `inspect --live` section (~line 120)**
+
+The output schema shows:
+```json
+{ "event": "form_page_reached", "count_30d": 0, "last_seen": null }
+```
+
+But the skill gives no instruction on what the agent should conclude or do when `count_30d: 0`. Should it block further actions? Alert the user? Proceed anyway? Without a decision rule, an agent calling `inspect --live` has output it cannot act on.
+
+**Fix:** Add a brief interpretation note: "Events with `count_30d: 0` indicate the event has not fired in the past 30 days — surface these to the user as a potential instrumentation gap before proceeding with `compare` or `create`."
+
+---
+
+#### Issue PE-2 — WRITE OPERATION warnings inconsistently applied: `create` vs `flags toggle`
+**Severity: Low**
+**File: `SKILL.md`, `create` section and `flags toggle` section**
+
+`create`, `flags toggle`, `flags create`, and `flags update` all have the announce-before-execute warning. This is good. However, `flags toggle` and `flags update` each have identical boilerplate:
+
+```
+WRITE: flags toggle <id> — reason: [why]
+Run $RUN flags toggle <id> --dry-run first to preview. Do not add flags or modify the command.
+```
+
+The phrase "Do not add flags or modify the command" is ambiguous in context — "flags" here means CLI options, not PostHog feature flags. The word collision could confuse an agent.
+
+**Fix:** Replace "Do not add flags or modify the command" with "Do not add CLI options or alter the invocation."
+
+---
+
+#### Issue PE-3 — `$RUN` shorthand is never used in the "Running live tests" block
+**Severity: Info**
+**File: `SKILL.md`, last section**
+
+All interactive command examples correctly use `$RUN`. But the live test invocation uses the full form:
+```bash
+POSTHOG_PERSONAL_API_KEY=phx_... POSTHOG_TEST_LIVE=1 npx tsx --test $SKILL_DIR/scripts/__tests__/*.test.ts
+```
+
+This is fine (tests aren't agent-executable commands) but mild inconsistency.
+
+---
+
+#### Remaining PE items: CLEAN
+
+- Instruction hierarchy is clear: Quick Reference → per-command detail → error handling → file structure. Progressive disclosure is well-implemented.
+- Output format is fully specified (JSON stdout, diagnostics stderr, exit codes table).
+- Dry-run mode is universal and documented.
+- Error output examples section provides strong error-recovery guidance.
+- Authority/commitment pattern ("WRITE OPERATION — announce first, dry-run first") is present on all mutating commands.
+
+---
+
+### Findings Summary
+
+- **SW-2 (Medium):** The `compare` dry-run fixture returns `"query_kind": "TrendsQuery"` but SKILL.md documents `"InsightVizNode(FunnelsQuery)"` — the fixture is wrong, the real insight (confirmed in `references/ach-reference-summary.json`) matches the docs.
+- **SW-1 (Medium):** The `status` example shows `ach_insight_id: "NOT SET"` which is impossible at runtime — the default is always `drOq2lO5`.
+- **SW-4 (Medium):** The File Structure section omits 6 real files (`cmd-*.ts`, `config.ts`) and 5 real test files, and misdescribes `run.ts`.
+- **SC-1 (Medium):** `helpers.ts` hardcodes a 4-level relative path to `node_modules/.bin/tsx` — structurally fragile, will break silently if the skill is relocated.
+- **PE-1 (Medium):** `inspect --live` output with `count_30d: 0` events has no agent-actionable interpretation guidance — zero counts are returned without any signal about what the agent should do with them.
+
+## Scout: Deep review of skill: prompt-engineering at /Users/josorio/Code/pi-skills/skills/prompt-engineering/
+
+Read ALL files (SKILL.md only — no references/ or scripts/). Evaluate using THREE lenses:
+
+**LENS 1 — Skill Writer:** Frontmatter (name, description, trigger phrases, pattern compliance), imperative voice, progressive disclosure, degrees of freedom, conciseness, consistent terminology, no time-sensitive info, no machine-specific paths, no agent-specific refs, portable relative paths.
+
+**LENS 2 — Skill Scanner:** Prompt injection, dangerous code, excessive permissions, secret exposure, supply chain (external URLs, remote code exec), config poisoning.
+
+**LENS 3 — Prompt Engineering:** Instruction hierarchy, authority/commitment patterns, no over-engineering/ambiguity/overflow, token efficiency, error recovery/fallback, output format specified.
+
+Report ALL issues with severity (Critical/High/Medium/Low/Info), exact file path and line, quoted text, and suggested fix. If no issues found for a lens, state CLEAN.
+
+## Deep Review: `prompt-engineering` SKILL.md
+
+---
+
+## LENS 1 — Skill Writer
+
+### ✅ Strengths
+- Imperative voice used consistently throughout
+- Progressive disclosure: Core Capabilities → Key Patterns → Pitfalls → Error Recovery → Output
+- Good use of before/after examples
+- Concise, no padding
+- Degrees of freedom section present and well-structured
+- No machine-specific paths
+- Portable relative paths (none needed — no external files referenced)
+- Output section at end specifies deliverables
+
+### Issues Found
+
+---
+
+**[Medium] — Frontmatter: `source` URL points to external upstream**
+- File: `SKILL.md`, line 7
+- Text: `source: https://github.com/NeoLabHQ/context-engineering-kit/blob/master/plugins/customaize-agent/skills/prompt-engineering/SKILL.md`
+- Issue: If the upstream repo is ever removed, renamed, or changes ownership, this metadata becomes misleading or unverifiable. The `license: See source repository` is especially fragile — it's a deferred reference that provides no actual licensing information.
+- Fix: Either include the actual license text/identifier (e.g., `license: MIT`) or remove the `source`/`license` fields if they add no enforced value.
+
+---
+
+**[Medium] — Frontmatter: `author: NeoLabHQ` is a third-party org reference**
+- File: `SKILL.md`, line 6
+- Text: `author: NeoLabHQ`
+- Issue: Skill Writer spec discourages agent-specific/org-specific references that may become stale or misleading. An author field that attributes a third-party org could cause confusion about ownership and maintenance.
+- Fix: Replace with the maintaining author or remove the field.
+
+---
+
+**[Low] — Description lists covered topics, reducing signal density**
+- File: `SKILL.md`, line 3 (description)
+- Text: `"Covers few-shot learning, chain-of-thought, template systems, persuasion principles, degrees of freedom, and token efficiency."`
+- Issue: The trailing enumeration adds tokens to every skill-dispatch context without adding routing signal. Trigger phrase matching happens on the action-oriented phrases earlier in the description.
+- Fix: Remove the `"Covers…"` sentence. The content is discoverable once the skill is loaded.
+
+---
+
+**[Low] — Version `'1.0'` is unquoted-number-as-string**
+- File: `SKILL.md`, line 8
+- Text: `version: '1.0'`
+- Issue: Cosmetic, but inconsistent — YAML will parse this as a string due to quotes, which is fine, but the convention across other skills in this repo should be checked for uniformity. Not blocking.
+
+---
+
+**[Info] — No explicit trigger phrases section**
+- File: `SKILL.md` (frontmatter)
+- Issue: The description embeds trigger phrases inline rather than in a dedicated `triggers:` frontmatter key. Other skills in the repo may use a structured key. Consistency aids the skill router.
+- Fix: If the skill spec supports a `triggers:` frontmatter key, extract the trigger phrases there.
+
+---
+
+## LENS 2 — Skill Scanner
+
+### Issues Found
+
+---
+
+**[High] — External URL in `source` metadata with no integrity check**
+- File: `SKILL.md`, line 7
+- Text: `source: https://github.com/NeoLabHQ/context-engineering-kit/...`
+- Issue: This is a supply-chain reference. If an agent or toolchain ever auto-fetches the `source` URL to "refresh" skill content, it would pull unvetted code from an external repo. Even if no auto-fetch occurs today, the metadata normalizes the pattern of linking skills to external mutable sources.
+- Fix: Remove the `source` field or replace with a static attribution comment that cannot be interpreted as a fetchable endpoint.
+
+---
+
+**[Medium] — Research citation without verifiable source**
+- File: `SKILL.md`, line ~87
+- Text: `"Research: Meincke et al. (2025) — persuasion techniques more than doubled compliance rates (33% → 72%, p < .001)."`
+- Issue: Citing a paper dated 2025 with specific p-values that cannot be independently verified by the agent introduces plausible-sounding authority that may be fabricated or misattributed. If an agent reproduces this citation in output, it could mislead users with false scientific authority.
+- Fix: Remove the citation or replace with a neutral framing: `"Persuasion research shows that…"` without specific statistics the agent cannot verify.
+
+---
+
+**[Low] — No dangerous code, excessive permissions, secrets, or remote code execution found**
+- The bash/python code blocks are illustrative snippets, not executable commands with side effects.
+- CLEAN on: permissions, secrets, config poisoning, shell injection.
+
+---
+
+## LENS 3 — Prompt Engineering
+
+### ✅ Strengths
+- Instruction hierarchy diagram is accurate and well-ordered
+- Degrees of freedom section is the best part of this skill — concrete, actionable, covers all three tiers
+- Persuasion principles table is crisp and immediately usable
+- Error recovery section present
+- Output format specified at the end (rewritten prompt + rationale + token delta)
+- "When Input Is Ambiguous" — good fallback with a single-question constraint
+
+### Issues Found
+
+---
+
+**[High] — Output section is underspecified for multi-task use**
+- File: `SKILL.md`, last section
+- Text: `"Deliver: (1) the rewritten prompt in a fenced code block, (2) a brief rationale for each change, (3) estimated token delta."`
+- Issue: This output spec assumes the user *always* wants a rewritten prompt. But the skill is also triggered for "write a system prompt," "write commands," "write sub-agent prompts," and "optimize a prompt" — tasks where there may be no existing prompt to rewrite. The output contract breaks when invoked for creation vs. optimization.
+- Fix: Add a conditional: `"If rewriting: (1) rewritten prompt in a fenced block, (2) rationale per change, (3) token delta. If creating from scratch: (1) prompt in a fenced block, (2) design rationale, (3) word on degrees of freedom chosen."`
+
+---
+
+**[Medium] — "Let's think step by step" instruction is outdated**
+- File: `SKILL.md`, line ~22
+- Text: `Add "Let's think step by step" for zero-shot`
+- Issue: This is a well-known but increasingly stale heuristic. Modern frontier models (GPT-4o, Claude 3.x, Gemini 1.5+) handle chain-of-thought implicitly or via `<thinking>` blocks. Prescribing this exact phrase as a pattern may actively harm output on models where it triggers unwanted verbosity or is ignored.
+- Fix: Generalize: `"Instruct the model to reason before answering (e.g., 'Think step by step' or use a scratchpad/thinking block if the model supports it)."`
+
+---
+
+**[Medium] — Ambiguity: "brief rationale for each change" is undefined**
+- File: `SKILL.md`, last section
+- Text: `"a brief rationale for each change"`
+- Issue: "Brief" is vague. One sentence? One paragraph? For a prompt with 10 changes, this could balloon to 500 tokens. No constraint on brevity in the output spec itself (ironic for a skill about token efficiency).
+- Fix: `"one-sentence rationale per change"` or `"max 20 words per change"`
+
+---
+
+**[Medium] — "Common Pitfalls" section uses passive warning style, not imperative**
+- File: `SKILL.md`, ~line 120
+- Text: `"Over-engineering: Starting complex before trying simple"` etc.
+- Issue: Inconsistent with the skill's own advice on authority/imperative language. Pitfall descriptions are noun phrases with no action instruction — the agent reading this has no directive to follow.
+- Fix: Convert to imperative: `"Do not start complex — try the simplest prompt first."` `"Do not use examples from unrelated tasks."` etc.
+
+---
+
+**[Low] — "Incremental Complexity" levels 1–4 have no trigger criteria**
+- File: `SKILL.md`, ~line 40
+- Text: `Level 1… Level 2… Level 3… Level 4…`
+- Issue: The agent is given the levels but no decision rule for when to advance from level 1 to level 2. The skill instructs "Start with simple, add only when needed" but doesn't define what "needed" means.
+- Fix: Add a one-liner per level: e.g., `"Advance to Level 2 if the output varies unacceptably across runs."` `"Advance to Level 3 if the model skips steps."`
+
+---
+
+**[Low] — No explicit instruction to apply this skill's own patterns when writing prompts**
+- File: `SKILL.md` (general)
+- Issue: The skill describes patterns but never instructs the agent to *apply them* when generating output. An agent could read this skill and produce a flat, unstructured prompt that violates every principle described. A self-referential instruction at the top would close this loop.
+- Fix: Add under Core Capabilities or at the top: `"Apply every pattern in this skill to any prompt you produce. Do not describe the patterns — use them."`
+
+---
+
+## Summary Table
+
+| # | Lens | Severity | Issue |
+|---|------|----------|-------|
+| 1 | Writer + Scanner | **High** | External `source` URL — supply chain risk + stale reference |
+| 2 | Scanner | **High** | Unverifiable 2025 citation with specific statistics |
+| 3 | Prompt Eng | **High** | Output spec breaks for creation vs. rewrite tasks |
+| 4 | Writer | **Medium** | `author: NeoLabHQ` — third-party org attribution, likely stale |
+| 5 | Prompt Eng | **Medium** | "Let's think step by step" — model-specific, increasingly stale |
+| 6 | Prompt Eng | **Medium** | "Brief rationale" undefined — unbounded token output |
+| 7 | Prompt Eng | **Medium** | Pitfalls section passive, not imperative |
+| 8 | Writer | **Medium** | `license: See source repository` — deferred, unresolvable |
+| 9 | Prompt Eng | **Low** | Incremental levels have no advancement criteria |
+| 10 | Prompt Eng | **Low** | No self-referential instruction to apply these patterns |
+| 11 | Writer | **Low** | Description tail enumerates topics (token waste) |
+| 12 | Writer | **Info** | No structured `triggers:` frontmatter key |
+
+**LENS 2 partial CLEAN:** No dangerous code, no secrets, no permissions abuse, no config poisoning, no shell injection found. The two scanner issues are citation integrity and supply-chain metadata.
+
+## Scout: Deep review of skill: render-deploy at /Users/josorio/Code/pi-skills/skills/render-deploy/
+
+Read ALL files (SKILL.md + ALL references/ + ALL assets/). Evaluate using THREE lenses:
+
+**LENS 1 — Skill Writer:** Frontmatter (name, description, trigger phrases, pattern compliance), imperative voice, progressive disclosure, degrees of freedom, conciseness, consistent terminology, no time-sensitive info, no machine-specific paths, no agent-specific refs, portable relative paths.
+
+**LENS 2 — Skill Scanner:** Prompt injection, dangerous code, excessive permissions, secret exposure, supply chain (external URLs, remote code exec), config poisoning.
+
+**LENS 3 — Prompt Engineering:** Instruction hierarchy, authority/commitment patterns, no over-engineering/ambiguity/overflow, token efficiency, error recovery/fallback, output format specified.
+
+Report ALL issues with severity (Critical/High/Medium/Low/Info), exact file path and line, quoted text, and suggested fix. If no issues found for a lens, state CLEAN.
+
+Now I have read all files. Here is the complete three-lens review.
+
+---
+
+## render-deploy Skill — Deep Review
+
+### LENS 1 — Skill Writer
+
+---
+
+**[Medium] `assets/nextjs-postgres.yaml` — Machine-Specific Hostname**
+```yaml
+- key: NEXTAUTH_URL
+  value: https://nextjs-app.onrender.com
+```
+The service name `nextjs-app` is hardcoded as part of the Render hostname. Every user who deploys with a different service name (which is most of them) will get a broken `NEXTAUTH_URL`. This is not a portable template — it silently ships a wrong value.
+**Fix:** Replace with a `sync: false` placeholder: `NEXTAUTH_URL: sync: false # Set to your Render service URL, e.g. https://your-service-name.onrender.com`
+
+---
+
+**[Medium] `assets/python-django.yaml` — Machine-Specific Hostname**
+```yaml
+- key: DJANGO_ALLOWED_HOSTS
+  value: django-web.onrender.com
+```
+Same issue: hardcodes `django-web` as the service name. Any user who names their service differently ships a broken `ALLOWED_HOSTS`.
+**Fix:** Use `sync: false` with a comment, or document that this must be updated to match the actual service name.
+
+---
+
+**[Medium] `references/runtimes.md` and `references/blueprint-spec.md` — Stale Runtime Versions Listed as Supported**
+
+`runtimes.md` lists:
+```
+Node.js Supported Versions: 14, 16, 18, 20, 22
+Python Supported Versions: 3.8, 3.9, 3.10, 3.11, 3.12
+Go Supported Versions: 1.20, 1.21, 1.22, 1.23
+```
+Node 14 and 16 are EOL. Python 3.8 reached EOL October 2024. Go 1.20 is EOL. Presenting these as "supported" in a how-to skill trains agents to generate configs with outdated runtimes.
+**Fix:** Remove EOL versions, add a note directing agents to check Render's current docs for the supported version list rather than enumerating it statically. Or add a top-of-file caveat: `> Version lists may be outdated — verify at https://render.com/docs`.
+
+---
+
+**[Low] `references/blueprint-spec.md` and `references/configuration-guide.md` — Time-Sensitive Pricing**
+
+Both files include specific dollar amounts (`$7/month`, `$25/month`, `$85/month`, etc.). The files do include a mitigation note ("Pricing may change. Verify at https://render.com/pricing"), which is good — but the tables still anchor the agent on potentially wrong numbers.
+**Fix:** The mitigation note is acceptable. Optionally remove the exact dollar amounts and keep only the plan names and relative descriptions.
+
+---
+
+**[Low] `SKILL.md` — Contradictory curl-to-shell Guidance**
+
+```markdown
+> ⚠️ **Security:** Piping to shell (`curl | sh`) executes remote code. Review the script at the URL before running, or use `brew install render` instead.
+
+- Linux/macOS: `curl -fsSL https://raw.githubusercontent.com/render-oss/cli/main/bin/install.sh | sh`
+```
+The skill first warns against piping to shell, then immediately provides the exact pipe-to-shell command as the Linux/macOS option. This mixed signal is confusing and somewhat undermines the warning.
+**Fix:** Reorder — show the pipe-to-shell command first (since it's the official Linux path), then add the warning. Or, lead with `brew install render` as the preferred option for all platforms that support it, and relegate the curl variant to a "Linux-only fallback."
+
+---
+
+**[Low] `SKILL.md` frontmatter — Description Mismatch with Registration**
+
+The SKILL.md frontmatter description ends with `...including databases, cron jobs, and background workers.` but the registered description in the skills registry does not include that clause. Minor inconsistency, not harmful.
+
+---
+
+**[Info] `python-django.yaml` — Migrations in Build Command**
+```yaml
+buildCommand: pip install -r requirements.txt && python manage.py collectstatic --no-input && python manage.py migrate
+```
+Running `migrate` in the build phase is a known Render anti-pattern for some setups (build runners may not have DB access). This is a design choice but worth a comment in the asset file warning users that DB access is required at build time.
+
+---
+
+### LENS 2 — Skill Scanner
+
+---
+
+**[Medium] `SKILL.md` — Remote Code Execution via Unpinned `main` Branch**
+
+```
+curl -fsSL https://raw.githubusercontent.com/render-oss/cli/main/bin/install.sh | sh
+```
+The URL resolves to the `main` branch of `render-oss/cli`, meaning the script content can change at any time without the skill being updated. If the `render-oss` GitHub org or the `main` branch is compromised, this skill would instruct agents to execute the attacker's code. The URL is not pinned to a commit hash or a tagged release.
+**Fix:** Pin to a specific release tag or commit hash: `https://raw.githubusercontent.com/render-oss/cli/v<VERSION>/bin/install.sh`. Prefer `brew install render` as the primary recommendation and demote the curl variant to a fallback for CI/headless Linux environments only.
+
+---
+
+**[Low] `render-api.md` — API Key Pattern Encourages Shell Variable Habit**
+```bash
+export RENDER_API_KEY="rnd_xxxxx"
+```
+This is safe as documentation. No issue with the placeholder value itself. However, there is no guidance discouraging users from putting real keys in shell history or `.bashrc` (e.g., "set this in your shell profile or a `.env` file not committed to git"). A brief warning would reduce credential exposure risk.
+**Fix:** Add: `# Store in ~/.zshrc or a .env file — never commit to source control`
+
+---
+
+**[Info] No prompt injection vectors found.** All command templates use static strings or clearly-labelled placeholders (`<SERVICE_ID>`, `<OWNER_ID>`, `<REPOSITORY_URL>`). No pattern interpolates user-provided freeform input directly into shell commands without sanitization cues.
+
+**[Info] No dangerous permissions or config poisoning.** The skill does not request filesystem access beyond the project directory, does not ask for credentials storage, and does not modify system configuration.
+
+**[Info] External URLs are all legitimate vendor domains** (`render.com`, `dashboard.render.com`, `api.render.com`, `github.com/render-oss`) — no suspicious third-party redirects.
+
+---
+
+### LENS 3 — Prompt Engineering
+
+---
+
+**[Medium] `references/` — Significant Content Duplication Across 4 Files**
+
+Environment variable patterns (`sync: false`, `fromDatabase`, `hardcoded`) are fully documented in:
+- `SKILL.md` (inline example)
+- `references/blueprint-spec.md` (full section)
+- `references/deployment-details.md` (repeated section)
+- `references/configuration-guide.md` (another full section)
+
+Port binding code examples appear in both `references/deployment-details.md` and `references/configuration-guide.md`.
+
+When multiple reference files are loaded into context simultaneously, this duplication wastes tokens and may cause the model to re-anchor on the same information multiple times without adding coverage.
+**Fix:** Make `configuration-guide.md` the single canonical source for env var patterns and port binding. Have `deployment-details.md` reference it with: "See [configuration-guide.md](configuration-guide.md) for env var and port binding patterns" rather than repeating the content.
+
+---
+
+**[Medium] `SKILL.md` Happy Path Question 2 — Unclear Framing for New Users**
+
+```
+Ask whether Render should provision everything the app needs ... or only the app while they bring their own infra.
+```
+"Bring your own infra" is jargon a new deployer won't understand. The question as written could cause confusion and unnecessary back-and-forth.
+**Fix:** Rephrase as a concrete question: `"Does your app need a database, background worker, or cache? (yes / no / not sure)"`
+
+---
+
+**[Low] `SKILL.md` — No Explicit Output Format for Deeplink Step**
+
+Step 6 "Generate Deeplink" specifies the format template:
+```
+https://dashboard.render.com/blueprint/new?repo=<REPOSITORY_URL>
+```
+But there is no explicit instruction about *how to deliver* the link to the user (e.g., "Display the deeplink as a clickable Markdown link"). The step says "provide the deeplink" without specifying the presentation format.
+**Fix:** Add: `Format the deeplink as a Markdown link: \`[Deploy to Render](https://dashboard.render.com/blueprint/new?repo=...)\``
+
+---
+
+**[Low] `SKILL.md` — Error Recovery Path for `render blueprints validate` Failure is Sparse**
+
+Step 4 Validate Configuration lists common errors but does not tell the agent what to do after fixing them (loop back to Step 2? re-run validate?). The recovery loop is implicit.
+**Fix:** Add: "After fixing validation errors, re-run `render blueprints validate` and repeat until clean before proceeding to Step 5."
+
+---
+
+**[Info] Instruction hierarchy is well-structured.** The SKILL.md uses a clear top-down flow: gateway questions → prerequisites → method 1 → method 2 → post-deploy. Decision tables are explicit and binary. The references/ layer correctly defers detail out of the main prompt path.
+
+**[Info] Authority markers (`CRITICAL`, `IMPORTANT`, `ALWAYS`) are used sparingly and appropriately** — 3 instances total in SKILL.md, all justified.
+
+**[Info] The Happy Path friction-reduction section is effective.** Asking 2 targeted questions before deep analysis is a good commitment/consistency pattern that prevents the agent from over-analysing before gathering basic constraints.
+
+---
+
+### Summary Table
+
+| # | Severity | Lens | File | Issue |
+|---|----------|------|------|-------|
+| 1 | Medium | Writer | `assets/nextjs-postgres.yaml` | Hardcoded machine-specific `NEXTAUTH_URL` hostname |
+| 2 | Medium | Writer | `assets/python-django.yaml` | Hardcoded machine-specific `DJANGO_ALLOWED_HOSTS` hostname |
+| 3 | Medium | Writer | `references/runtimes.md`, `blueprint-spec.md` | EOL runtime versions presented as supported |
+| 4 | Medium | Scanner | `SKILL.md` | Install script pinned to mutable `main` branch — unpinned remote exec |
+| 5 | Medium | Prompt Eng | `references/` (4 files) | Env var and port binding content duplicated across 4 reference files |
+| 6 | Medium | Prompt Eng | `SKILL.md` | Happy Path Q2 uses "bring your own infra" jargon — unclear for new users |
+| 7 | Low | Writer | `references/blueprint-spec.md`, `configuration-guide.md` | Time-sensitive pricing (mitigated by inline note) |
+| 8 | Low | Writer | `SKILL.md` | Contradictory curl-to-shell warning: warns then provides the exact command |
+| 9 | Low | Scanner | `render-api.md` | No warning against committing API key to source control |
+| 10 | Low | Prompt Eng | `SKILL.md` | No explicit output format for deeplink (how to present to user) |
+| 11 | Low | Prompt Eng | `SKILL.md` | Validate failure loop is implicit — no instruction to re-run after fixes |
+| 12 | Info | Writer | `SKILL.md` frontmatter | Description mismatch vs. skill registry entry |
+| 13 | Info | Writer | `python-django.yaml` | Migrations in build phase — no warning about DB access requirement |
+
+## Scout: Deep review of skill: skill-scanner at /Users/josorio/Code/pi-skills/skills/skill-scanner/
+
+Read ALL files (SKILL.md + references/ + scripts/). Evaluate using THREE lenses:
+
+**LENS 1 — Skill Writer:** Frontmatter (name, description, trigger phrases, pattern compliance), imperative voice, progressive disclosure, degrees of freedom, conciseness, consistent terminology, no time-sensitive info, no machine-specific paths, no agent-specific refs, portable relative paths.
+
+**LENS 2 — Skill Scanner:** Prompt injection, dangerous code, excessive permissions, secret exposure, supply chain (external URLs, remote code exec), config poisoning.
+
+**LENS 3 — Prompt Engineering:** Instruction hierarchy, authority/commitment patterns, no over-engineering/ambiguity/overflow, token efficiency, error recovery/fallback, output format specified.
+
+Report ALL issues with severity (Critical/High/Medium/Low/Info), exact file path and line, quoted text, and suggested fix. If no issues found for a lens, state CLEAN.
+
+## Skill Security Scan: skill-scanner
+
+---
+
+## LENS 1 — Skill Writer
+
+### Issue SW-001 · Medium
+**File:** `SKILL.md` · Section after frontmatter (~line 33)
+**Text:** `## Guiding Principles` immediately followed by `## Confidence Levels` with **zero content between them**
+```markdown
+## Guiding Principles
+
+## Confidence Levels
+```
+**Problem:** The `## Guiding Principles` heading is an empty section — no body, no list, nothing. It creates a visible structural gap that confuses both human readers and the agent (which will look for content and find none).
+**Fix:** Either remove the heading entirely or add 1–3 bullet principles under it (e.g., "Always evaluate intent before severity", "False positives are worse than false negatives for security skills", "Confidence must be earned, not assumed").
+
+---
+
+### Issue SW-002 · Medium
+**File:** `SKILL.md` · Frontmatter
+**Text:** Frontmatter contains `name`, `description`, `metadata.author`, `metadata.version` — but **no `allowed-tools` field**
+```yaml
+---
+name: skill-scanner
+description: Scan agent skills for security issues...
+metadata:
+  author: josorio7122
+  version: '1.0'
+---
+```
+**Problem:** Phase 2 of the workflow instructs the agent to run `uv run scripts/scan_skill.py <skill-directory>`, which requires Bash. Without an explicit `allowed-tools` declaration, the agent may not have Bash available — or the reader has no way to know the skill's required permissions. This also means the permission analysis phase (Phase 8) would give "no `allowed-tools` declared" as the result for this skill's own scan, which is confusing given it *does* need Bash.
+**Fix:** Add `allowed-tools: Read Grep Glob Bash` to the frontmatter. The fallback in Phase 2 handles the Bash-unavailable case, but the declaration should still be explicit.
+
+---
+
+### Issue SW-003 · Low
+**File:** `SKILL.md` · Phase 1
+**Text:** `"look for it under skills/<name>/ directories in the project or installed packages"`
+**Problem:** "installed packages" is undefined. The agent has no guidance on where to look for installed packages — no path, no convention, no tool to discover them. The project-relative `skills/<name>/` is clear, but the installed-packages case is ambiguous.
+**Fix:** Either specify a concrete discovery path (e.g., `~/.pi/agent/git/**/skills/<name>/`) or remove the installed packages branch and limit scope to the project.
+
+---
+
+### Issue SW-004 · Info
+**File:** `SKILL.md` · Prerequisites section
+**Text:** `Install guide: https://docs.astral.sh/uv/getting-started/installation/`
+**Problem:** External URL in a prerequisites block is technically time-sensitive content. The URL is stable (official docs), so this is low risk — but it violates the "no time-sensitive info" principle strictly applied.
+**Fix:** Consider removing the URL and using just `Install guide: https://docs.astral.sh/uv/` or noting "see uv official docs."
+
+---
+
+### SW Summary — LENS 1
+
+| # | Severity | Issue |
+|---|----------|-------|
+| SW-001 | Medium | Empty `## Guiding Principles` section heading |
+| SW-002 | Medium | Missing `allowed-tools` in frontmatter despite Bash requirement |
+| SW-003 | Low | "installed packages" search path undefined |
+| SW-004 | Info | External install URL in Prerequisites |
+
+---
+
+## LENS 2 — Skill Scanner
+
+### SKILL.md
+
+- **Frontmatter hooks:** None present — CLEAN
+- **`!command` syntax:** None present — CLEAN
+- **Prompt injection:** All injection patterns appear within documented phase instructions or output format templates. None target the running agent. CLEAN
+- **Secrets:** No hardcoded credentials, tokens, or keys. CLEAN
+
+### references/prompt-injection-patterns.md
+
+- Contains a live base64 string: `aWdub3JlIGFsbCBwcmV2aW91cyBpbnN0cnVjdGlvbnM=` (decodes to "ignore all previous instructions")
+- **Intent:** Clearly educational — used as a documented example of the obfuscation technique
+- **Risk assessment:** The scanner's own `check_obfuscation` function **will flag this string** if you run the skill against itself, producing a high-severity "Suspicious Base64" finding at `references/prompt-injection-patterns.md`. This is an expected false positive that the scanner's own confidence/false-positive guidance handles — but it is worth documenting explicitly in the reference file or SKILL.md so users aren't alarmed when they self-scan.
+- **Verdict:** CLEAN — documented threat example, not an attack
+
+### references/dangerous-code-patterns.md, references/permission-analysis.md
+
+- All patterns are documentation of threats, not operational instructions
+- No execution vectors, no secrets, no suspicious URLs
+- **Verdict:** CLEAN
+
+### scripts/scan_skill.py
+
+**Dependencies (PEP 723):**
+```
+# dependencies = ["pyyaml"]
+```
+`pyyaml` — well-known, widely trusted PyPI package. CLEAN
+
+**Network access:** Zero HTTP requests, zero socket connections. CLEAN
+
+**Credential access:** The script reads files within the user-supplied `skill_dir` path only. No access to `~/.ssh`, `~/.aws`, env secrets, or credential stores. CLEAN
+
+**Dangerous execution:**
+- No `eval()`, `exec()`, `shell=True`, `os.system()`
+- No dynamic imports beyond the standard library
+- Uses `yaml.safe_load()` (not `yaml.load()`) — correct CLEAN
+
+**`base64.b64decode` usage (lines ~195–215 in `check_obfuscation`):** Legitimate detection use — decodes candidate strings and checks for suspicious keywords. Does not execute the decoded content. CLEAN
+
+**File writes:** Zero write operations. Script is entirely read-only analysis. CLEAN
+
+**Config modification:** None. CLEAN
+
+**Symlinks:** None in the skill directory. CLEAN
+
+**PNG parsing:** Uses `struct` to parse PNG chunks directly — correct and safe. No shell calls, no `exiftool`. CLEAN
+
+**Supply chain URLs:**
+- `https://docs.astral.sh/uv/getting-started/installation/` — official uv docs, trusted
+
+**Verdict for Lens 2:** CLEAN
+
+---
+
+### Issue SC-001 · Info (Meta)
+**File:** `references/prompt-injection-patterns.md`
+**Text:** The example base64 string `aWdub3JlIGFsbCBwcmV2aW91cyBpbnN0cnVjdGlvbnM=`
+**Note:** When this skill is scanned by *itself*, the scanner will emit a high-severity finding for this string. This is a correct false positive — the scanner is working as designed. However, it creates a confusing first experience ("this security skill is flagging itself as malicious"). Consider adding a note in the reference file: `<!-- This example will trigger a false positive in automated scanners — see confidence level guidance. -->`
+
+---
+
+## LENS 3 — Prompt Engineering
+
+### Issue PE-001 · Medium
+**File:** `SKILL.md` · Phase 1 (Input & Discovery), no fallback for missing input
+**Text:** The three branches cover "user provides a path", "user names a skill", "user says scan all skills" — but there is **no fallback branch** for when the user provides insufficient input (e.g., just "scan this skill" with no path and no name).
+**Fix:** Add: `If neither a path nor a name is clear from the request, ask the user: "Please provide the path to the skill directory or the skill name to scan."`
+
+---
+
+### Issue PE-002 · Low
+**File:** `SKILL.md` · Phase 6 (Script Analysis)
+**Text:** `"Read each script file fully (do not skip any)"` — good imperative, but…
+The instruction says to load `references/dangerous-code-patterns.md` **at the start of Phase 6**. However, Phase 4 already loaded `references/prompt-injection-patterns.md`. The reference loading is scattered across phases rather than front-loaded or consolidated.
+**Problem:** If the agent is working sequentially, it may load reference files late or out of order. In a long context window session, the references could be loaded inconsistently.
+**Fix:** Either load all reference files at the start of Phase 3 (before any analysis begins) and reference them by name in subsequent phases, or add a "Phase 0: Load all references" step.
+
+---
+
+### Issue PE-003 · Low
+**File:** `SKILL.md` · Output Format → Risk Level Determination
+**Text:**
+```
+- **High**: High-confidence high-severity findings or multiple medium findings
+```
+**Problem:** "Multiple medium findings" is ambiguous. Is 2 medium findings "High"? Is 10? No threshold is given.
+**Fix:** Define a threshold, e.g. "3 or more medium-confidence findings" or "any high-severity finding."
+
+---
+
+### Issue PE-004 · Low
+**File:** `scripts/scan_skill.py` · Lines ~300–315 (PNG chunk loop, `findings.append`)
+```python
+                if keyword and value.strip():
+                            findings.append({
+```
+**Problem:** The `findings.append(...)` call inside the `if keyword and value.strip():` block is indented **12 spaces deeper** than the `if` (28 spaces total vs. expected 20). This is valid Python but inconsistent with the rest of the file's 4-space indentation convention. It appears to be an accidental extra indentation that slipped through.
+**Fix:** Reduce indentation to `if keyword and value.strip(): [4 spaces deeper]findings.append(...)` to match the file's convention.
+
+---
+
+### Issue PE-005 · Info
+**File:** `SKILL.md` · Reference Files table (bottom of file)
+**Text:** The table at the end listing reference files with their purposes is **partially redundant** — each phase that uses a reference already names it and explains its purpose inline. The table adds ~6 lines for information already present elsewhere.
+**Note:** The table does serve as a quick lookup, so this is a judgment call. Low-priority.
+
+---
+
+### PE Summary — LENS 3
+
+| # | Severity | Issue |
+|---|----------|-------|
+| PE-001 | Medium | No fallback for missing/ambiguous user input in Phase 1 |
+| PE-002 | Low | Reference file loading is scattered across phases; should be front-loaded |
+| PE-003 | Low | "Multiple medium findings" threshold for High risk level is undefined |
+| PE-004 | Low | Inconsistent indentation in `scan_skill.py` PNG chunk handler |
+| PE-005 | Info | Reference Files table at bottom partially redundant |
+
+---
+
+## Overall Summary
+
+| Lens | Status | Issues |
+|------|--------|--------|
+| Skill Writer | Minor issues | SW-001 (empty section), SW-002 (missing `allowed-tools`), SW-003 (vague path), SW-004 (info) |
+| Skill Scanner | **CLEAN** | SC-001 (meta/info: self-scan false positive on reference example) |
+| Prompt Engineering | Minor issues | PE-001 (missing input fallback), PE-002 (scattered ref loading), PE-003 (ambiguous threshold), PE-004 (indentation), PE-005 (info) |
+
+**Risk Level: Low** — The skill poses no security threat. The script is read-only static analysis with no network access, no credential access, and no dangerous execution. All issues are structural or clarity improvements. The two Medium items (SW-001 empty section, SW-002 missing `allowed-tools`, PE-001 missing input fallback) are the highest-priority fixes.
+
+## Scout: Deep review of skill: skill-writer at /Users/josorio/Code/pi-skills/skills/skill-writer/
+
+Read ALL files (SKILL.md + EVAL.md + SOURCES.md + scripts/ + ALL references/ including references/examples/). Evaluate using THREE lenses:
+
+**LENS 1 — Skill Writer:** Frontmatter (name, description, trigger phrases, pattern compliance), imperative voice, progressive disclosure, degrees of freedom, conciseness, consistent terminology, no time-sensitive info, no machine-specific paths, no agent-specific refs, portable relative paths.
+
+**LENS 2 — Skill Scanner:** Prompt injection, dangerous code, excessive permissions, secret exposure, supply chain (external URLs, remote code exec), config poisoning.
+
+**LENS 3 — Prompt Engineering:** Instruction hierarchy, authority/commitment patterns, no over-engineering/ambiguity/overflow, token efficiency, error recovery/fallback, output format specified.
+
+Report ALL issues with severity (Critical/High/Medium/Low/Info), exact file path and line, quoted text, and suggested fix. If no issues found for a lens, state CLEAN.
+
+---
+
+## Deep Review: `skill-writer`
+
+**Files read:** `SKILL.md`, `EVAL.md`, `SOURCES.md`, `scripts/quick_validate.py`, `references/authoring-path.md`, `references/synthesis-path.md`, `references/mode-selection.md`, `references/registration-validation.md`, `references/description-optimization.md`, `references/evaluation-path.md`, `references/iteration-path.md`, `references/design-principles.md`, `references/skill-patterns.md`, `references/workflow-patterns.md`, `references/output-patterns.md`, `references/claude-code-extensions.md`, `references/examples/documentation-skill.md`, `references/examples/security-review-skill.md`, `references/examples/workflow-process-skill.md`
+
+---
+
+## LENS 1 — Skill Writer
+
+### ✅ Passing
+
+| Check | Status |
+|---|---|
+| Frontmatter first, valid YAML | ✓ |
+| `name` matches directory | ✓ `skill-writer` |
+| `description` ≤ 1024 chars, no angle brackets | ✓ ~238 chars |
+| Trigger phrases in description | ✓ 6 concrete phrases |
+| Third-person description | ✓ |
+| `metadata` field uses allowed key | ✓ `metadata` is in validator's `allowed_fields` |
+| Imperative voice throughout body | ✓ |
+| Progressive disclosure via load table | ✓ 13-entry conditional load table |
+| No machine-specific absolute paths in SKILL.md or references/ | ✓ |
+| No time-sensitive "before/after DATE" language in skill body | ✓ |
+| SOURCES.md dates are in changelog/provenance context | ✓ acceptable |
+| Provider-specific content properly gated | ✓ claude-code-extensions.md and skill-patterns.md argument section labeled |
+| Body line count | ✓ ~70 lines, well under 500 |
+
+---
+
+### ❌ Issues Found
+
+---
+
+**[HIGH] Missing `skill-authoring` example profile**
+- **Files:** `references/examples/` (directory), `references/synthesis-path.md` §1.5, `references/mode-selection.md` (Skill class table)
+- **Evidence:** The examples directory contains exactly three profiles:
+  ```
+  references/examples/documentation-skill.md
+  references/examples/security-review-skill.md
+  references/examples/workflow-process-skill.md
+  ```
+  `synthesis-path.md` §1.5 states: *"Select and load one or more profiles from `references/examples/*.md`"* and uses the profile as *"a concrete depth and output checklist."* `mode-selection.md` defines five skill classes: `workflow-process`, `integration-documentation`, `security-review`, `skill-authoring`, `generic`. `skill-writer` itself is classified as `skill-authoring` — yet there is no `references/examples/skill-authoring-skill.md` profile. The skill cannot satisfy its own depth gate (§1.5 selects a matching profile) when invoked to create or update another `skill-authoring` class skill.
+- **Fix:** Create `references/examples/skill-authoring-skill.md` covering: source provenance, depth gate enforcement, transformed example artifacts, registration/validation as required dimensions.
+
+---
+
+**[HIGH] Missing transformed examples for skill-authoring class (own depth gate violation)**
+- **Files:** `references/synthesis-path.md` §4 depth gate 3, `references/authoring-path.md` §Example artifact requirements, `references/mode-selection.md` hard stop rules
+- **Quoted text from `synthesis-path.md`:**
+  > *"For authoring/generator skills, transformed example artifacts exist in references: happy-path, secure/robust variant, anti-pattern + corrected version"*
+- **Quoted text from `mode-selection.md`:**
+  > *"For authoring/generator skills, missing transformed example artifacts is a hard failure."*
+- **Evidence:** No files matching `references/happy-path*.md`, `references/anti-pattern*.md`, or similar exist. The `examples/` case studies (e.g. `documentation-skill.md`) document *how to synthesize other skill types*, not happy-path/anti-pattern/secure outputs of the skill-writing process itself. A skill-authoring skill that fails its own hard-stop rule is a credibility and consistency problem.
+- **Fix:** Add three artifacts to `references/`:
+  1. `references/examples/skill-authoring-happy-path.md` — a complete end-to-end example of creating a skill with full source provenance, SOURCES.md, and validator output.
+  2. `references/examples/skill-authoring-robust.md` — same with strict depth gates enforced and explicit gaps documented.
+  3. `references/examples/skill-authoring-antipattern.md` — example of shallow skill creation (missing depth gates, no SOURCES.md, vague description) alongside corrected version.
+
+---
+
+**[MEDIUM] Terminology inconsistency: "skill root" vs "skill directory"**
+- **Files:** `references/authoring-path.md` lines 1, 20 vs `references/registration-validation.md` lines 1, 14, 30
+- **Quoted text:** `authoring-path.md`: *"Treat the skill directory containing `SKILL.md` as the root for bundled references."* — `registration-validation.md`: *"Inspect the workspace and identify the canonical skill root for this repository before editing skill files."*
+- Also: `references/skill-patterns.md` uses `<skill-dir>` in code examples; `references/synthesis-path.md` uses neither explicitly.
+- The validator docs (`registration-validation.md`) use `uv run scripts/quick_validate.py <path/to/skill-directory>` while EVAL.md uses `uv run "scripts/quick_validate.py" "$EVAL_DIR/<target-skill-name>"`.
+- **Fix:** Pick one canonical term. `skill directory` (noun phrase, self-explanatory) is preferable. Replace `skill root` with `skill directory` in `registration-validation.md` and all reference files, and use `<skill-dir>` as the path placeholder consistently (as skill-patterns.md already does).
+
+---
+
+**[MEDIUM] `references/examples/*.md` loaded as a wildcard without a cap or conditional gate**
+- **File:** `SKILL.md` load table, row 7
+- **Quoted text:** `references/examples/*.md` — *"Load representative synthesis examples by skill type"*
+- **Issue:** The instruction implies loading ALL files matching the glob, currently 3 files. As the examples library grows (e.g., after the missing `skill-authoring` profile is added, plus a `generic` profile), this becomes an unconditional multi-file load for every synthesis pass regardless of skill class. `skill-patterns.md` explicitly warns against *"Unconditional Reference Loading"* as an anti-pattern.
+- **Fix:** Change the table entry to make selection conditional on classified skill class:
+  ```
+  Load the example profile matching your classified skill class   references/examples/<class>-skill.md
+  ```
+  This aligns with `synthesis-path.md` §1.5 which already says *"select one or more profiles"* based on classification.
+
+---
+
+**[LOW] SOURCES.md lists unverified external URL as canonical trust tier**
+- **File:** `SOURCES.md`, source table row 6
+- **Quoted text:** `https://agentskills.io/specification` — trust tier: `canonical`, confidence: `high`
+- **Issue:** The `design-principles.md` principle "Avoid Time-Sensitive Information" applies. The URL `https://agentskills.io/specification` is not a widely-confirmed live resource. Marking an unconfirmed external URL as `canonical / high confidence` is overconfident. If this spec doesn't resolve, any agent following instructions to consult it will silently fail.
+- **Fix:** Downgrade trust tier to `secondary` until confirmed live, or replace with the confirmed GitHub URL `https://github.com/anthropics/skills/tree/main` which is the actual upstream used. Add a note in the row's "Usage constraints" column: *"confirm URL is live before referencing in agent instructions."*
+
+---
+
+**[LOW] SOURCES.md "Anthropic upstream" row references non-standard path**
+- **File:** `SOURCES.md`, source table row 5
+- **Quoted text:** `https://github.com/anthropics/skills/tree/main/skills/skill-creator`
+- **Issue:** The Anthropic GitHub repo is `github.com/anthropics/claude-code` or `github.com/anthropics/anthropic-cookbook` — `anthropics/skills` is not a known canonical Anthropic repository name. If this URL doesn't resolve it silently points to a non-existent source.
+- **Fix:** Verify and correct the URL. If the path doesn't exist, mark it as `unverified` or `N/A` in trust tier.
+
+---
+
+## LENS 2 — Skill Scanner
+
+### ✅ CLEAN
+
+No critical security issues found.
+
+**Evidence reviewed:**
+
+| Check | Finding |
+|---|---|
+| Prompt injection in SKILL.md or references/ | None found. No user-controlled content interpolated into instructions. |
+| Dangerous code in `scripts/quick_validate.py` | Uses only `Path.read_text()`, `yaml.safe_load`, `argparse`, `re`, `json`. No `subprocess`, `exec`, `eval`, or network calls. |
+| Script dependency supply chain | Only `pyyaml` via PEP 723 inline metadata — well-known, safe. |
+| External URL execution | Three external URLs in SOURCES.md/EVAL.md are documentation references, never fetched/executed automatically. |
+| Secret/credential exposure | None found in any file. |
+| Config poisoning | `yaml.safe_load` used throughout — no `yaml.load(unsafe=True)`. ✓ |
+| EVAL.md bash snippet | `rsync` excludes `.env` and `.git`. `/tmp` world-readable warning is present. ✓ |
+| `allowed-tools` scope | Not declared; inherits all tools. Appropriate for a skill-creation workflow that must write files and run scripts. |
+
+**Minor cosmetic note (Info):**
+- **File:** `EVAL.md`, validation command
+- **Quoted text:** `uv run "scripts/quick_validate.py"` — unnecessary quotes around the path. Not harmful, but inconsistent with the unquoted form in `registration-validation.md`.
+
+---
+
+## LENS 3 — Prompt Engineering
+
+### ✅ Passing
+
+| Check | Status |
+|---|---|
+| Strong authority framing | ✓ "Use this as the single canonical workflow" |
+| Output format specified | ✓ 4-item structured list at bottom of SKILL.md |
+| Simple-task shortcut provided | ✓ Callout block distinguishes simple vs full rewrites |
+| Commitment/hard-stop language | ✓ mode-selection.md "Do not claim completion when..." |
+| Agent-agnostic language | ✓ No provider-specific assumptions in main flow |
+| Error recovery for missing sources | ✓ synthesis-path.md §1.2: "If a listed source path does not exist...skip it and proceed" |
+
+---
+
+### ❌ Issues Found
+
+---
+
+**[MEDIUM] Step 4.3 unconditionally references three structure reference files with no conditional gate**
+- **File:** `SKILL.md`, Step 4 item 3
+- **Quoted text:**
+  > *"Follow `references/skill-patterns.md`, `references/workflow-patterns.md`, and `references/output-patterns.md` for structure and output determinism."*
+- **Issue:** All three files are loaded unconditionally for every authoring step. `skill-patterns.md` is 250+ lines, `workflow-patterns.md` and `output-patterns.md` are 100+ lines each — a combined ~450+ lines injected into context for every authoring task including simple wording updates. This directly contradicts the progressive disclosure principle and the anti-pattern listed in `skill-patterns.md`: *"Over-long SKILL.md... consuming excessive context window."*
+- **Fix:** Add a conditional selection table to Step 4, e.g.:
+
+  | Skill type | Load |
+  |---|---|
+  | Any new skill / major rewrite | `references/skill-patterns.md` |
+  | Multi-step process skill | + `references/workflow-patterns.md` |
+  | Structured output required | + `references/output-patterns.md` |
+
+---
+
+**[MEDIUM] Step 3 skip condition is circular and underspecified**
+- **File:** `SKILL.md`, Step 3
+- **Quoted text:**
+  > *"Skip this step when selected path does not include `iteration` (for example operation `iterate`)."*
+- **Issue:** The agent has to have already read `references/mode-selection.md` and resolved a "selected path" before reaching Step 3. But the word `iteration` doesn't appear verbatim in the mode-selection path table — the table uses the operation label `iterate` and the path phrase *"Improve skill from outcomes/examples"*. An agent operating without having fully processed mode-selection could fail to match this condition. The parenthetical "(for example operation `iterate`)" is a hint, not a definition.
+- **Fix:** Make the skip condition concrete and self-contained:
+  > *"Skip this step unless the request explicitly involves improving from outcomes, examples, or observed failures (operation: `iterate`). For all other operations — `create`, `update`, `synthesize` — proceed to Step 4."*
+
+---
+
+**[LOW] Step 2 trigger ("when needed") is underspecified in SKILL.md without reading mode-selection.md**
+- **File:** `SKILL.md`, Step 2 heading
+- **Quoted text:** *"Run synthesis when needed"*
+- **Issue:** "When needed" has no definition in the SKILL.md body. The definition lives in `references/mode-selection.md` (the path mapping table). An agent that reads SKILL.md first and skips to the relevant step per the quick-path callout may skip Step 1 (mode selection) and then encounter "when needed" without grounding. The preamble callout partially mitigates this but doesn't define "needed."
+- **Fix:** Add a parenthetical: *"Run synthesis when needed (required for `create` and `synthesize` operations; skip for wording-only `update`; see `references/mode-selection.md` for full path mapping)."*
+
+---
+
+**[LOW] No fallback behavior defined for validator failure**
+- **File:** `SKILL.md`, Step 7 and `references/registration-validation.md`
+- **Evidence:** `registration-validation.md` says *"Reject shallow outputs that fail depth gates or required artifact checks"* — but does not specify what action to take after rejection. Does the agent loop back to Step 4? Report to the user and stop? The lack of a recovery path means a failing validator leaves the agent in an undefined state.
+- **Fix:** Add to `registration-validation.md` §Validation checklist:
+  > *"If validation fails: identify the failing gate, return to the responsible step (Step 2 for coverage gaps, Step 4 for missing artifacts), resolve the gap, and re-run validation before reporting completion."*
+
+---
+
+**[INFO] Output format section is at the bottom but not referenced from the Steps**
+- **File:** `SKILL.md`, `## Output format` section
+- **Issue:** Steps 1–7 each have "Required output" in their reference files but SKILL.md's own `## Output format` block (Summary, Changes Made, Validation Results, Open Gaps) is visually separated and not linked from any step. An agent completing Step 7 might emit step-level outputs and miss this final consolidation format.
+- **Fix:** Add a single line at Step 7 item 3: *"Then produce consolidated output per the `## Output format` section below."*
+
+---
+
+## Summary Table
+
+| Severity | Count | Lens | Item |
+|---|---|---|---|
+| **High** | 2 | L1 | Missing `skill-authoring` example profile; transformed examples for own class |
+| **Medium** | 3 | L1+L3 | Wildcard example loading; terminology inconsistency; Step 4.3 unconditional 3-file load |
+| **Low** | 4 | L1+L3 | Unverified canonical URL; unverified Anthropic URL; Step 3 skip ambiguity; no validator fallback |
+| **Info** | 2 | L2+L3 | Unnecessary quotes in EVAL.md; output format not linked from steps |
+| **Critical** | 0 | — | — |
+
+## Scout: Deep review of skill: test-prompt at /Users/josorio/Code/pi-skills/skills/test-prompt/
+
+Read ALL files (SKILL.md only). Evaluate using THREE lenses:
+
+**LENS 1 — Skill Writer:** Frontmatter (name, description, trigger phrases, pattern compliance), imperative voice, progressive disclosure, degrees of freedom, conciseness, consistent terminology, no time-sensitive info, no machine-specific paths, no agent-specific refs, portable relative paths.
+
+**LENS 2 — Skill Scanner:** Prompt injection, dangerous code, excessive permissions, secret exposure, supply chain (external URLs, remote code exec), config poisoning.
+
+**LENS 3 — Prompt Engineering:** Instruction hierarchy, authority/commitment patterns, no over-engineering/ambiguity/overflow, token efficiency, error recovery/fallback, output format specified.
+
+Report ALL issues with severity (Critical/High/Medium/Low/Info), exact file path and line, quoted text, and suggested fix. If no issues found for a lens, state CLEAN.
+
+## Domain: test-prompt skill at `/Users/josorio/Code/pi-skills/skills/test-prompt/SKILL.md`
+
+---
+
+## LENS 1 — Skill Writer
+
+### Issue 1 — High | Frontmatter: `license: Unknown`
+**Line:** 8 — `license: Unknown`
+`Unknown` is a red flag value; it signals the author never resolved licensing. Either set a proper SPDX identifier (`MIT`, `Apache-2.0`) or omit the field entirely if unneeded. Leaving `Unknown` trains readers to ignore the field and may block distribution.
+**Fix:** `license: MIT` or remove the `license` key entirely.
+
+---
+
+### Issue 2 — Medium | Frontmatter: `version: '1.0'`
+**Line:** 7 — `version: '1.0'`
+Version strings in skill files become stale and are rarely maintained. No other skills in this repo use a `version` field in metadata; it's inconsistent and noisy.
+**Fix:** Remove `version` from metadata, or at minimum align with repo convention (which appears to be omitting it).
+
+---
+
+### Issue 3 — Medium | Frontmatter: `author: NeoLabHQ`
+**Line:** 6 — `author: NeoLabHQ`
+An external org name here implies this skill is maintained by a third party. If it was adapted/rewritten in-house, the attribution is misleading. If it truly came from NeoLabHQ, the `license: Unknown` is a real IP risk (see Issue 1).
+**Fix:** Confirm provenance. If internally authored, remove or change `author`. If third-party, resolve the license.
+
+---
+
+### Issue 4 — Low | Cross-reference uses relative path
+**Line:** 19 — `[prompt-engineering](../prompt-engineering/SKILL.md)`
+Relative path is correct per skill spec. ✅ — but verify the referenced file exists and the path is correct (cannot confirm without reading that file; path appears standard).
+
+---
+
+### Issue 5 — Low | Trigger phrases missing key verb forms
+**Description field** — The description lists: `"test this prompt"`, `"verify prompt behavior"`, `"stress test a skill"`, `"check if this prompt works"`. Missing common phrasing: `"validate a prompt"`, `"does this prompt work"`, `"run prompt tests"`. Low coverage on the validation/QA vocabulary.
+**Fix:** Add `"validate this prompt"` and `"run prompt tests"` to trigger phrases.
+
+---
+
+### Issue 6 — Info | Title diverges from skill name
+**Line:** 13 — `# Testing Prompts With Subagents`
+The H1 title includes "With Subagents" which is an implementation detail, not the skill's purpose. The registered `name` is `test-prompt`. The title adds noise.
+**Fix:** `# Prompt Testing (RED-GREEN-REFACTOR)` or simply `# Test Prompt`.
+
+---
+
+## LENS 2 — Skill Scanner
+
+### Issue 7 — High | External authorship + unknown license = supply chain risk
+**Lines:** 6–8 — `author: NeoLabHQ`, `license: Unknown`
+The combination of an external author and an unresolved license means this skill's content cannot be confirmed as safe to redistribute or execute in an agent context. If NeoLabHQ's methodology includes embedded instructions designed to influence agent behavior adversarially, there is no license or disclosure that would surface it.
+**Fix:** Audit full content for injected behavioral directives and resolve license. See also Issue 1 and 3.
+
+---
+
+### Issue 8 — Medium | Scenario examples could train agents to violate TDD discipline
+**Lines:** 46–53 — The discipline-enforcing test scenario explicitly presents option `B) Commit now, tests later` as a live choice. An agent reading this without the RED context might internalize the framing as a valid pattern.
+This is by design (the scenario is meant to test resistance to temptation), but the framing is adjacent to prompt injection — a poorly-scoped agent could absorb `Option B` as an acceptable behavior.
+**Fix:** Add a note: `"These scenarios are adversarial by design — do not apply outside test harness context."` or wrap the scenario blocks with a `> ⚠️ Adversarial test scenario — not a behavioral template` callout.
+
+---
+
+### Issue 9 — Info | No external URLs, no remote code exec, no secrets
+The skill contains no `curl`, `wget`, `http://`, `https://` (besides relative links), no environment variable references, no API keys, no shell execution blocks, no `import`, no `require`. **CLEAN** on those vectors.
+
+---
+
+## LENS 3 — Prompt Engineering
+
+### Issue 10 — High | No instruction hierarchy / authority signal
+**Entire document** — The skill is written as guidance prose with checklists. It never establishes *why the agent must follow this methodology* — no authority framing, no consequence statement, no "this is non-negotiable" signal. For a discipline-enforcing testing methodology, the skill itself violates its own principle: it teaches authority patterns but doesn't apply them.
+**Fix:** Add an authority statement early:
+
+```
+**Non-negotiable:** Never write a prompt before completing the RED phase.
+Skipping RED means you're fixing imaginary problems.
+```
+
+---
+
+### Issue 11 — Medium | Output format is underspecified
+**Lines:** 107–112 — The Output Format section says to produce "three sections" but gives no template, no field names, no example output. A fresh agent receiving this skill has no concrete model to follow.
+**Fix:** Add a minimal fenced-block template:
+
+```markdown
+## Test Report
+
+### RED Results
+- **Scenario:** <scenario text>
+- **Agent behavior:** <verbatim output>
+- **Failures:** <list>
+
+### GREEN Prompt
+```prompt
+<prompt text>
+```
+
+### REFACTOR Log
+- Changes: <list>
+- Token delta: -N tokens
+- Re-test: PASS / FAIL
+```
+
+---
+
+### Issue 12 — Medium | No error recovery / fallback guidance
+**Entire document** — The skill has no guidance for what to do when: (a) the subagent crashes mid-test, (b) the GREEN phase never converges (prompt keeps failing), (c) the prompt type is ambiguous and fits multiple categories. No fallback or escape hatch is defined.
+**Fix:** Add a `## When Testing Stalls` section with at minimum:
+- "If GREEN fails after 3 iterations, escalate to meta-testing"
+- "If prompt type is unclear, default to Instruction testing strategy"
+
+---
+
+### Issue 13 — Low | Token cost: Parallel Baseline section is thin
+**Lines:** 93–95 — `### Parallel Baseline` body is one sentence. Either give a concrete example (how many subagents, what task shape) or merge it into the parent section. Single-sentence H3 sections add heading overhead without content payoff.
+**Fix:** Expand with a concrete dispatch example, or fold into the intro paragraph.
+
+---
+
+### Issue 14 — Low | "Stay GREEN" label inconsistent with TDD vocabulary
+**Line:** 22 — `**Stay GREEN**` is not a standard TDD phase label. Standard phases are Red → Green → Refactor (loop). This custom label adds cognitive overhead for readers familiar with TDD.
+**Fix:** Rename to `**Re-verify (loop)**` or simply collapse into the REFACTOR row.
+
+---
+
+### Issue 15 — Info | Commitment patterns used correctly
+The `Common Mistakes` section (lines 115–122) is well-structured as a negative pattern list — it uses imperative-adjacent framing and specificity ("Always use fresh context," "Capture verbatim"). This is good commitment/authority usage. ✅
+
+---
+
+## Summary Table
+
+| # | Lens | Severity | Issue |
+|---|------|----------|-------|
+| 1 | Writer | High | `license: Unknown` — unresolved, must fix |
+| 7 | Scanner | High | External author + unknown license = supply chain ambiguity |
+| 10 | Prompt Eng | High | No authority/commitment signal for discipline enforcement |
+| 2 | Writer | Medium | `version: '1.0'` — stale and inconsistent with repo |
+| 3 | Writer | Medium | `author: NeoLabHQ` — provenance unclear |
+| 8 | Scanner | Medium | Adversarial scenario examples not marked as such |
+| 11 | Prompt Eng | Medium | Output format underspecified — no template |
+| 12 | Prompt Eng | Medium | No error recovery / convergence fallback defined |
+| 5 | Writer | Low | Trigger phrases missing `validate`, `run prompt tests` |
+| 6 | Writer | Info | H1 title includes implementation detail |
+| 13 | Prompt Eng | Low | `Parallel Baseline` section too thin for its heading |
+| 14 | Prompt Eng | Low | `Stay GREEN` non-standard TDD label adds friction |
+| 9 | Scanner | Info | No external URLs, secrets, or remote exec — CLEAN |
+| 15 | Prompt Eng | Info | Commitment patterns in Common Mistakes — well done ✅ |
+
+**Most critical action:** Resolve `license: Unknown` + confirm `author: NeoLabHQ` provenance before distributing this skill. Everything else is refinement.
+

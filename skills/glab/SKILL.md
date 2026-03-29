@@ -1,9 +1,6 @@
 ---
 name: glab
 description: Interact with GitLab from the command line using the glab CLI. Use when working with merge requests, issues, CI/CD pipelines and jobs, variables, schedules, releases, stacked diffs, repository management, or GitLab API calls. Also use when the user says "open an MR," "create an issue," "check the pipeline," "merge this," "retrigger CI," "deploy," or any GitLab-related task — even if they don't mention glab explicitly. Requires glab CLI installed and authenticated.
-metadata:
-  author: josorio7122
-  version: '3.0'
 ---
 
 # GitLab CLI (glab)
@@ -212,6 +209,7 @@ glab api graphql -f query='{ currentUser { username } }'
 
 - **`glab api` does not support multipart file uploads** (e.g. project uploads for attaching images to MR comments). Use `curl` instead:
   ```bash
+  # Token visible in process lists — use only on single-user machines or CI with masked vars
   curl --request POST \
     --header "PRIVATE-TOKEN: $(glab config get token --host gitlab.com)" \
     --form "file=@/path/to/image.png" \

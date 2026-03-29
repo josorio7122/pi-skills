@@ -31,7 +31,7 @@
  *
  * Options JSON for poll:
  *   {
- *     "pollInterval": 1000,           // ms between polls (default 1000)
+ *     "pollInterval": 2000,           // ms between polls (default 2000)
  *     "timeoutMs": 600000,            // max wait time (default 10 min)
  *     "events": false
  *   }

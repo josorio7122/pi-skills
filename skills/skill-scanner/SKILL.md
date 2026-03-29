@@ -4,9 +4,6 @@ description: Scan agent skills for security issues. Use when asked to "scan a sk
   "audit a skill", "review skill security", "check skill for injection", "validate SKILL.md",
   or assess whether an agent skill is safe to install. Checks for prompt injection,
   malicious scripts, excessive permissions, secret exposure, and supply chain risks.
-metadata:
-  author: josorio7122
-  version: '1.0'
 ---
 
 # Skill Security Scanner
@@ -33,6 +30,10 @@ Returns JSON with findings, URLs, structure info, and severity counts. The scrip
 
 ## Guiding Principles
 
+- Evaluate intent before severity — legitimate security skills reference attack patterns.
+- False positives erode trust more than false negatives.
+- Confidence must be earned from evidence, not assumed from pattern matches.
+
 ## Confidence Levels
 
 | Level      | Criteria                                     | Action                       |
@@ -49,6 +50,7 @@ Returns JSON with findings, URLs, structure info, and severity counts. The scrip
 
 Determine the scan target:
 
+- If neither a path nor a name is provided, ask: "Please provide the path to the skill directory or the skill name to scan."
 - If the user provides a skill directory path, use it directly
 - If the user names a skill, look for it under `skills/<name>/` directories in the project or installed packages
 - If the user says "scan all skills", discover all `*/SKILL.md` files and scan each

@@ -1,9 +1,6 @@
 ---
 name: interface-design
 description: Design crafted, distinctive interfaces for dashboards, admin panels, SaaS apps, tools, settings pages, and data-heavy products. Use when the user asks to "design a dashboard," "build an admin panel," "create a settings page," "design a data interface," or wants to build any interactive product UI that is NOT a marketing page or landing page. Also use when the user says their UI looks "generic," "templated," or "like every other app." Redirect landing pages and marketing sites to frontend-design.
-metadata:
-  author: josorio7122
-  version: '1.0'
 ---
 
 # Interface Design
@@ -16,7 +13,7 @@ Build interface design with craft and consistency.
 
 **Use for:** Dashboards, admin panels, SaaS apps, tools, settings pages, data interfaces.
 
-**Not for:** Landing pages, marketing sites, campaigns. Redirect those to `/frontend-design`.
+**Not for:** Landing pages, marketing sites, campaigns. Redirect those to the frontend-design skill.
 
 ---
 
@@ -90,7 +87,7 @@ If any check fails, iterate before showing.
 
 # Before Writing Each Component
 
-**Every time** you write UI code — even small additions — state:
+**Every time** you write a new component or establish a new visual pattern — state:
 
 ```
 Intent: [who is this human, what must they do, how should it feel]
@@ -109,15 +106,16 @@ If you can't explain WHY for each choice, you're defaulting. Stop and think.
 
 ## Reference Files
 
-| When                             | Load                                                                                                        |
-| -------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| Implementing specific components | `references/design-system.md` — token architecture, spacing, depth, typography, controls, animation, states |
-| Exploring craft and expression   | `references/craft-foundations.md` — subtle layering, infinite expression, color philosophy                  |
-| Reviewing design quality         | `references/memory.md` — Saving patterns and memory management                                              |
-| Critiquing existing designs      | `references/critique.md`                                                                                    |
-| Studying design principles       | `references/principles.md`                                                                                  |
-| Understanding design mindset     | `references/mindset.md` — Why defaults win and where they hide                                              |
-| Viewing examples                 | `references/example.md`                                                                                     |
+| When                                | Load                                                                                                        |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Implementing specific components    | `references/design-system.md` — token architecture, spacing, depth, typography, controls, animation, states |
+| Exploring craft and expression      | `references/craft-foundations.md` — subtle layering, infinite expression, color philosophy                  |
+| Reviewing design quality            | `references/critique.md`                                                                                    |
+| Saving patterns for future sessions | `references/memory.md` — Saving patterns and memory management                                              |
+| Critiquing existing designs         | `references/critique.md`                                                                                    |
+| Studying design principles          | `references/principles.md`                                                                                  |
+| Understanding design mindset        | `references/mindset.md` — Why defaults win and where they hide                                              |
+| Viewing examples                    | `references/example.md`                                                                                     |
 
 ---
 

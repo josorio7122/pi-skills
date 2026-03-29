@@ -14,7 +14,7 @@ node --version   # Must be 18+
 echo $EXA_API_KEY # Must be set
 ```
 
-Dependencies are managed at the repository root. Run `pnpm install` from the repo root if needed.
+Run `pnpm install` from this skill's parent directory if dependencies are not yet installed.
 
 Get an API key at: https://dashboard.exa.ai/api-keys
 
@@ -39,7 +39,7 @@ This is the most important decision. Picking the wrong script wastes API credits
    - Yes, and you want related pages → `find-similar.ts`
 
 2. **Is it a direct question with a short answer?**
-   - Yes → `answer.ts` — returns a cited answer, not a list of links
+   - Yes → `answer.ts` — returns a cited answer, not a list of links (For comparing multiple doc sources, see Documentation Lookup pattern below.)
    - "What is the latest version of Next.js?" → `answer.ts`
    - "How do I configure Drizzle ORM with Postgres?" → `answer.ts`
 
@@ -201,7 +201,7 @@ tsx scripts/find-similar.ts "https://tailwindcss.com" '{"text":true,"excludeSour
 | Research (standard)     | Varies | 2-10x more than search      |
 | Research (pro)          | Higher | Use only for complex topics |
 
-Prices as of 2025. Verify at https://exa.ai/pricing.
+Prices may change. Verify at https://exa.ai/pricing.
 
 **Cost strategies:**
 
