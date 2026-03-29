@@ -3,7 +3,6 @@ name: playwright
 description: Automate a real browser from the terminal for navigation, form filling, screenshots, data extraction, and UI-flow debugging. Use when the user asks to "take a screenshot," "scrape a page," "fill a form," "test a UI flow," "automate the browser," "open a webpage," or any task that requires interacting with a live website. Also use when the user needs to extract data from a JavaScript-rendered page that simple HTTP requests can't handle. Uses playwright-cli or the bundled wrapper script.
 ---
 
-
 # Playwright CLI Skill
 
 Drive a real browser from the terminal using `playwright-cli`. Prefer the bundled wrapper script so the CLI works even when it is not globally installed.

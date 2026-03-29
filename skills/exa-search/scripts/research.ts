@@ -52,107 +52,101 @@
  *   tsx scripts/research.ts list '{"limit":5}'
  */
 
-import {
-  showHelp,
-  requireApiKey,
-  handleError,
-  requireArg,
-  createClient,
-} from "./lib/common.js";
+import { showHelp, requireApiKey, handleError, requireArg, createClient } from './lib/common.js'
 
-const args = process.argv.slice(2);
+const args = process.argv.slice(2)
 
-if (args.includes("--help") || args.length === 0) {
-  showHelp(import.meta.url);
+if (args.includes('--help') || args.length === 0) {
+  showHelp(import.meta.url)
 }
 
-const subcommand = args[0];
-const arg1 = args[1];
+const subcommand = args[0]
+const arg1 = args[1]
 
-requireApiKey();
+requireApiKey()
 
-const exa = createClient();
+const exa = createClient()
 
 try {
   switch (subcommand) {
-    case "create": {
-      const instructions = requireArg(arg1, "instructions");
+    case 'create': {
+      const instructions = requireArg(arg1, 'instructions')
       const opts: Record<string, unknown> = args[2]
         ? (JSON.parse(args[2]) as Record<string, unknown>)
-        : {};
+        : {}
       const result = await exa.research.create({
         instructions,
         model:
-          (opts.model as "exa-research-fast" | "exa-research" | "exa-research-pro") ?? undefined,
+          (opts.model as 'exa-research-fast' | 'exa-research' | 'exa-research-pro') ?? undefined,
         outputSchema: (opts.outputSchema as Record<string, unknown>) ?? undefined,
-      });
-      console.log(JSON.stringify(result, null, 2));
-      break;
+      })
+      console.log(JSON.stringify(result, null, 2))
+      break
     }
 
-    case "get": {
-      const researchId = requireArg(arg1, "research-id");
+    case 'get': {
+      const researchId = requireArg(arg1, 'research-id')
       const opts: Record<string, unknown> = args[2]
         ? (JSON.parse(args[2]) as Record<string, unknown>)
-        : {};
+        : {}
       if (opts.stream) {
-        const streamResult = await exa.research.get(researchId, { stream: true, ...opts });
+        const streamResult = await exa.research.get(researchId, { stream: true, ...opts })
         for await (const event of streamResult) {
-          console.log(JSON.stringify(event));
+          console.log(JSON.stringify(event))
         }
       } else {
-        const result = await exa.research.get(researchId, opts);
-        console.log(JSON.stringify(result, null, 2));
+        const result = await exa.research.get(researchId, opts)
+        console.log(JSON.stringify(result, null, 2))
       }
-      break;
+      break
     }
 
-    case "poll": {
-      const researchId = requireArg(arg1, "research-id");
+    case 'poll': {
+      const researchId = requireArg(arg1, 'research-id')
       const opts: Record<string, unknown> = args[2]
         ? (JSON.parse(args[2]) as Record<string, unknown>)
-        : {};
-      const result = await exa.research.pollUntilFinished(researchId, opts);
-      console.log(JSON.stringify(result, null, 2));
-      break;
+        : {}
+      const result = await exa.research.pollUntilFinished(researchId, opts)
+      console.log(JSON.stringify(result, null, 2))
+      break
     }
 
-    case "run": {
-      const instructions = requireArg(arg1, "instructions");
+    case 'run': {
+      const instructions = requireArg(arg1, 'instructions')
       const opts: Record<string, unknown> = args[2]
         ? (JSON.parse(args[2]) as Record<string, unknown>)
-        : {};
+        : {}
       const created = await exa.research.create({
         instructions,
         model:
-          (opts.model as "exa-research-fast" | "exa-research" | "exa-research-pro") ?? undefined,
+          (opts.model as 'exa-research-fast' | 'exa-research' | 'exa-research-pro') ?? undefined,
         outputSchema: (opts.outputSchema as Record<string, unknown>) ?? undefined,
-      });
-      const createdTyped = created as { researchId: string };
-      console.error(`Research task created: ${createdTyped.researchId} — polling...`);
+      })
+      const createdTyped = created as { researchId: string }
+      console.error(`Research task created: ${createdTyped.researchId} — polling...`)
       const result = await exa.research.pollUntilFinished(createdTyped.researchId, {
         pollInterval: (opts.pollInterval as number) || 2000,
         timeoutMs: (opts.timeoutMs as number) || 600000,
         events: opts.events as boolean | undefined,
-      });
-      console.log(JSON.stringify(result, null, 2));
-      break;
+      })
+      console.log(JSON.stringify(result, null, 2))
+      break
     }
 
-    case "list": {
+    case 'list': {
       const opts: Record<string, unknown> = arg1
         ? (JSON.parse(arg1) as Record<string, unknown>)
-        : {};
-      const result = await exa.research.list(opts);
-      console.log(JSON.stringify(result, null, 2));
-      break;
+        : {}
+      const result = await exa.research.list(opts)
+      console.log(JSON.stringify(result, null, 2))
+      break
     }
 
     default:
-      console.error(`Error: Unknown subcommand "${subcommand}".`);
-      console.error("Valid subcommands: create, get, poll, list, run");
-      process.exit(1);
+      console.error(`Error: Unknown subcommand "${subcommand}".`)
+      console.error('Valid subcommands: create, get, poll, list, run')
+      process.exit(1)
   }
 } catch (err) {
-  handleError(err);
+  handleError(err)
 }

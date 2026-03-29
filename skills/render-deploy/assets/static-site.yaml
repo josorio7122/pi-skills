@@ -9,7 +9,7 @@ services:
     branch: main
     autoDeploy: true
     buildCommand: npm ci && npm run build
-    staticPublishPath: ./build  # Change to ./dist for Vue/Vite, ./public for Gatsby
+    staticPublishPath: ./build # Change to ./dist for Vue/Vite, ./public for Gatsby
 
     # SPA routing - rewrite all routes to index.html
     routes:

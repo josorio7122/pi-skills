@@ -26,43 +26,37 @@
  *   tsx scripts/answer.ts "List top 3 ORMs" '{"outputSchema":{"type":"object","properties":{"items":{"type":"array","items":{"type":"string"}}}}}'
  */
 
-import {
-  parseArgs,
-  requireApiKey,
-  handleError,
-  filterOptions,
-  createClient,
-} from "./lib/common.js";
+import { parseArgs, requireApiKey, handleError, filterOptions, createClient } from './lib/common.js'
 
-const { query, opts } = parseArgs(import.meta.url);
-requireApiKey();
+const { query, opts } = parseArgs(import.meta.url)
+requireApiKey()
 
-const exa = createClient();
+const exa = createClient()
 
 const answerOpts = filterOptions(opts, [
-  "text",
-  "model",
-  "systemPrompt",
-  "outputSchema",
-  "userLocation",
-]);
+  'text',
+  'model',
+  'systemPrompt',
+  'outputSchema',
+  'userLocation',
+])
 
 try {
   if (opts.stream) {
     // Streaming mode — write chunks as they arrive
     for await (const chunk of exa.streamAnswer(query, answerOpts)) {
-      const typedChunk = chunk as { content?: string; citations?: unknown };
-      if (typedChunk.content) process.stdout.write(typedChunk.content);
+      const typedChunk = chunk as { content?: string; citations?: unknown }
+      if (typedChunk.content) process.stdout.write(typedChunk.content)
       if (typedChunk.citations) {
-        process.stdout.write("\n");
-        console.log(JSON.stringify({ citations: typedChunk.citations }, null, 2));
+        process.stdout.write('\n')
+        console.log(JSON.stringify({ citations: typedChunk.citations }, null, 2))
       }
     }
-    process.stdout.write("\n");
+    process.stdout.write('\n')
   } else {
-    const result = await exa.answer(query, answerOpts);
-    console.log(JSON.stringify(result, null, 2));
+    const result = await exa.answer(query, answerOpts)
+    console.log(JSON.stringify(result, null, 2))
   }
 } catch (err) {
-  handleError(err);
+  handleError(err)
 }

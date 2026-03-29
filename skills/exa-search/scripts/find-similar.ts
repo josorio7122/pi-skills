@@ -40,37 +40,37 @@ import {
   buildContentsOptions,
   createClient,
   executeAndPrint,
-} from "./lib/common.js";
+} from './lib/common.js'
 
-const { query: url, opts } = parseArgs(import.meta.url);
-requireApiKey();
+const { query: url, opts } = parseArgs(import.meta.url)
+requireApiKey()
 
-const exa = createClient();
+const exa = createClient()
 
-const wantContents = opts.contents || opts.text || opts.highlights || opts.summary;
+const wantContents = opts.contents || opts.text || opts.highlights || opts.summary
 
-const contentsOpts = buildContentsOptions(opts);
+const contentsOpts = buildContentsOptions(opts)
 
 const findSimilarKeys = [
-  "numResults",
-  "excludeSourceDomain",
-  "includeDomains",
-  "excludeDomains",
-  "startCrawlDate",
-  "endCrawlDate",
-  "startPublishedDate",
-  "endPublishedDate",
-  "category",
-  "includeText",
-  "excludeText",
-] as const;
+  'numResults',
+  'excludeSourceDomain',
+  'includeDomains',
+  'excludeDomains',
+  'startCrawlDate',
+  'endCrawlDate',
+  'startPublishedDate',
+  'endPublishedDate',
+  'category',
+  'includeText',
+  'excludeText',
+] as const
 
-const searchOpts = filterOptions(opts, findSimilarKeys);
+const searchOpts = filterOptions(opts, findSimilarKeys)
 
 await executeAndPrint(async () => {
   if (wantContents) {
-    return await exa.findSimilarAndContents(url, { ...searchOpts, ...contentsOpts });
+    return await exa.findSimilarAndContents(url, { ...searchOpts, ...contentsOpts })
   } else {
-    return await exa.findSimilar(url, searchOpts);
+    return await exa.findSimilar(url, searchOpts)
   }
-});
+})

@@ -22,7 +22,7 @@ services:
       - key: NEXTAUTH_URL
         value: https://nextjs-app.onrender.com
       - key: NEXTAUTH_SECRET
-        sync: false  # User provides in Dashboard
+        sync: false # User provides in Dashboard
       - key: JWT_SECRET
         generateValue: true
 
@@ -31,5 +31,5 @@ databases:
     databaseName: nextjs_production
     user: nextjs_user
     plan: free
-    postgresMajorVersion: "15"
-    ipAllowList: []  # Internal access only
+    postgresMajorVersion: '15'
+    ipAllowList: [] # Internal access only

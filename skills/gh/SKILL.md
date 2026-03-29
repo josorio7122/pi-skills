@@ -1,10 +1,10 @@
 ---
 name: gh
 description: Interact with GitHub from the command line using the gh CLI. Use when working with pull requests, issues, releases, Actions workflows and runs, repository management, code review, or GitHub API calls. Also use when the user says "open a PR," "create an issue," "check CI," "merge this," "make a release," or any GitHub-related task — even if they don't mention gh explicitly. Requires gh CLI installed and authenticated.
-compatibility: "Requires gh CLI installed (brew install gh) and authenticated (gh auth login)"
+compatibility: 'Requires gh CLI installed (brew install gh) and authenticated (gh auth login)'
 metadata:
   author: josorio7122
-  version: "2.0"
+  version: '2.0'
 ---
 
 # GitHub CLI (gh)
@@ -31,15 +31,15 @@ gh auth login --with-token <<< "<pat>" # With personal access token
 
 Most GitHub work falls into a few categories. Pick the right one and you avoid wasting time.
 
-| You need to...                              | Start here                          |
-| ------------------------------------------- | ----------------------------------- |
-| Push your work and get it reviewed           | [Create a PR](#create-a-pr)         |
-| Check if CI passed before merging            | [Check CI](#check-ci)               |
-| Review someone else's PR                     | [Review a PR](#review-a-pr)         |
-| Ship a PR to main                            | [Merge a PR](#merge-a-pr)           |
-| Track or report a bug/feature                | [Work with Issues](#work-with-issues) |
-| Cut a new version                            | [Make a Release](#make-a-release)   |
-| Do something gh doesn't have a command for   | [Use the API](#use-the-api)         |
+| You need to...                             | Start here                            |
+| ------------------------------------------ | ------------------------------------- |
+| Push your work and get it reviewed         | [Create a PR](#create-a-pr)           |
+| Check if CI passed before merging          | [Check CI](#check-ci)                 |
+| Review someone else's PR                   | [Review a PR](#review-a-pr)           |
+| Ship a PR to main                          | [Merge a PR](#merge-a-pr)             |
+| Track or report a bug/feature              | [Work with Issues](#work-with-issues) |
+| Cut a new version                          | [Make a Release](#make-a-release)     |
+| Do something gh doesn't have a command for | [Use the API](#use-the-api)           |
 
 ---
 
@@ -104,6 +104,7 @@ gh pr merge <number> --delete-branch           # Merge commit (preserves branch 
 ```
 
 **When to use which:**
+
 - **Squash** — default for most projects. One commit per PR on main. Clean log.
 - **Rebase** — when individual commits are meaningful and well-structured.
 - **Merge commit** — when you need to preserve the branch topology (rare).

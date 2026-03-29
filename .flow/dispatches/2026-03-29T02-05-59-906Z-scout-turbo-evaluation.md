@@ -1,0 +1,6 @@
+---
+agent: "scout"
+task: "Analyze the full source code of /Users/josorio/Code/pi-skills/skills/posthog-skill/ to determine what can be extracted into a shared library package. Read ALL of these files completely:\n\n1. scripts/run.ts — the CLI entry point\n2. scripts/lib/posthog-client.ts — the API client\n3. scripts/lib/dashboard-spec.ts — dashboard specification logic\n4. scripts/lib/fixtures.ts — fixtures/data\n\nFor each file, report:\n- Total lines\n- All exports (functions, types, interfaces, constants)\n- All imports\n- What is \"business logic / reusable core\" vs \"CLI glue / script wiring\"\n- Dependencies on other files in the project\n\nAlso read ALL test files in scripts/__tests__/ and report which modules they test and how (unit vs integration via spawnSync).\n\nThe goal: determine a clean split between a reusable \"core\" package (types, API client, dashboard spec, fixtures) and a thin \"scripts\" layer (CLI entry points). What would go where?"
+exitCode: 0
+usage: {"input":6,"output":4374,"cacheRead":61796,"cacheWrite":48507,"cost":0.26606805,"contextTokens":51931,"turns":4}
+---

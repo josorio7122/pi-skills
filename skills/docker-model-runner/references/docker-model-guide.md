@@ -7,15 +7,18 @@ Docker Model Runner (DMR) is included with Docker Desktop and Docker Engine. It 
 ## Installation
 
 ### Docker Desktop (macOS and Windows)
+
 Docker Model Runner is included in Docker Desktop. Install from: https://docs.docker.com/desktop/
 
 ### Docker Engine (Linux)
+
 ```bash
 curl -fsSL https://get.docker.com | sudo bash
 sudo usermod -aG docker $USER
 ```
 
 ### Verify Installation
+
 ```bash
 docker model --help
 docker model version
@@ -180,19 +183,19 @@ for chunk in stream:
 ### JavaScript/TypeScript
 
 ```javascript
-import OpenAI from 'openai';
+import OpenAI from 'openai'
 
 const client = new OpenAI({
   baseURL: 'http://localhost:12434/engines/llama.cpp/v1',
-  apiKey: 'not-needed'
-});
+  apiKey: 'not-needed',
+})
 
 const response = await client.chat.completions.create({
   model: 'ai/smollm2',
-  messages: [{ role: 'user', content: 'Hello!' }]
-});
+  messages: [{ role: 'user', content: 'Hello!' }],
+})
 
-console.log(response.choices[0].message.content);
+console.log(response.choices[0].message.content)
 ```
 
 ### Go
@@ -229,14 +232,14 @@ func main() {
 
 ## Popular Models
 
-| Model | Size | Description |
-|-------|------|-------------|
-| `ai/smollm2` | ~1GB | Fast, small model for quick tasks |
-| `ai/gemma3` | ~5GB | Google's Gemma 3 model |
-| `ai/llama3.2` | ~4GB | Meta's Llama 3.2 |
-| `ai/qwen3` | ~4GB | Alibaba's Qwen 3 |
-| `ai/phi4` | ~9GB | Microsoft's Phi-4 |
-| `ai/mistral` | ~4GB | Mistral AI's base model |
+| Model         | Size | Description                       |
+| ------------- | ---- | --------------------------------- |
+| `ai/smollm2`  | ~1GB | Fast, small model for quick tasks |
+| `ai/gemma3`   | ~5GB | Google's Gemma 3 model            |
+| `ai/llama3.2` | ~4GB | Meta's Llama 3.2                  |
+| `ai/qwen3`    | ~4GB | Alibaba's Qwen 3                  |
+| `ai/phi4`     | ~9GB | Microsoft's Phi-4                 |
+| `ai/mistral`  | ~4GB | Mistral AI's base model           |
 
 ## Configuration
 
@@ -258,6 +261,7 @@ docker model inspect ai/smollm2
 ## Troubleshooting
 
 ### Model Runner Not Found
+
 ```bash
 # Check if Docker is from official repositories
 docker version
@@ -267,6 +271,7 @@ curl -fsSL https://get.docker.com | sudo bash
 ```
 
 ### Model Loading Issues
+
 ```bash
 # Check logs for errors
 docker model logs

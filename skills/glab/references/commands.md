@@ -282,21 +282,21 @@ glab config edit                        # Edit config file
 
 ## Environment Variables
 
-| Variable                               | Purpose                                                                    |
-| -------------------------------------- | -------------------------------------------------------------------------- |
-| `GITLAB_TOKEN`                         | Authentication token (alternative to `glab auth login`)                    |
-| `GITLAB_HOST` / `GL_HOST`             | Default GitLab hostname (default: `https://gitlab.com`)                    |
-| `GLAB_CONFIG_DIR`                      | Custom config directory (default: `~/.config/glab`)                        |
-| `VISUAL` / `EDITOR`                   | Editor for authoring text (`VISUAL` takes precedence)                      |
-| `BROWSER`                              | Web browser for opening links                                              |
-| `NO_COLOR`                             | Disable color output                                                       |
-| `NO_PROMPT`                            | Disable interactive prompts                                                |
-| `DEBUG`                                | Enable verbose logging including git commands and DNS details              |
-| `GLAB_DEBUG_HTTP`                      | Log HTTP request/response transport information                            |
-| `FORCE_HYPERLINKS`                     | Force hyperlinks in output even when not a TTY                             |
-| `GLAB_CHECK_UPDATE`                    | Force update check (default: once per day)                                 |
-| `GLAB_SEND_TELEMETRY`                 | Set `false` to disable telemetry                                           |
-| `GITLAB_CLIENT_ID`                     | Custom OAuth client ID                                                     |
-| `GLAMOUR_STYLE`                        | Markdown renderer style: `dark`, `light`, `notty`                          |
-| `REMOTE_ALIAS` / `GIT_REMOTE_URL_VAR` | Git remote alias containing GitLab URL                                     |
+| Variable                              | Purpose                                                                   |
+| ------------------------------------- | ------------------------------------------------------------------------- |
+| `GITLAB_TOKEN`                        | Authentication token (alternative to `glab auth login`)                   |
+| `GITLAB_HOST` / `GL_HOST`             | Default GitLab hostname (default: `https://gitlab.com`)                   |
+| `GLAB_CONFIG_DIR`                     | Custom config directory (default: `~/.config/glab`)                       |
+| `VISUAL` / `EDITOR`                   | Editor for authoring text (`VISUAL` takes precedence)                     |
+| `BROWSER`                             | Web browser for opening links                                             |
+| `NO_COLOR`                            | Disable color output                                                      |
+| `NO_PROMPT`                           | Disable interactive prompts                                               |
+| `DEBUG`                               | Enable verbose logging including git commands and DNS details             |
+| `GLAB_DEBUG_HTTP`                     | Log HTTP request/response transport information                           |
+| `FORCE_HYPERLINKS`                    | Force hyperlinks in output even when not a TTY                            |
+| `GLAB_CHECK_UPDATE`                   | Force update check (default: once per day)                                |
+| `GLAB_SEND_TELEMETRY`                 | Set `false` to disable telemetry                                          |
+| `GITLAB_CLIENT_ID`                    | Custom OAuth client ID                                                    |
+| `GLAMOUR_STYLE`                       | Markdown renderer style: `dark`, `light`, `notty`                         |
+| `REMOTE_ALIAS` / `GIT_REMOTE_URL_VAR` | Git remote alias containing GitLab URL                                    |
 | `GLAB_ENABLE_CI_AUTOLOGIN`            | Set `true` to auto-login in GitLab CI using `CI_JOB_TOKEN` (experimental) |

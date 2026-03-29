@@ -1,10 +1,10 @@
 ---
 name: glab
 description: Interact with GitLab from the command line using the glab CLI. Use when working with merge requests, issues, CI/CD pipelines and jobs, variables, schedules, releases, stacked diffs, repository management, or GitLab API calls. Also use when the user says "open an MR," "create an issue," "check the pipeline," "merge this," "retrigger CI," "deploy," or any GitLab-related task — even if they don't mention glab explicitly. Requires glab CLI installed and authenticated.
-compatibility: "Requires glab CLI installed (brew install glab) and authenticated (glab auth login)"
+compatibility: 'Requires glab CLI installed (brew install glab) and authenticated (glab auth login)'
 metadata:
   author: josorio7122
-  version: "3.0"
+  version: '3.0'
 ---
 
 # GitLab CLI (glab)
@@ -30,8 +30,8 @@ glab auth login --hostname gitlab.example.com # Self-hosted instance
 
 ## Choosing the Right Command
 
-| You need to...                              | Start here                            |
-| ------------------------------------------- | ------------------------------------- |
+| You need to...                               | Start here                            |
+| -------------------------------------------- | ------------------------------------- |
 | Push your work and get it reviewed           | [Create an MR](#create-an-mr)         |
 | Check if the pipeline passed                 | [Check CI/CD](#check-cicd)            |
 | Review someone else's MR                     | [Review an MR](#review-an-mr)         |
@@ -120,6 +120,7 @@ glab mr rebase <id>                              # Rebase before merging
 ```
 
 **When to use which:**
+
 - **Squash** — default for most projects. One commit per MR on the target branch. Clean log.
 - **`--when-pipeline-succeeds`** — set-and-forget. GitLab merges automatically when CI goes green. Combine with `--squash` for the most common flow.
 - **Rebase first** — when the MR has conflicts or needs to be up-to-date. Run `glab mr rebase` before merging.

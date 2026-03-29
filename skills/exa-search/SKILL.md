@@ -1,10 +1,10 @@
 ---
 name: exa-search
 description: Semantic web search, content extraction, AI-powered answers, and deep research via the Exa API. Use when you need to search documentation, look up facts, find current information, extract page content from URLs, get AI answers with citations, find pages similar to a URL, research companies or people, find LinkedIn profiles, or run deep multi-step research. Also use when the user asks to "look something up," "search the web," "find docs for," "what does X's documentation say," "research this company," or needs any information that may be more current than your training data. Requires EXA_API_KEY environment variable.
-compatibility: "Requires Node.js 18+, tsx, and EXA_API_KEY environment variable set"
+compatibility: 'Requires Node.js 18+, tsx, and EXA_API_KEY environment variable set'
 metadata:
   author: josorio7122
-  version: "3.0"
+  version: '3.0'
 ---
 
 # Exa Search
@@ -32,13 +32,13 @@ Get an API key at: https://dashboard.exa.ai/api-keys
 
 This is the most important decision. Picking the wrong script wastes API credits and returns worse results.
 
-| You need to...                                      | Use                       |
-| --------------------------------------------------- | ------------------------- |
-| Answer a factual question with sources               | `scripts/answer.ts`       |
-| Find web pages about a topic                         | `scripts/search.ts`       |
-| Read the contents of a known URL                     | `scripts/contents.ts`     |
-| Find pages similar to a URL you already have         | `scripts/find-similar.ts` |
-| Do multi-step research on a complex topic            | `scripts/research.ts`     |
+| You need to...                               | Use                       |
+| -------------------------------------------- | ------------------------- |
+| Answer a factual question with sources       | `scripts/answer.ts`       |
+| Find web pages about a topic                 | `scripts/search.ts`       |
+| Read the contents of a known URL             | `scripts/contents.ts`     |
+| Find pages similar to a URL you already have | `scripts/find-similar.ts` |
+| Do multi-step research on a complex topic    | `scripts/research.ts`     |
 
 ### When to use which — decision tree
 
@@ -200,16 +200,17 @@ tsx scripts/find-similar.ts "https://tailwindcss.com" '{"text":true,"excludeSour
 
 ## Cost Awareness
 
-| Operation | Price | Notes |
-|-----------|-------|-------|
-| Search (1-25 results) | $0.005 | Default — use this range |
-| Search (26-100 results) | $0.025 | 5x more expensive |
-| Answer | $0.005 | Per query |
-| Contents | $0.005 | Per page |
-| Research (standard) | Varies | 2-10x more than search |
-| Research (pro) | Higher | Use only for complex topics |
+| Operation               | Price  | Notes                       |
+| ----------------------- | ------ | --------------------------- |
+| Search (1-25 results)   | $0.005 | Default — use this range    |
+| Search (26-100 results) | $0.025 | 5x more expensive           |
+| Answer                  | $0.005 | Per query                   |
+| Contents                | $0.005 | Per page                    |
+| Research (standard)     | Varies | 2-10x more than search      |
+| Research (pro)          | Higher | Use only for complex topics |
 
 **Cost strategies:**
+
 - **Default to ≤25 results** — 5x cheaper and sufficient for most queries
 - **Need 50+ results?** Run multiple targeted searches with different query angles — better quality and cheaper than one large search
 - **Prefer `answer.ts` over `search.ts`** for direct questions — one API call instead of search + read

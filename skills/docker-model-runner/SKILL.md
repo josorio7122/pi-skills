@@ -1,7 +1,7 @@
 ---
 name: docker-model-runner
 description: Run AI models locally using Docker Model Runner with an OpenAI-compatible API. Use when the user wants to run a local LLM, use local inference, pull or manage AI models with Docker, set up a local model endpoint, or integrate local models into code via the OpenAI SDK. Also use when they mention "docker model," "local LLM," "run a model locally," or need an alternative to cloud AI APIs. Requires Docker Desktop or Docker Engine with Model Runner enabled.
-compatibility: "Requires Docker Desktop 4.40+ or Docker Engine with Model Runner. Run `docker model version` to verify."
+compatibility: 'Requires Docker Desktop 4.40+ or Docker Engine with Model Runner. Run `docker model version` to verify.'
 ---
 
 # Docker Model Runner
@@ -66,15 +66,15 @@ response = client.chat.completions.create(
 
 ## Key Commands
 
-| Command | Description |
-|---------|-------------|
+| Command                             | Description                      |
+| ----------------------------------- | -------------------------------- |
 | `docker model run <model> [prompt]` | Run a model with optional prompt |
-| `docker model pull <model>` | Pull a model from registry |
-| `docker model list` | List downloaded models |
-| `docker model search <query>` | Search for models |
-| `docker model ps` | Show running models |
-| `docker model rm <model>` | Remove a model |
-| `docker model inspect <model>` | Show model details |
+| `docker model pull <model>`         | Pull a model from registry       |
+| `docker model list`                 | List downloaded models           |
+| `docker model search <query>`       | Search for models                |
+| `docker model ps`                   | Show running models              |
+| `docker model rm <model>`           | Remove a model                   |
+| `docker model inspect <model>`      | Show model details               |
 
 ## Best Practices
 

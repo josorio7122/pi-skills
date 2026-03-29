@@ -22,14 +22,14 @@ services:
           name: postgres
           property: connectionString
       - key: JWT_SECRET
-        sync: false  # User provides in Dashboard
+        sync: false # User provides in Dashboard
       - key: API_KEY
-        sync: false  # User provides in Dashboard
+        sync: false # User provides in Dashboard
 
 databases:
   - name: postgres
     databaseName: go_api_production
     user: go_api_user
     plan: free
-    postgresMajorVersion: "15"
-    ipAllowList: []  # Internal access only
+    postgresMajorVersion: '15'
+    ipAllowList: [] # Internal access only

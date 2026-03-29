@@ -1,0 +1,217 @@
+[
+  {
+    "agent": "scout",
+    "agentSource": "builtin",
+    "task": "Analyze the exa-search skill at /Users/josorio/Code/pi-skills/skills/exa-search/scripts/ to determine what can be extracted into a shared library package vs what stays as CLI scripts.\n\nRead ALL files completely:\n1. scripts/lib/common.ts\n2. scripts/answer.ts\n3. scripts/search.ts\n4. scripts/contents.ts\n5. scripts/find-similar.ts\n6. scripts/research.ts\n\nFor each file report:\n- Total lines\n- All exports (functions, types, interfaces, constants)\n- All imports\n- What is \"reusable core / business logic\" vs \"CLI glue / script wiring\"\n- Any usage of process.argv, process.env, process.exit, process.stdout, console.log, or other Node CLI-only APIs\n\nThe goal: determine if there's a clean split between a reusable \"exa-core\" package (API client wrapper, types, shared utilities) and thin CLI scripts. What would go in core vs stay in scripts?",
+    "exitCode": 0,
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "text": "Analyze the exa-search skill at /Users/josorio/Code/pi-skills/skills/exa-search/scripts/ to determine what can be extracted into a shared library package vs what stays as CLI scripts.\n\nRead ALL files completely:\n1. scripts/lib/common.ts\n2. scripts/answer.ts\n3. scripts/search.ts\n4. scripts/contents.ts\n5. scripts/find-similar.ts\n6. scripts/research.ts\n\nFor each file report:\n- Total lines\n- All exports (functions, types, interfaces, constants)\n- All imports\n- What is \"reusable core / business logic\" vs \"CLI glue / script wiring\"\n- Any usage of process.argv, process.env, process.exit, process.stdout, console.log, or other Node CLI-only APIs\n\nThe goal: determine if there's a clean split between a reusable \"exa-core\" package (API client wrapper, types, shared utilities) and thin CLI scripts. What would go in core vs stay in scripts?"
+          }
+        ],
+        "timestamp": 1774750082905
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "Let me read all the files.",
+            "thinkingSignature": "EtcBClsIDBgCKkBBtORE7FaQndmhHkm/8J4ohIQKiLsqpKDlbefM4mK4kSht+isMQCJCYFKhiy7vji/y4CXZYY94dowmpuSpoKPxMhFjbGF1ZGUtc29ubmV0LTQtNjgAEgy/F5IdC2h+PWa8ffEaDEOXd2g/mGnaKtqfbyIw8uRuojPVqXL+e3JbGh1dA8iYmxIcDSV48WiUIMjJl9wU+ExXjHkHvA3eAShxwpvmKirz3qgmlx/+I5y1f8+VQOS+ahUmGUKpbhz+tvn4lv2WR6ZKgX46Dqnj1fYYAQ=="
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01C3wuyFNkWPPuWodDVdUSb2",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/exa-search/scripts/lib/common.ts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01LHgU98gVGm8wyEBVqkCmi4",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/exa-search/scripts/answer.ts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01PL9fP49SrmwoNrQheXy175",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/exa-search/scripts/search.ts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_011KZKjsw4iDPVHp1sXpMrFF",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/exa-search/scripts/contents.ts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01PCnxJq2awzFso2LFQsy6We",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/exa-search/scripts/find-similar.ts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01XBNYnh83waABKetCbuRLp1",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/exa-search/scripts/research.ts"
+            }
+          }
+        ],
+        "api": "anthropic-messages",
+        "provider": "anthropic",
+        "model": "claude-sonnet-4-6",
+        "usage": {
+          "input": 3,
+          "output": 385,
+          "cacheRead": 14835,
+          "cacheWrite": 556,
+          "totalTokens": 15779,
+          "cost": {
+            "input": 0.000009,
+            "output": 0.005775,
+            "cacheRead": 0.0044505,
+            "cacheWrite": 0.002085,
+            "total": 0.0123195
+          }
+        },
+        "stopReason": "toolUse",
+        "timestamp": 1774750082916,
+        "responseId": "msg_01PX8tBMWUEtzHLwdBupBpoh"
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01C3wuyFNkWPPuWodDVdUSb2",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "import { readFileSync } from \"node:fs\";\nimport { Exa } from \"exa-js\";\n\n/** Create an Exa client instance. Requires EXA_API_KEY env var. */\nexport function createClient(): Exa {\n  return new Exa();\n}\n\n/** Require a CLI argument, exit with error if missing. */\nexport function requireArg(value: string | undefined, name: string): string {\n  if (!value) {\n    console.error(`Error: ${name} is required`);\n    process.exit(1);\n  }\n  return value;\n}\n\n/** Execute an async API call, print JSON result, exit on error. */\nexport async function executeAndPrint<T>(apiCall: () => Promise<T>): Promise<void> {\n  try {\n    const result = await apiCall();\n    console.log(JSON.stringify(result, null, 2));\n  } catch (err) {\n    handleError(err);\n  }\n}\n\n/**\n * Show help text extracted from the JSDoc comment at the top of a script file.\n * Reads lines starting with \" * \" until \" * /\" is found.\n */\nexport function showHelp(scriptUrl: string): void {\n  const lines: string[] = [];\n  const src = readFileSync(new URL(scriptUrl), \"utf8\");\n  for (const line of src.split(\"\\n\")) {\n    if (line.startsWith(\" * \") || line.startsWith(\" */\")) {\n      if (line.startsWith(\" */\")) break;\n      lines.push(line.slice(3));\n    }\n  }\n  console.log(lines.join(\"\\n\"));\n  process.exit(0);\n}\n\n/**\n * Ensure EXA_API_KEY is set. Exits with an error message if not.\n */\nexport function requireApiKey(): void {\n  if (!process.env.EXA_API_KEY) {\n    console.error(\"Error: EXA_API_KEY environment variable is required.\");\n    console.error(\"Get one at: https://dashboard.exa.ai/api-keys\");\n    process.exit(1);\n  }\n}\n\n/**\n * Parse CLI args: show help if --help or no args, return query and options.\n */\nexport function parseArgs(scriptUrl: string): { query: string; opts: Record<string, unknown> } {\n  const args = process.argv.slice(2);\n\n  if (args.includes(\"--help\") || args.length === 0) {\n    showHelp(scriptUrl);\n  }\n\n  const query = args[0];\n  const opts: Record<string, unknown> = args[1]\n    ? (JSON.parse(args[1]) as Record<string, unknown>)\n    : {};\n\n  return { query, opts };\n}\n\n/**\n * Standardized error handler for all exa scripts.\n */\nexport function handleError(err: unknown): never {\n  console.error(`Error: ${(err as Error).message}`);\n  process.exit(1);\n}\n\n/**\n * Pick allowed keys from an options object, skipping undefined values.\n */\nexport function filterOptions(\n  opts: Record<string, unknown>,\n  keys: readonly string[],\n): Record<string, unknown> {\n  const filtered: Record<string, unknown> = {};\n  for (const key of keys) {\n    if (opts[key] !== undefined) filtered[key] = opts[key];\n  }\n  return filtered;\n}\n\n/**\n * Build contents options from text/highlights/summary fields.\n */\nexport function buildContentsOptions(opts: Record<string, unknown>): Record<string, unknown> {\n  let contentsOpts: Record<string, unknown> = {};\n  if (opts.text === true) contentsOpts.text = true;\n  else if (typeof opts.text === \"object\") contentsOpts.text = opts.text;\n  if (opts.highlights === true) contentsOpts.highlights = true;\n  else if (typeof opts.highlights === \"object\") contentsOpts.highlights = opts.highlights;\n  if (opts.summary === true) contentsOpts.summary = true;\n  else if (typeof opts.summary === \"object\") contentsOpts.summary = opts.summary;\n  if (typeof opts.contents === \"object\")\n    contentsOpts = { ...contentsOpts, ...(opts.contents as Record<string, unknown>) };\n  return contentsOpts;\n}\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774750088354
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01LHgU98gVGm8wyEBVqkCmi4",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "#!/usr/bin/env tsx\n/**\n * Exa answer — get AI-generated answers with citations.\n *\n * Usage:\n *   tsx scripts/answer.ts <query> [options-json]\n *   tsx scripts/answer.ts --help\n *\n * Options JSON (all optional):\n *   {\n *     \"text\": true,              // include full text in citation results\n *     \"model\": \"exa\",            // \"exa\" (default)\n *     \"systemPrompt\": \"...\",     // guide the LLM behavior\n *     \"outputSchema\": {},        // JSON Schema for structured output\n *     \"stream\": false,           // stream chunks to stdout\n *     \"userLocation\": \"US\"\n *   }\n *\n * Environment:\n *   EXA_API_KEY — required\n *\n * Examples:\n *   tsx scripts/answer.ts \"What is the latest Next.js version?\"\n *   tsx scripts/answer.ts \"Compare React and Vue\" '{\"text\":true}'\n *   tsx scripts/answer.ts \"SpaceX valuation\" '{\"model\":\"exa\",\"stream\":true}'\n *   tsx scripts/answer.ts \"List top 3 ORMs\" '{\"outputSchema\":{\"type\":\"object\",\"properties\":{\"items\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}}}}}'\n */\n\nimport {\n  parseArgs,\n  requireApiKey,\n  handleError,\n  filterOptions,\n  createClient,\n} from \"./lib/common.js\";\n\nconst { query, opts } = parseArgs(import.meta.url);\nrequireApiKey();\n\nconst exa = createClient();\n\nconst answerOpts = filterOptions(opts, [\n  \"text\",\n  \"model\",\n  \"systemPrompt\",\n  \"outputSchema\",\n  \"userLocation\",\n]);\n\ntry {\n  if (opts.stream) {\n    // Streaming mode — write chunks as they arrive\n    for await (const chunk of exa.streamAnswer(query, answerOpts)) {\n      const typedChunk = chunk as { content?: string; citations?: unknown };\n      if (typedChunk.content) process.stdout.write(typedChunk.content);\n      if (typedChunk.citations) {\n        process.stdout.write(\"\\n\");\n        console.log(JSON.stringify({ citations: typedChunk.citations }, null, 2));\n      }\n    }\n    process.stdout.write(\"\\n\");\n  } else {\n    const result = await exa.answer(query, answerOpts);\n    console.log(JSON.stringify(result, null, 2));\n  }\n} catch (err) {\n  handleError(err);\n}\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774750088354
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01PL9fP49SrmwoNrQheXy175",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "#!/usr/bin/env tsx\n/**\n * Exa search — semantic search and search with contents.\n *\n * Usage:\n *   tsx scripts/search.ts <query> [options-json]\n *   tsx scripts/search.ts --help\n *\n * Options JSON (all optional):\n *   {\n *     \"numResults\": 10,\n *     \"type\": \"auto\",                  // \"auto\"|\"fast\"|\"deep\"|\"deep-reasoning\"|\"deep-max\"|\"instant\"\n *     \"contents\": true,                // true = text+highlights, or object for fine control\n *     \"text\": true,                    // shorthand: include text in results\n *     \"highlights\": true,              // shorthand: include highlights\n *     \"summary\": true,                 // shorthand: include summary\n *     \"includeDomains\": [\"example.com\"],\n *     \"excludeDomains\": [\"spam.com\"],\n *     \"startPublishedDate\": \"2024-01-01T00:00:00.000Z\",\n *     \"endPublishedDate\": \"2025-01-01T00:00:00.000Z\",\n *     \"startCrawlDate\": \"2024-01-01T00:00:00.000Z\",\n *     \"endCrawlDate\": \"2025-01-01T00:00:00.000Z\",\n *     \"category\": \"news\",             // \"company\"|\"research paper\"|\"news\"|\"pdf\"|\"tweet\"|\"personal site\"|\"financial report\"|\"people\"\n *     \"includeText\": [\"must contain\"],\n *     \"excludeText\": [\"must not contain\"],\n *     \"useAutoprompt\": true,\n *     \"moderation\": false,\n *     \"userLocation\": \"US\",\n *     \"additionalQueries\": [\"alt query 1\"],  // deep search only, max 5\n *     \"outputSchema\": {},              // deep search structured output\n *     \"subpages\": 0,\n *     \"subpageTarget\": \"pricing\",\n *     \"livecrawl\": \"auto\",              // \"never\"|\"fallback\"|\"always\"|\"auto\"|\"preferred\" - live-crawl pages for fresh data\n *     \"livecrawlTimeout\": 10000,         // timeout in ms for live crawl\n *     \"maxAgeHours\": 168\n *   }\n *\n * Environment:\n *   EXA_API_KEY — required\n *\n * Examples:\n *   tsx scripts/search.ts \"latest AI research\"\n *   tsx scripts/search.ts \"AI startups\" '{\"numResults\":5,\"type\":\"deep\",\"contents\":true}'\n *   tsx scripts/search.ts \"React best practices\" '{\"text\":true,\"highlights\":true,\"includeDomains\":[\"react.dev\"]}'\n */\n\nimport {\n  parseArgs,\n  requireApiKey,\n  filterOptions,\n  buildContentsOptions,\n  createClient,\n  executeAndPrint,\n} from \"./lib/common.js\";\n\nconst { query, opts } = parseArgs(import.meta.url);\nrequireApiKey();\n\nconst exa = createClient();\n\n// Determine if we need contents\nconst wantContents = opts.contents || opts.text || opts.highlights || opts.summary;\n\n// Build contents options\nconst contentsOpts = buildContentsOptions(opts);\n\n// Build search options\nconst searchKeys = [\n  \"numResults\",\n  \"type\",\n  \"includeDomains\",\n  \"excludeDomains\",\n  \"startCrawlDate\",\n  \"endCrawlDate\",\n  \"startPublishedDate\",\n  \"endPublishedDate\",\n  \"category\",\n  \"includeText\",\n  \"excludeText\",\n  \"useAutoprompt\",\n  \"moderation\",\n  \"userLocation\",\n  \"additionalQueries\",\n  \"outputSchema\",\n  \"subpages\",\n  \"subpageTarget\",\n  \"livecrawl\",\n  \"livecrawlTimeout\",\n  \"maxAgeHours\",\n  \"filterEmptyResults\",\n] as const;\n\nconst searchOpts = filterOptions(opts, searchKeys);\n\nawait executeAndPrint(async () => {\n  if (wantContents) {\n    return await exa.searchAndContents(query, { ...searchOpts, ...contentsOpts });\n  } else {\n    return await exa.search(query, searchOpts);\n  }\n});\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774750088354
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_011KZKjsw4iDPVHp1sXpMrFF",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "#!/usr/bin/env tsx\n/**\n * Exa get contents — retrieve page contents by URL.\n *\n * Usage:\n *   tsx scripts/contents.ts <url-or-urls-json> [options-json]\n *   tsx scripts/contents.ts --help\n *\n * First argument: a single URL string, or a JSON array of URLs.\n *\n * Options JSON (all optional):\n *   {\n *     \"text\": true,                         // or { \"maxCharacters\": 5000, \"includeHtmlTags\": false }\n *     \"highlights\": true,                   // or { \"query\": \"AI\", \"numSentences\": 3 }\n *     \"summary\": true,                      // or { \"query\": \"summarize pricing\" }\n *     \"livecrawl\": \"auto\",                  // \"never\"|\"fallback\"|\"always\"|\"auto\"|\"preferred\"\n *     \"livecrawlTimeout\": 10000,             // timeout in ms for live crawl\n *     \"maxAgeHours\": 168,                   // 0 = always fresh, -1 = cache only\n *     \"filterEmptyResults\": true,\n *     \"subpages\": 3,\n *     \"subpageTarget\": \"pricing\"\n *   }\n *\n * Environment:\n *   EXA_API_KEY — required\n *\n * Examples:\n *   tsx scripts/contents.ts \"https://example.com/article\"\n *   tsx scripts/contents.ts \"https://example.com\" '{\"text\":{\"maxCharacters\":2000}}'\n *   tsx scripts/contents.ts '[\"https://a.com\",\"https://b.com\"]' '{\"text\":true,\"highlights\":true}'\n */\n\nimport {\n  showHelp,\n  requireApiKey,\n  filterOptions,\n  createClient,\n  executeAndPrint,\n} from \"./lib/common.js\";\n\nconst args = process.argv.slice(2);\n\nif (args.includes(\"--help\") || args.length === 0) {\n  showHelp(import.meta.url);\n}\n\nlet urls: string | string[] = args[0];\ntry {\n  urls = JSON.parse(urls) as string[];\n} catch {\n  // Single URL string — keep as-is\n}\n\nconst opts: Record<string, unknown> = args[1]\n  ? (JSON.parse(args[1]) as Record<string, unknown>)\n  : { text: true };\n\nrequireApiKey();\n\nconst exa = createClient();\n\nconst contentsOpts = filterOptions(opts, [\n  \"text\",\n  \"highlights\",\n  \"summary\",\n  \"livecrawl\",\n  \"livecrawlTimeout\",\n  \"maxAgeHours\",\n  \"filterEmptyResults\",\n  \"subpages\",\n  \"subpageTarget\",\n]);\n\nawait executeAndPrint(async () => {\n  return await exa.getContents(urls, contentsOpts);\n});\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774750088354
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01PCnxJq2awzFso2LFQsy6We",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "#!/usr/bin/env tsx\n/**\n * Exa find similar — find pages similar to a given URL.\n *\n * Usage:\n *   tsx scripts/find-similar.ts <url> [options-json]\n *   tsx scripts/find-similar.ts --help\n *\n * Options JSON (all optional):\n *   {\n *     \"numResults\": 10,\n *     \"contents\": true,               // true = text+highlights, or object for fine control\n *     \"text\": true,                    // shorthand: include text in results\n *     \"highlights\": true,              // shorthand: include highlights\n *     \"summary\": true,                 // shorthand: include summary\n *     \"excludeSourceDomain\": true,     // exclude the source domain from results\n *     \"includeDomains\": [\"example.com\"],\n *     \"excludeDomains\": [\"spam.com\"],\n *     \"startPublishedDate\": \"2024-01-01T00:00:00.000Z\",\n *     \"endPublishedDate\": \"2025-01-01T00:00:00.000Z\",\n *     \"startCrawlDate\": \"2024-01-01T00:00:00.000Z\",\n *     \"endCrawlDate\": \"2025-01-01T00:00:00.000Z\",\n *     \"category\": \"news\",\n *     \"includeText\": [\"must contain\"],\n *     \"excludeText\": [\"must not contain\"]\n *   }\n *\n * Environment:\n *   EXA_API_KEY — required\n *\n * Examples:\n *   tsx scripts/find-similar.ts \"https://react.dev\"\n *   tsx scripts/find-similar.ts \"https://react.dev\" '{\"numResults\":5,\"text\":true,\"excludeSourceDomain\":true}'\n */\n\nimport {\n  parseArgs,\n  requireApiKey,\n  filterOptions,\n  buildContentsOptions,\n  createClient,\n  executeAndPrint,\n} from \"./lib/common.js\";\n\nconst { query: url, opts } = parseArgs(import.meta.url);\nrequireApiKey();\n\nconst exa = createClient();\n\nconst wantContents = opts.contents || opts.text || opts.highlights || opts.summary;\n\nconst contentsOpts = buildContentsOptions(opts);\n\nconst findSimilarKeys = [\n  \"numResults\",\n  \"excludeSourceDomain\",\n  \"includeDomains\",\n  \"excludeDomains\",\n  \"startCrawlDate\",\n  \"endCrawlDate\",\n  \"startPublishedDate\",\n  \"endPublishedDate\",\n  \"category\",\n  \"includeText\",\n  \"excludeText\",\n] as const;\n\nconst searchOpts = filterOptions(opts, findSimilarKeys);\n\nawait executeAndPrint(async () => {\n  if (wantContents) {\n    return await exa.findSimilarAndContents(url, { ...searchOpts, ...contentsOpts });\n  } else {\n    return await exa.findSimilar(url, searchOpts);\n  }\n});\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774750088354
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01XBNYnh83waABKetCbuRLp1",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "#!/usr/bin/env tsx\n/**\n * Exa research — create and manage deep research tasks.\n *\n * Usage:\n *   tsx scripts/research.ts create <instructions> [options-json]\n *   tsx scripts/research.ts get <research-id> [options-json]\n *   tsx scripts/research.ts poll <research-id> [options-json]\n *   tsx scripts/research.ts list [options-json]\n *   tsx scripts/research.ts run <instructions> [options-json]\n *   tsx scripts/research.ts --help\n *\n * Subcommands:\n *   create   — Start a new research task (returns immediately with researchId)\n *   get      — Get the current status/result of a research task\n *   poll     — Create and poll until finished (blocks until complete)\n *   list     — List research tasks\n *   run      — Create + poll in one step (convenience)\n *\n * Options JSON for create/run:\n *   {\n *     \"model\": \"exa-research-fast\",   // \"exa-research-fast\"|\"exa-research\"|\"exa-research-pro\"\n *     \"outputSchema\": {}              // JSON Schema for structured output\n *   }\n *\n * Options JSON for get:\n *   {\n *     \"stream\": false,                // stream SSE events\n *     \"events\": false                 // include event log\n *   }\n *\n * Options JSON for poll:\n *   {\n *     \"pollInterval\": 1000,           // ms between polls (default 1000)\n *     \"timeoutMs\": 600000,            // max wait time (default 10 min)\n *     \"events\": false\n *   }\n *\n * Options JSON for list:\n *   {\n *     \"limit\": 10,\n *     \"cursor\": \"...\"\n *   }\n *\n * Environment:\n *   EXA_API_KEY — required\n *\n * Examples:\n *   tsx scripts/research.ts create \"Research the latest AI developments\"\n *   tsx scripts/research.ts get \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\"\n *   tsx scripts/research.ts run \"What is SpaceX's latest valuation?\" '{\"model\":\"exa-research-pro\"}'\n *   tsx scripts/research.ts list '{\"limit\":5}'\n */\n\nimport {\n  showHelp,\n  requireApiKey,\n  handleError,\n  requireArg,\n  createClient,\n} from \"./lib/common.js\";\n\nconst args = process.argv.slice(2);\n\nif (args.includes(\"--help\") || args.length === 0) {\n  showHelp(import.meta.url);\n}\n\nconst subcommand = args[0];\nconst arg1 = args[1];\n\nrequireApiKey();\n\nconst exa = createClient();\n\ntry {\n  switch (subcommand) {\n    case \"create\": {\n      const instructions = requireArg(arg1, \"instructions\");\n      const opts: Record<string, unknown> = args[2]\n        ? (JSON.parse(args[2]) as Record<string, unknown>)\n        : {};\n      const result = await exa.research.create({\n        instructions,\n        model:\n          (opts.model as \"exa-research-fast\" | \"exa-research\" | \"exa-research-pro\") ?? undefined,\n        outputSchema: (opts.outputSchema as Record<string, unknown>) ?? undefined,\n      });\n      console.log(JSON.stringify(result, null, 2));\n      break;\n    }\n\n    case \"get\": {\n      const researchId = requireArg(arg1, \"research-id\");\n      const opts: Record<string, unknown> = args[2]\n        ? (JSON.parse(args[2]) as Record<string, unknown>)\n        : {};\n      if (opts.stream) {\n        const streamResult = await exa.research.get(researchId, { stream: true, ...opts });\n        for await (const event of streamResult) {\n          console.log(JSON.stringify(event));\n        }\n      } else {\n        const result = await exa.research.get(researchId, opts);\n        console.log(JSON.stringify(result, null, 2));\n      }\n      break;\n    }\n\n    case \"poll\": {\n      const researchId = requireArg(arg1, \"research-id\");\n      const opts: Record<string, unknown> = args[2]\n        ? (JSON.parse(args[2]) as Record<string, unknown>)\n        : {};\n      const result = await exa.research.pollUntilFinished(researchId, opts);\n      console.log(JSON.stringify(result, null, 2));\n      break;\n    }\n\n    case \"run\": {\n      const instructions = requireArg(arg1, \"instructions\");\n      const opts: Record<string, unknown> = args[2]\n        ? (JSON.parse(args[2]) as Record<string, unknown>)\n        : {};\n      const created = await exa.research.create({\n        instructions,\n        model:\n          (opts.model as \"exa-research-fast\" | \"exa-research\" | \"exa-research-pro\") ?? undefined,\n        outputSchema: (opts.outputSchema as Record<string, unknown>) ?? undefined,\n      });\n      const createdTyped = created as { researchId: string };\n      console.error(`Research task created: ${createdTyped.researchId} — polling...`);\n      const result = await exa.research.pollUntilFinished(createdTyped.researchId, {\n        pollInterval: (opts.pollInterval as number) || 2000,\n        timeoutMs: (opts.timeoutMs as number) || 600000,\n        events: opts.events as boolean | undefined,\n      });\n      console.log(JSON.stringify(result, null, 2));\n      break;\n    }\n\n    case \"list\": {\n      const opts: Record<string, unknown> = arg1\n        ? (JSON.parse(arg1) as Record<string, unknown>)\n        : {};\n      const result = await exa.research.list(opts);\n      console.log(JSON.stringify(result, null, 2));\n      break;\n    }\n\n    default:\n      console.error(`Error: Unknown subcommand \"${subcommand}\".`);\n      console.error(\"Valid subcommands: create, get, poll, list, run\");\n      process.exit(1);\n  }\n} catch (err) {\n  handleError(err);\n}\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774750088354
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "text",
+            "text": "## Domain: exa-search skill — `scripts/` analysis\n\n---\n\n### File Inventory\n\n| File | Lines | Role |\n|------|-------|------|\n| `lib/common.ts` | 96 | Shared utilities — mix of reusable logic and CLI glue |\n| `answer.ts` | 55 | CLI script for `exa.answer` / `exa.streamAnswer` |\n| `search.ts` | 73 | CLI script for `exa.search` / `exa.searchAndContents` |\n| `contents.ts` | 57 | CLI script for `exa.getContents` |\n| `find-similar.ts` | 61 | CLI script for `exa.findSimilar` / `exa.findSimilarAndContents` |\n| `research.ts` | 97 | CLI script for `exa.research.*` (multi-subcommand) |\n| **Total** | **439** | |\n\n---\n\n### Exports Inventory\n\n#### `lib/common.ts` — 8 exports\n| Export | Type | Reusable? |\n|--------|------|-----------|\n| `createClient()` | `() => Exa` | ✅ Core |\n| `filterOptions()` | `(opts, keys) => Record<string,unknown>` | ✅ Core |\n| `buildContentsOptions()` | `(opts) => Record<string,unknown>` | ✅ Core |\n| `executeAndPrint()` | `<T>(fn) => Promise<void>` | ⚠️ Partial — calls `console.log` + `process.exit` |\n| `handleError()` | `(err) => never` | ❌ CLI-only — `console.error` + `process.exit(1)` |\n| `requireArg()` | `(value, name) => string` | ❌ CLI-only — `console.error` + `process.exit(1)` |\n| `showHelp()` | `(scriptUrl) => void` | ❌ CLI-only — reads file, `console.log` + `process.exit(0)` |\n| `requireApiKey()` | `() => void` | ❌ CLI-only — reads `process.env`, `process.exit(1)` |\n| `parseArgs()` | `(scriptUrl) => {query, opts}` | ❌ CLI-only — `process.argv.slice(2)` |\n\nAll 5 scripts import from `./lib/common.js` only + `exa-js` (external).  \nNone import from each other.\n\n---\n\n### CLI-Only API Usage (Node process/console)\n\n| File | `process.argv` | `process.env` | `process.exit` | `process.stdout` | `console.log` | `console.error` |\n|------|:-:|:-:|:-:|:-:|:-:|:-:|\n| `lib/common.ts` | ✅ (`parseArgs`) | ✅ (`requireApiKey`) | ✅ (5×) | — | ✅ (2×) | ✅ (4×) |\n| `answer.ts` | — | — | — | ✅ (streaming) | ✅ | ✅ |\n| `search.ts` | — | — | — | — | (via `executeAndPrint`) | — |\n| `contents.ts` | ✅ (raw) | — | — | — | (via `executeAndPrint`) | — |\n| `research.ts` | ✅ (raw) | — | — | — | ✅ (multiple) | ✅ (`run` progress) |\n\n---\n\n### Reusable Core vs CLI Glue — Detailed Split\n\n#### ✅ Would go in `exa-core` package\n\nThese have **zero CLI dependencies** — pure data-in, data-out:\n\n```\ncreateClient()          — wraps `new Exa()`, returns Exa instance\nfilterOptions()         — pure: {opts, keys} → filtered object\nbuildContentsOptions()  — pure: opts → contentsOpts object\n```\n\n**What `createClient()` needs:** `EXA_API_KEY` — but the `Exa` constructor reads it automatically from the environment. `createClient()` itself just calls `new Exa()` — no `process.env` in the function body. ✅ Safe to keep as-is in core.\n\nAdditionally, the **Exa method call shapes** used in each script are implicit core logic:\n- The `wantContents` branch logic in `search.ts` and `find-similar.ts` — decides `search` vs `searchAndContents` — is pure business logic that could be wrapped as `search(exa, query, opts)` core functions.\n- The `research.ts` `run` subcommand (create → poll) is a multi-step orchestration that's pure API logic with no reason to be CLI-only.\n\n#### ❌ Stays in CLI scripts\n\nEverything that touches process/console **by design**:\n\n| Function | Why CLI-only |\n|----------|-------------|\n| `parseArgs()` | `process.argv` is the contract of a CLI script |\n| `requireApiKey()` | `process.env` + `process.exit` — env guard for CLI startup |\n| `requireArg()` | `process.exit(1)` on missing arg — fatal for CLI, wrong for library |\n| `showHelp()` | Reads script source via `new URL(scriptUrl)`, `process.exit(0)` |\n| `handleError()` | `process.exit(1)` — library code should throw, not exit |\n| `executeAndPrint()` | `console.log(JSON.stringify(...))` + `process.exit` in `handleError` |\n\nThe streaming loop in `answer.ts` (`process.stdout.write`) and the progress message in `research.ts` (`console.error(...)`) are also inherently CLI concerns.\n\n---\n\n### Blast Radius Map\n\n#### Files that must change to extract `exa-core`\n- `scripts/lib/common.ts` — split in two: pure exports to `core/`, CLI exports stay\n- All 5 scripts — update import path from `./lib/common.js` → `exa-core`\n\n#### Files at regression risk\n- `contents.ts` — does **not** use `parseArgs()`; has its own raw `process.argv.slice(2)` + inline JSON.parse on lines 37–41. Would need a separate extraction or a `parseUrlArg()` CLI helper.\n- `research.ts` — has its own raw `process.argv.slice(2)` + multi-subcommand switch. Doesn't use `parseArgs()`. The `run` subcommand duplicates create+poll logic that should be a core wrapper.\n\n---\n\n### Constraints\n\n- All scripts use `import.meta.url` for `showHelp()` — ESM-only. Any core package must also be ESM (or the shebang scripts must not pass `import.meta.url` into core).\n- `exa-js` is the only external dependency across all files. Core package would have one dependency: `exa-js`.\n- `contents.ts` is the only script that defaults `opts` to `{ text: true }` when no options arg is passed — implicit default that would need to be preserved in any wrapper.\n- `research.ts` emits progress to `stderr` (`console.error(\"Research task created...\")`) not stdout — intentional design for piping.\n\n---\n\n### Findings Summary\n\n- **3 functions are cleanly extractable** into `exa-core` with zero changes: `createClient`, `filterOptions`, `buildContentsOptions`. These have no `process.*` or `console.*` calls.\n- **5 functions are CLI-only by construction** (`parseArgs`, `requireApiKey`, `requireArg`, `showHelp`, `handleError`) — they call `process.exit` and must stay in the CLI layer.\n- **`executeAndPrint` is a hybrid** — wraps an API call but outputs to `console.log` and delegates errors to `handleError`. In a core package it would become `executeApi<T>(fn) → Promise<T>` (returns data, throws on error); the print+exit wrapper stays in CLI.\n- **`contents.ts` and `research.ts` diverge from the shared `parseArgs()` pattern** — they parse `process.argv` inline. A full extraction would need to normalize this.\n- **The `run` subcommand in `research.ts`** (create → poll in one step) is pure API orchestration with no CLI dependency — it's the strongest candidate for promotion into a core `runResearch()` helper alongside the three already-clean functions."
+          }
+        ],
+        "api": "anthropic-messages",
+        "provider": "anthropic",
+        "model": "claude-sonnet-4-6",
+        "usage": {
+          "input": 1,
+          "output": 2110,
+          "cacheRead": 15391,
+          "cacheWrite": 6535,
+          "totalTokens": 24037,
+          "cost": {
+            "input": 0.000003,
+            "output": 0.03165,
+            "cacheRead": 0.0046172999999999995,
+            "cacheWrite": 0.02450625,
+            "total": 0.06077655
+          }
+        },
+        "stopReason": "stop",
+        "timestamp": 1774750088354,
+        "responseId": "msg_01QqF15oKAbmpHdEiifG2kj5"
+      }
+    ],
+    "stderr": "",
+    "usage": {
+      "input": 4,
+      "output": 2495,
+      "cacheRead": 30226,
+      "cacheWrite": 7091,
+      "cost": 0.07309605,
+      "contextTokens": 24037,
+      "turns": 2
+    },
+    "model": "claude-sonnet-4-6",
+    "stopReason": "stop"
+  }
+]

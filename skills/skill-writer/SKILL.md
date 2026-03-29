@@ -10,21 +10,21 @@ Primary success condition: maximize high-value input coverage before authoring s
 
 Load only the path(s) required for the task:
 
-| Task | Read |
-|------|------|
-| Set skill class and required dimensions | `references/mode-selection.md` |
-| Apply writing constraints for depth vs concision | `references/design-principles.md` |
-| Select structure pattern for this skill | `references/skill-patterns.md` |
-| Select workflow orchestration pattern for process-heavy skills | `references/workflow-patterns.md` |
-| Select output format pattern for deterministic quality | `references/output-patterns.md` |
-| Choose workflow path and required outputs | `references/mode-selection.md` |
-| Load representative synthesis examples by skill type | `references/examples/*.md` |
-| Synthesize external/local sources with depth gates | `references/synthesis-path.md` |
-| Author or update SKILL.md and supporting files | `references/authoring-path.md` |
-| Optimize skill description and trigger precision | `references/description-optimization.md` |
-| Iterate using positive/negative/fix examples | `references/iteration-path.md` |
-| Evaluate behavior and compare baseline vs with-skill (opt-in quantitative) | `references/evaluation-path.md` |
-| Register and validate skill changes | `references/registration-validation.md` |
+| Task                                                                       | Read                                     |
+| -------------------------------------------------------------------------- | ---------------------------------------- |
+| Set skill class and required dimensions                                    | `references/mode-selection.md`           |
+| Apply writing constraints for depth vs concision                           | `references/design-principles.md`        |
+| Select structure pattern for this skill                                    | `references/skill-patterns.md`           |
+| Select workflow orchestration pattern for process-heavy skills             | `references/workflow-patterns.md`        |
+| Select output format pattern for deterministic quality                     | `references/output-patterns.md`          |
+| Choose workflow path and required outputs                                  | `references/mode-selection.md`           |
+| Load representative synthesis examples by skill type                       | `references/examples/*.md`               |
+| Synthesize external/local sources with depth gates                         | `references/synthesis-path.md`           |
+| Author or update SKILL.md and supporting files                             | `references/authoring-path.md`           |
+| Optimize skill description and trigger precision                           | `references/description-optimization.md` |
+| Iterate using positive/negative/fix examples                               | `references/iteration-path.md`           |
+| Evaluate behavior and compare baseline vs with-skill (opt-in quantitative) | `references/evaluation-path.md`          |
+| Register and validate skill changes                                        | `references/registration-validation.md`  |
 
 ## Step 1: Resolve target and path
 

@@ -9,8 +9,8 @@ services:
     region: oregon
     branch: main
     autoDeploy: true
-    dockerfilePath: ./Dockerfile  # Path to your Dockerfile
-    dockerContext: .              # Build context directory
+    dockerfilePath: ./Dockerfile # Path to your Dockerfile
+    dockerContext: . # Build context directory
     healthCheckPath: /health
     envVars:
       - key: PORT
@@ -26,14 +26,14 @@ services:
           name: redis
           property: connectionString
       - key: SECRET_KEY
-        sync: false  # User provides in Dashboard
+        sync: false # User provides in Dashboard
 
 databases:
   - name: postgres
     databaseName: app_production
     user: app_user
     plan: free
-    postgresMajorVersion: "15"
+    postgresMajorVersion: '15'
     ipAllowList: []
 
   - name: redis

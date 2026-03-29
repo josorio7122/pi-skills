@@ -19,56 +19,56 @@ Complete options reference for all exa-search scripts. All scripts accept option
 tsx scripts/search.ts <query> [options-json]
 ```
 
-| Option               | Type        | Description                                                                              |
-| -------------------- | ----------- | ---------------------------------------------------------------------------------------- |
-| `numResults`         | number      | Number of results (default 10)                                                           |
-| `type`               | string      | Search type (see [Search Types](#search-types))                                          |
-| `category`           | string      | Content category filter (see [Categories](#categories))                                  |
-| `text`               | bool/object | Include page text. Object: `{"maxCharacters":5000}`                                      |
-| `highlights`         | bool/object | Include highlights. Object: `{"query":"...", "numSentences":3}`                          |
-| `summary`            | bool/object | Include summary. Object: `{"query":"summarize pricing"}`                                 |
-| `includeDomains`     | string[]    | Only search these domains. Supports path filtering and subdomain wildcards               |
-| `excludeDomains`     | string[]    | Exclude these domains                                                                    |
-| `startPublishedDate` | string      | ISO date — results published after this                                                  |
-| `endPublishedDate`   | string      | ISO date — results published before this                                                 |
-| `startCrawlDate`     | string      | ISO date — results crawled after this                                                    |
-| `endCrawlDate`       | string      | ISO date — results crawled before this                                                   |
-| `includeText`        | string[]    | Page must contain these strings (**single-item arrays only**, up to 5 words per item)    |
-| `excludeText`        | string[]    | Page must not contain these strings (**single-item arrays only**)                        |
-| `useAutoprompt`      | bool        | Enhance query automatically                                                              |
-| `userLocation`       | string      | Two-letter ISO country code (e.g. `"US"`) — biases results geographically                |
-| `systemPrompt`       | string      | Deep-search-only instructions guiding search process and synthesized result               |
-| `subpages`           | number      | Number of subpages per result                                                            |
-| `subpageTarget`      | string      | Text to match subpages against                                                           |
-| `livecrawl`          | string      | `"never"`, `"fallback"`, `"auto"`, `"preferred"`, `"always"`                             |
-| `livecrawlTimeout`   | number      | Timeout in ms for live crawl (default: 10000)                                            |
-| `additionalQueries`  | string[]    | Alt queries for deep search (max 5)                                                      |
-| `outputSchema`       | object      | JSON Schema for deep search structured output                                            |
+| Option               | Type        | Description                                                                           |
+| -------------------- | ----------- | ------------------------------------------------------------------------------------- |
+| `numResults`         | number      | Number of results (default 10)                                                        |
+| `type`               | string      | Search type (see [Search Types](#search-types))                                       |
+| `category`           | string      | Content category filter (see [Categories](#categories))                               |
+| `text`               | bool/object | Include page text. Object: `{"maxCharacters":5000}`                                   |
+| `highlights`         | bool/object | Include highlights. Object: `{"query":"...", "numSentences":3}`                       |
+| `summary`            | bool/object | Include summary. Object: `{"query":"summarize pricing"}`                              |
+| `includeDomains`     | string[]    | Only search these domains. Supports path filtering and subdomain wildcards            |
+| `excludeDomains`     | string[]    | Exclude these domains                                                                 |
+| `startPublishedDate` | string      | ISO date — results published after this                                               |
+| `endPublishedDate`   | string      | ISO date — results published before this                                              |
+| `startCrawlDate`     | string      | ISO date — results crawled after this                                                 |
+| `endCrawlDate`       | string      | ISO date — results crawled before this                                                |
+| `includeText`        | string[]    | Page must contain these strings (**single-item arrays only**, up to 5 words per item) |
+| `excludeText`        | string[]    | Page must not contain these strings (**single-item arrays only**)                     |
+| `useAutoprompt`      | bool        | Enhance query automatically                                                           |
+| `userLocation`       | string      | Two-letter ISO country code (e.g. `"US"`) — biases results geographically             |
+| `systemPrompt`       | string      | Deep-search-only instructions guiding search process and synthesized result           |
+| `subpages`           | number      | Number of subpages per result                                                         |
+| `subpageTarget`      | string      | Text to match subpages against                                                        |
+| `livecrawl`          | string      | `"never"`, `"fallback"`, `"auto"`, `"preferred"`, `"always"`                          |
+| `livecrawlTimeout`   | number      | Timeout in ms for live crawl (default: 10000)                                         |
+| `additionalQueries`  | string[]    | Alt queries for deep search (max 5)                                                   |
+| `outputSchema`       | object      | JSON Schema for deep search structured output                                         |
 
 ## Search Types
 
-| Type             | Speed   | Depth  | Use when                                                  |
-| ---------------- | ------- | ------ | --------------------------------------------------------- |
-| `auto`           | varies  | varies | Default — Exa picks the best strategy                     |
-| `neural`         | medium  | medium | Embeddings-based semantic search                          |
-| `fast`           | fastest | low    | Quick lookups, known topics                                |
-| `instant`        | instant | lowest | Simple factual queries, sub-200ms latency                  |
-| `deep`           | slow    | high   | Complex queries — smart query expansion + summaries        |
-| `deep-reasoning` | slower  | higher | Queries requiring inference and reasoning                  |
-| `deep-max`       | slowest | max    | Maximum depth — exhaustive research queries                |
+| Type             | Speed   | Depth  | Use when                                            |
+| ---------------- | ------- | ------ | --------------------------------------------------- |
+| `auto`           | varies  | varies | Default — Exa picks the best strategy               |
+| `neural`         | medium  | medium | Embeddings-based semantic search                    |
+| `fast`           | fastest | low    | Quick lookups, known topics                         |
+| `instant`        | instant | lowest | Simple factual queries, sub-200ms latency           |
+| `deep`           | slow    | high   | Complex queries — smart query expansion + summaries |
+| `deep-reasoning` | slower  | higher | Queries requiring inference and reasoning           |
+| `deep-max`       | slowest | max    | Maximum depth — exhaustive research queries         |
 
 ## Categories
 
-| Category           | Metadata returned                                           | Notes                                      |
-| ------------------ | ----------------------------------------------------------- | ------------------------------------------ |
-| `company`          | Headcount, location, funding, revenue, company homepage     | Fine-tuned retrieval + entity matching     |
-| `people`           | LinkedIn profiles (public data)                             | 1B+ indexed profiles                       |
-| `news`             | Press coverage, announcements                               | Supports date filters                      |
-| `research paper`   | Academic papers                                             |                                            |
-| `tweet`            | Social posts                                                |                                            |
-| `pdf`              | PDF documents                                               |                                            |
-| `personal site`    | Personal websites/blogs                                     |                                            |
-| `financial report` | SEC filings, earnings reports                               |                                            |
+| Category           | Metadata returned                                       | Notes                                  |
+| ------------------ | ------------------------------------------------------- | -------------------------------------- |
+| `company`          | Headcount, location, funding, revenue, company homepage | Fine-tuned retrieval + entity matching |
+| `people`           | LinkedIn profiles (public data)                         | 1B+ indexed profiles                   |
+| `news`             | Press coverage, announcements                           | Supports date filters                  |
+| `research paper`   | Academic papers                                         |                                        |
+| `tweet`            | Social posts                                            |                                        |
+| `pdf`              | PDF documents                                           |                                        |
+| `personal site`    | Personal websites/blogs                                 |                                        |
+| `financial report` | SEC filings, earnings reports                           |                                        |
 
 ## Category Filter Restrictions
 
@@ -77,6 +77,7 @@ tsx scripts/search.ts <query> [options-json]
 ### `company` category restrictions
 
 These parameters are **NOT supported** and will error:
+
 - `includeDomains` / `excludeDomains`
 - `startPublishedDate` / `endPublishedDate`
 - `startCrawlDate` / `endCrawlDate`
@@ -85,6 +86,7 @@ These parameters are **NOT supported** and will error:
 ### `people` category restrictions
 
 Same restrictions as `company`, plus:
+
 - `includeDomains` only accepts LinkedIn domains
 
 ### Universal restrictions
@@ -130,7 +132,7 @@ First argument: a single URL string, or a JSON array of URLs.
 | `text`               | bool/object | Include page text. Object: `{"maxCharacters":5000}`             |
 | `highlights`         | bool/object | Include highlights. Object: `{"query":"...", "numSentences":3}` |
 | `summary`            | bool/object | Include summary. Object: `{"query":"summarize pricing"}`        |
-| `livecrawl`          | string      | `"never"`, `"fallback"`, `"auto"`, `"preferred"`, `"always"`   |
+| `livecrawl`          | string      | `"never"`, `"fallback"`, `"auto"`, `"preferred"`, `"always"`    |
 | `livecrawlTimeout`   | number      | Timeout in ms for live crawl                                    |
 | `maxAgeHours`        | number      | 0 = always fresh, -1 = cache only                               |
 | `filterEmptyResults` | bool        | Remove results with no content                                  |
@@ -143,14 +145,14 @@ First argument: a single URL string, or a JSON array of URLs.
 tsx scripts/answer.ts <query> [options-json]
 ```
 
-| Option         | Type   | Description                                  |
-| -------------- | ------ | -------------------------------------------- |
-| `text`         | bool   | Include full text in citation results        |
-| `model`        | string | `"exa"` (default)                            |
-| `systemPrompt` | string | Guide the LLM behavior                       |
-| `outputSchema` | object | JSON Schema for structured output            |
-| `stream`       | bool   | Stream chunks to stdout                      |
-| `userLocation` | string | Country code for location-aware answers      |
+| Option         | Type   | Description                             |
+| -------------- | ------ | --------------------------------------- |
+| `text`         | bool   | Include full text in citation results   |
+| `model`        | string | `"exa"` (default)                       |
+| `systemPrompt` | string | Guide the LLM behavior                  |
+| `outputSchema` | object | JSON Schema for structured output       |
+| `stream`       | bool   | Stream chunks to stdout                 |
+| `userLocation` | string | Country code for location-aware answers |
 
 ## Research Options
 
@@ -170,10 +172,10 @@ tsx scripts/research.ts <subcommand> <arg> [options-json]
 
 ### Create/Run Options
 
-| Option         | Type   | Description                                                              |
-| -------------- | ------ | ------------------------------------------------------------------------ |
+| Option         | Type   | Description                                                             |
+| -------------- | ------ | ----------------------------------------------------------------------- |
 | `model`        | string | `"exa-research-fast"`, `"exa-research"` (default), `"exa-research-pro"` |
-| `outputSchema` | object | JSON Schema for structured output                                        |
+| `outputSchema` | object | JSON Schema for structured output                                       |
 
 ### Research Models
 

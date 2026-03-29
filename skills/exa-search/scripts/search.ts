@@ -51,51 +51,51 @@ import {
   buildContentsOptions,
   createClient,
   executeAndPrint,
-} from "./lib/common.js";
+} from './lib/common.js'
 
-const { query, opts } = parseArgs(import.meta.url);
-requireApiKey();
+const { query, opts } = parseArgs(import.meta.url)
+requireApiKey()
 
-const exa = createClient();
+const exa = createClient()
 
 // Determine if we need contents
-const wantContents = opts.contents || opts.text || opts.highlights || opts.summary;
+const wantContents = opts.contents || opts.text || opts.highlights || opts.summary
 
 // Build contents options
-const contentsOpts = buildContentsOptions(opts);
+const contentsOpts = buildContentsOptions(opts)
 
 // Build search options
 const searchKeys = [
-  "numResults",
-  "type",
-  "includeDomains",
-  "excludeDomains",
-  "startCrawlDate",
-  "endCrawlDate",
-  "startPublishedDate",
-  "endPublishedDate",
-  "category",
-  "includeText",
-  "excludeText",
-  "useAutoprompt",
-  "moderation",
-  "userLocation",
-  "additionalQueries",
-  "outputSchema",
-  "subpages",
-  "subpageTarget",
-  "livecrawl",
-  "livecrawlTimeout",
-  "maxAgeHours",
-  "filterEmptyResults",
-] as const;
+  'numResults',
+  'type',
+  'includeDomains',
+  'excludeDomains',
+  'startCrawlDate',
+  'endCrawlDate',
+  'startPublishedDate',
+  'endPublishedDate',
+  'category',
+  'includeText',
+  'excludeText',
+  'useAutoprompt',
+  'moderation',
+  'userLocation',
+  'additionalQueries',
+  'outputSchema',
+  'subpages',
+  'subpageTarget',
+  'livecrawl',
+  'livecrawlTimeout',
+  'maxAgeHours',
+  'filterEmptyResults',
+] as const
 
-const searchOpts = filterOptions(opts, searchKeys);
+const searchOpts = filterOptions(opts, searchKeys)
 
 await executeAndPrint(async () => {
   if (wantContents) {
-    return await exa.searchAndContents(query, { ...searchOpts, ...contentsOpts });
+    return await exa.searchAndContents(query, { ...searchOpts, ...contentsOpts })
   } else {
-    return await exa.search(query, searchOpts);
+    return await exa.search(query, searchOpts)
   }
-});
+})

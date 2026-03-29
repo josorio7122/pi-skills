@@ -1,0 +1,1999 @@
+[
+  {
+    "agent": "scout",
+    "agentSource": "builtin",
+    "task": "Map the full directory structure of /Users/josorio/Code/pi-skills. Focus on: 1) Top-level files (package.json, tsconfig.json, etc.) 2) All subdirectories and their contents 3) Any existing workspace configuration 4) All package.json files (root and nested) — read each one fully 5) All tsconfig files — read each one fully 6) Any build scripts or configuration. Output: complete inventory of the project structure with special attention to TypeScript packages/modules and their relationships.",
+    "exitCode": 0,
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "text": "Map the full directory structure of /Users/josorio/Code/pi-skills. Focus on: 1) Top-level files (package.json, tsconfig.json, etc.) 2) All subdirectories and their contents 3) Any existing workspace configuration 4) All package.json files (root and nested) — read each one fully 5) All tsconfig files — read each one fully 6) Any build scripts or configuration. Output: complete inventory of the project structure with special attention to TypeScript packages/modules and their relationships."
+          }
+        ],
+        "timestamp": 1774749009606
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "Let me map the directory structure systematically.",
+            "thinkingSignature": "Eu8BClsIDBgCKkASPgXPQrBQ0tQlYhlu2Nn3tZh0CHq2VM0hgGu4LcsscnlKIve3fene0H9b8HW8G235KMDroIHoho3Dl+gCh6XQMhFjbGF1ZGUtc29ubmV0LTQtNjgAEgxdQimxA4ax9V1eSOUaDC9sjnGHd3eO1XuqbiIwS1CHv4CJdcT+dLSIJ/uMNTs7F+UHuEo7L9MFNV9lR3qCUD+E29XyC4ssc4QE2XdKKkK7lUHmhdqQAO3mo4vbDtBhN7EfBkQK8cYwFF9qAl8vIpv18D4WuHPdyNbPmCCRAd8aBs/PQOBlFOlk+fMtHV4zqZMYAQ=="
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01JAsYjV484mRLwbREcxjFAG",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills"
+            }
+          }
+        ],
+        "api": "anthropic-messages",
+        "provider": "anthropic",
+        "model": "claude-sonnet-4-6",
+        "usage": {
+          "input": 3,
+          "output": 85,
+          "cacheRead": 0,
+          "cacheWrite": 15272,
+          "totalTokens": 15360,
+          "cost": {
+            "input": 0.000009,
+            "output": 0.001275,
+            "cacheRead": 0,
+            "cacheWrite": 0.05727,
+            "total": 0.058554
+          }
+        },
+        "stopReason": "toolUse",
+        "timestamp": 1774749009619,
+        "responseId": "msg_016KiH4JXVbZNWEKfj5hdusn"
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01JAsYjV484mRLwbREcxjFAG",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": ".flow/\n.git/\n.gitignore\nLICENSE\nnode_modules/\npackage.json\npnpm-lock.yaml\nREADME.md\nskills/\nTHIRD-PARTY-NOTICES.md\ntsconfig.json"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749011770
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "toolCall",
+            "id": "toolu_01Sba9MVk2KpNjPESPKW3JQN",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_017zPo2JTxWoyMFRQgmQjDSv",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/package.json"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_015yThA5hdY8yYtFsgMXz2D8",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/tsconfig.json"
+            }
+          }
+        ],
+        "api": "anthropic-messages",
+        "provider": "anthropic",
+        "model": "claude-sonnet-4-6",
+        "usage": {
+          "input": 1,
+          "output": 160,
+          "cacheRead": 14835,
+          "cacheWrite": 589,
+          "totalTokens": 15585,
+          "cost": {
+            "input": 0.000003,
+            "output": 0.0024000000000000002,
+            "cacheRead": 0.0044505,
+            "cacheWrite": 0.00220875,
+            "total": 0.00906225
+          }
+        },
+        "stopReason": "toolUse",
+        "timestamp": 1774749011770,
+        "responseId": "msg_01YXDVajbgzErXNmyDFLyCxf"
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01Sba9MVk2KpNjPESPKW3JQN",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "agents-md/\ndocker-model-runner/\nexa-search/\nfrontend-design/\ngh/\nglab/\ninterface-design/\npdf/\nplaywright/\nrender-deploy/\nskill-scanner/\nskill-writer/"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749014744
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_017zPo2JTxWoyMFRQgmQjDSv",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"name\": \"pi-skills\",\n  \"version\": \"1.0.0\",\n  \"description\": \"Personal pi skills collection\",\n  \"scripts\": {},\n  \"keywords\": [\n    \"pi-package\"\n  ],\n  \"author\": \"\",\n  \"license\": \"ISC\",\n  \"packageManager\": \"pnpm@10.30.1\",\n  \"private\": \"true\",\n  \"pi\": {\n    \"skills\": [\n      \"./skills\"\n    ]\n  },\n  \"type\": \"module\",\n  \"dependencies\": {\n    \"exa-js\": \"^2.10.0\"\n  },\n  \"devDependencies\": {\n    \"@types/node\": \"^25.5.0\",\n    \"tsx\": \"^4.21.0\",\n    \"typescript\": \"^6.0.2\"\n  }\n}\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749014747
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_015yThA5hdY8yYtFsgMXz2D8",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"compilerOptions\": {\n    \"target\": \"ES2022\",\n    \"module\": \"ES2022\",\n    \"moduleResolution\": \"bundler\",\n    \"esModuleInterop\": true,\n    \"strict\": true,\n    \"noEmit\": true,\n    \"skipLibCheck\": true\n  },\n  \"include\": [\"skills/**/*.ts\"]\n}\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749014747
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "toolCall",
+            "id": "toolu_018RDyZFqL82iduXhTMvm4Z3",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/agents-md"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01TpUfPcGDEqmdtyU4LMPq7r",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/docker-model-runner"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_013vYcuEdz4X1unsqS8KM8Fv",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/exa-search"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01E1irab5qtULvXCPhGKVkMV",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/frontend-design"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01GSuW1KKrANVHrsvt5vPYJ2",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/gh"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_013LoYhaqC3SZ1yiUiE7o8gG",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/glab"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_013VJNXBtr74EXWnQLsAV8BW",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/interface-design"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01XsHyyt2ALxB6UCen9B1Xst",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/pdf"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01XVqmeep191GDNeVro7GBEg",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/playwright"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01TfptKBrDUsoLdjpD8XUag7",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/render-deploy"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01MUa3xWpyQvtPhytiJ94ktQ",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/skill-scanner"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01VQUNhddotxhdgwRNoW7TMF",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/skill-writer"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_013KbwUcJXpPZFRJT1ysh8C4",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/.flow"
+            }
+          }
+        ],
+        "api": "anthropic-messages",
+        "provider": "anthropic",
+        "model": "claude-sonnet-4-6",
+        "usage": {
+          "input": 1,
+          "output": 659,
+          "cacheRead": 15424,
+          "cacheWrite": 595,
+          "totalTokens": 16679,
+          "cost": {
+            "input": 0.000003,
+            "output": 0.009885,
+            "cacheRead": 0.0046272,
+            "cacheWrite": 0.00223125,
+            "total": 0.01674645
+          }
+        },
+        "stopReason": "toolUse",
+        "timestamp": 1774749014747,
+        "responseId": "msg_01QPQDHNyNT4LqokTELDyyGw"
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_018RDyZFqL82iduXhTMvm4Z3",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "LICENSE\nSKILL.md"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749019860
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01TpUfPcGDEqmdtyU4LMPq7r",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "references/\nSKILL.md"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749019860
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_013vYcuEdz4X1unsqS8KM8Fv",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "references/\nscripts/\nSKILL.md"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749019860
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01E1irab5qtULvXCPhGKVkMV",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "LICENSE.txt\nSKILL.md"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749019860
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01GSuW1KKrANVHrsvt5vPYJ2",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "references/\nSKILL.md"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749019860
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_013LoYhaqC3SZ1yiUiE7o8gG",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "references/\nSKILL.md"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749019860
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_013VJNXBtr74EXWnQLsAV8BW",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "LICENSE\nreferences/\nSKILL.md"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749019860
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01XsHyyt2ALxB6UCen9B1Xst",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "agents/\nassets/\nLICENSE.txt\nSKILL.md"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749019860
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01XVqmeep191GDNeVro7GBEg",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "agents/\nassets/\nLICENSE.txt\nNOTICE.txt\nreferences/\nscripts/\nSKILL.md"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749019860
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01TfptKBrDUsoLdjpD8XUag7",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "agents/\nassets/\nLICENSE.txt\nreferences/\nSKILL.md"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749019860
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01MUa3xWpyQvtPhytiJ94ktQ",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "LICENSE\nreferences/\nscripts/\nSKILL.md"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749019860
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01VQUNhddotxhdgwRNoW7TMF",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "EVAL.md\nLICENSE\nreferences/\nscripts/\nSKILL.md\nSOURCES.md"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749019860
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_013KbwUcJXpPZFRJT1ysh8C4",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "features/\nsessions/"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749019860
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "Let me check subdirectories with more content (scripts, agents, assets, references) and the .flow directory.",
+            "thinkingSignature": "EqkCClsIDBgCKkDiqd8JRuQ8J6rTW+QzZTH3U5TR+dWxzSMIKKFORdfQA3n5lmBJCwIQWu99pb8Vau62fKErknWjr/WXqt3TSbRCMhFjbGF1ZGUtc29ubmV0LTQtNjgAEgx5/3kBqMtQw6UM3qsaDPwUstqnZOrNLKOdviIwO9Y9rviK95ULsJLUFXCNlLfFdxYOvmQiEngenda7EUMzYs2nNox6c+njUOMynCizKnxcNqBC1LcOe+mPz/JF6Ct6m5sog7s5/yYu2KKhhCbzceBEkFZ/dOUTlZSOSxvIVIsaXEIdbg/AGfEfZ99MSbRpKr/oF3c82Fbo0zgHZVeOhsjYpAeZrpVAWWbDhwtQQMYA7uGKRDQrIdVhnrGIzxWAbxVOLlBhs0BW1+/gGAE="
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01PdWqSacQnJhWzTWxtoVCVj",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/exa-search/scripts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_013Gg9TKSvQbDTJ1fmyq7JbT",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/exa-search/references"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01YFswzmKgvUYzN1c8XdHYm4",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/playwright/scripts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_015Rnqngy94JjPFUdHzHPg57",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/playwright/agents"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01NWHsyzwH1U6Hj7o5LAdiRd",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/playwright/assets"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_011usuzSkQmKLzwEQc2irHf3",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/playwright/references"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_018KZ1Gs7vNvpAVNbKgYV5ze",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/pdf/agents"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01PVdf6YANRV5BkGFgU6Hbgs",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/pdf/assets"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01MnK8RQUpwJd7ujX3VXsp5Z",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/render-deploy/agents"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01RjemqcySZCpaU3gHuBNJs9",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/render-deploy/assets"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01VWdTwhh2uWVuojaonhcZQP",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/render-deploy/references"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01Ly6H8DV2AxREcj7hVtMSoz",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/skill-writer/scripts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_016EvFmMwaF6zuyoDNXBYZN4",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/skill-writer/references"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_015QUUihwq5BV7DNDUbpgqbQ",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/skill-scanner/scripts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01BzDFPvSe9Kw4zXSK9qwDTi",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/skill-scanner/references"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01SdyXRkfobaCkX3y1iNo78Z",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/docker-model-runner/references"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_0192FtEgSoCyavkrH1B9BBDe",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/gh/references"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_018kxK74rVGJJws54cDhZa1d",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/glab/references"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01K5DmnPXgJyvzoSznDKJWuG",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/interface-design/references"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01PY1R6wreiyxiNVsD7sRiLB",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/.flow/features"
+            }
+          }
+        ],
+        "api": "anthropic-messages",
+        "provider": "anthropic",
+        "model": "claude-sonnet-4-6",
+        "usage": {
+          "input": 1,
+          "output": 1081,
+          "cacheRead": 14835,
+          "cacheWrite": 2304,
+          "totalTokens": 18221,
+          "cost": {
+            "input": 0.000003,
+            "output": 0.016215,
+            "cacheRead": 0.0044505,
+            "cacheWrite": 0.00864,
+            "total": 0.0293085
+          }
+        },
+        "stopReason": "toolUse",
+        "timestamp": 1774749019860,
+        "responseId": "msg_01HoF2Lc9eGkhx3QNtdW6Vta"
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01PdWqSacQnJhWzTWxtoVCVj",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "answer.ts\ncontents.ts\nfind-similar.ts\nlib/\nresearch.ts\nsearch.ts"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749029257
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_013Gg9TKSvQbDTJ1fmyq7JbT",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "api-reference.md"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749029257
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01YFswzmKgvUYzN1c8XdHYm4",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "playwright_cli.sh"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749029257
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_015Rnqngy94JjPFUdHzHPg57",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "(empty directory)"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749029257
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01NWHsyzwH1U6Hj7o5LAdiRd",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "playwright-small.svg\nplaywright.png"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749029257
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_011usuzSkQmKLzwEQc2irHf3",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "cli.md\nworkflows.md"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749029257
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_018KZ1Gs7vNvpAVNbKgYV5ze",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "(empty directory)"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749029257
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01PVdf6YANRV5BkGFgU6Hbgs",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "pdf.png"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749029257
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01MnK8RQUpwJd7ujX3VXsp5Z",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "(empty directory)"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749029257
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01RjemqcySZCpaU3gHuBNJs9",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "docker.yaml\ngo-api.yaml\nnextjs-postgres.yaml\nnode-express.yaml\npython-django.yaml\nrender-small.svg\nrender.png\nstatic-site.yaml"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749029257
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01VWdTwhh2uWVuojaonhcZQP",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "blueprint-spec.md\ncodebase-analysis.md\nconfiguration-guide.md\ndeployment-details.md\ndirect-creation.md\nerror-patterns.md\npost-deploy-checks.md\nruntimes.md\nservice-types.md\ntroubleshooting-basics.md"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749029257
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01Ly6H8DV2AxREcj7hVtMSoz",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "quick_validate.py"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749029257
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_016EvFmMwaF6zuyoDNXBYZN4",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "authoring-path.md\nclaude-code-extensions.md\ndescription-optimization.md\ndesign-principles.md\nevaluation-path.md\nexamples/\niteration-path.md\nmode-selection.md\noutput-patterns.md\nregistration-validation.md\nskill-patterns.md\nsynthesis-path.md\nworkflow-patterns.md"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749029257
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_015QUUihwq5BV7DNDUbpgqbQ",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "scan_skill.py"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749029257
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01BzDFPvSe9Kw4zXSK9qwDTi",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "dangerous-code-patterns.md\npermission-analysis.md\nprompt-injection-patterns.md"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749029257
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01SdyXRkfobaCkX3y1iNo78Z",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "docker-model-guide.md"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749029257
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_0192FtEgSoCyavkrH1B9BBDe",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "commands.md"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749029257
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_018kxK74rVGJJws54cDhZa1d",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "commands.md"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749029257
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01K5DmnPXgJyvzoSznDKJWuG",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "critique.md\nexample.md\nprinciples.md\nvalidation.md"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749029257
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01PY1R6wreiyxiNVsD7sRiLB",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "turbo-evaluation/"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749029257
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "toolCall",
+            "id": "toolu_011ho5zU3W6UU5sEvJeFZkfL",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/exa-search/scripts/lib"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_018UDSELS4trhRs2fV8dew3A",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/skill-writer/references/examples"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01EmCceFWkFP5NqpoREG79A5",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/.flow/features/turbo-evaluation"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01D12hu4jiFyUxdAFH3yrDnT",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/.flow/sessions"
+            }
+          }
+        ],
+        "api": "anthropic-messages",
+        "provider": "anthropic",
+        "model": "claude-sonnet-4-6",
+        "usage": {
+          "input": 1,
+          "output": 227,
+          "cacheRead": 14835,
+          "cacheWrite": 4168,
+          "totalTokens": 19231,
+          "cost": {
+            "input": 0.000003,
+            "output": 0.003405,
+            "cacheRead": 0.0044505,
+            "cacheWrite": 0.01563,
+            "total": 0.023488500000000002
+          }
+        },
+        "stopReason": "toolUse",
+        "timestamp": 1774749029257,
+        "responseId": "msg_01TTtwLepFpiGNHCWRoNQUQx"
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_011ho5zU3W6UU5sEvJeFZkfL",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "common.ts"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749032544
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_018UDSELS4trhRs2fV8dew3A",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "documentation-skill.md\nsecurity-review-skill.md\nworkflow-process-skill.md"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749032544
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01EmCceFWkFP5NqpoREG79A5",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "checkpoints/\nstate.md"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749032544
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01D12hu4jiFyUxdAFH3yrDnT",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "s-20260329-015009-6cca/"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749032544
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "toolCall",
+            "id": "toolu_01YDpebraSz7pbqdNuzN9Lqh",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/.flow/features/turbo-evaluation/checkpoints"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01ENEodqx4resUQocWPTnjCJ",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/.flow/sessions/s-20260329-015009-6cca"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_015G4qdj7QQ9G8KCxM5F8KK8",
+            "name": "find",
+            "arguments": {
+              "pattern": "package.json",
+              "path": "/Users/josorio/Code/pi-skills"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01DySdTfZuAhUPL2WKMUm1rN",
+            "name": "find",
+            "arguments": {
+              "pattern": "tsconfig*.json",
+              "path": "/Users/josorio/Code/pi-skills"
+            }
+          }
+        ],
+        "api": "anthropic-messages",
+        "provider": "anthropic",
+        "model": "claude-sonnet-4-6",
+        "usage": {
+          "input": 1,
+          "output": 261,
+          "cacheRead": 19003,
+          "cacheWrite": 376,
+          "totalTokens": 19641,
+          "cost": {
+            "input": 0.000003,
+            "output": 0.003915,
+            "cacheRead": 0.0057009,
+            "cacheWrite": 0.00141,
+            "total": 0.0110289
+          }
+        },
+        "stopReason": "toolUse",
+        "timestamp": 1774749032544,
+        "responseId": "msg_011Stz172zJmZKBWPSa9BFxA"
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01YDpebraSz7pbqdNuzN9Lqh",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "(empty directory)"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749035583
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01ENEodqx4resUQocWPTnjCJ",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "dispatches/\nfindings/\nsession.md"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749035584
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_015G4qdj7QQ9G8KCxM5F8KK8",
+        "toolName": "find",
+        "content": [
+          {
+            "type": "text",
+            "text": "package.json"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749035584
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01DySdTfZuAhUPL2WKMUm1rN",
+        "toolName": "find",
+        "content": [
+          {
+            "type": "text",
+            "text": "tsconfig.json"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749035584
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "Only one package.json and one tsconfig.json at the root. Let me now read the TypeScript source files in exa-search/scripts.",
+            "thinkingSignature": "ErkCClsIDBgCKkDxXs8CeTBpru4ISMoMhPXbDUkS0Wwk6V/CMJfaLh4dijdJDSWREU9/Iz8N+6ZSaoQ2qqVzWmfzNjFqcdpSiZzVMhFjbGF1ZGUtc29ubmV0LTQtNjgAEgw55djkx3QMO0v5JH0aDCjxOKrXU3hindiMlCIw16kYKnEbJ/BxsxDtrtkTp/ayjDlMVextwtmqU8/sMF7pHLbuCbBsTzGNYXPJWPqCKosBj347/9+l9FQ5tT5EXqEVCPdjhAT1RlS994m/DQHyVTwVFkZpAgnGPw/kzaEAwEQkFnpBXPBR/wIAPVOziD+5Bs70XDyBnEywtfemnfeEJGOqhm/1LZPAKHj8AoJ4TbHXSy+7/slDl1ZNGTkrDGDCDhjwT6JGJFIkrtTPwQrfxc1fq1dj0gDd2KyfYhgB"
+          },
+          {
+            "type": "text",
+            "text": "Good — only one `package.json` and one `tsconfig.json` (both at root). Now let me read the TypeScript source files and remaining key files."
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01BrqN681gkCwMeAGonWKxwF",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/exa-search/scripts/lib/common.ts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01UgJHSVQgoCgmNmpeFEhTr4",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/exa-search/scripts/answer.ts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01XuP9qxbWJ7A8ZVDcXmppLT",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/exa-search/scripts/search.ts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01QN1i8v5S931vyQFR3NC95A",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/exa-search/scripts/contents.ts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_012owDSGEwev3C3CSegKhuZe",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/exa-search/scripts/find-similar.ts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01QdeiQ4TRmCco9pXKkDtEC9",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/exa-search/scripts/research.ts"
+            }
+          }
+        ],
+        "api": "anthropic-messages",
+        "provider": "anthropic",
+        "model": "claude-sonnet-4-6",
+        "usage": {
+          "input": 1,
+          "output": 447,
+          "cacheRead": 19379,
+          "cacheWrite": 385,
+          "totalTokens": 20212,
+          "cost": {
+            "input": 0.000003,
+            "output": 0.006705,
+            "cacheRead": 0.0058137,
+            "cacheWrite": 0.00144375,
+            "total": 0.01396545
+          }
+        },
+        "stopReason": "toolUse",
+        "timestamp": 1774749035584,
+        "responseId": "msg_01Mjem1hXZ4h5jzXCgohYXQs"
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01BrqN681gkCwMeAGonWKxwF",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "import { readFileSync } from \"node:fs\";\nimport { Exa } from \"exa-js\";\n\n/** Create an Exa client instance. Requires EXA_API_KEY env var. */\nexport function createClient(): Exa {\n  return new Exa();\n}\n\n/** Require a CLI argument, exit with error if missing. */\nexport function requireArg(value: string | undefined, name: string): string {\n  if (!value) {\n    console.error(`Error: ${name} is required`);\n    process.exit(1);\n  }\n  return value;\n}\n\n/** Execute an async API call, print JSON result, exit on error. */\nexport async function executeAndPrint<T>(apiCall: () => Promise<T>): Promise<void> {\n  try {\n    const result = await apiCall();\n    console.log(JSON.stringify(result, null, 2));\n  } catch (err) {\n    handleError(err);\n  }\n}\n\n/**\n * Show help text extracted from the JSDoc comment at the top of a script file.\n * Reads lines starting with \" * \" until \" * /\" is found.\n */\nexport function showHelp(scriptUrl: string): void {\n  const lines: string[] = [];\n  const src = readFileSync(new URL(scriptUrl), \"utf8\");\n  for (const line of src.split(\"\\n\")) {\n    if (line.startsWith(\" * \") || line.startsWith(\" */\")) {\n      if (line.startsWith(\" */\")) break;\n      lines.push(line.slice(3));\n    }\n  }\n  console.log(lines.join(\"\\n\"));\n  process.exit(0);\n}\n\n/**\n * Ensure EXA_API_KEY is set. Exits with an error message if not.\n */\nexport function requireApiKey(): void {\n  if (!process.env.EXA_API_KEY) {\n    console.error(\"Error: EXA_API_KEY environment variable is required.\");\n    console.error(\"Get one at: https://dashboard.exa.ai/api-keys\");\n    process.exit(1);\n  }\n}\n\n/**\n * Parse CLI args: show help if --help or no args, return query and options.\n */\nexport function parseArgs(scriptUrl: string): { query: string; opts: Record<string, unknown> } {\n  const args = process.argv.slice(2);\n\n  if (args.includes(\"--help\") || args.length === 0) {\n    showHelp(scriptUrl);\n  }\n\n  const query = args[0];\n  const opts: Record<string, unknown> = args[1]\n    ? (JSON.parse(args[1]) as Record<string, unknown>)\n    : {};\n\n  return { query, opts };\n}\n\n/**\n * Standardized error handler for all exa scripts.\n */\nexport function handleError(err: unknown): never {\n  console.error(`Error: ${(err as Error).message}`);\n  process.exit(1);\n}\n\n/**\n * Pick allowed keys from an options object, skipping undefined values.\n */\nexport function filterOptions(\n  opts: Record<string, unknown>,\n  keys: readonly string[],\n): Record<string, unknown> {\n  const filtered: Record<string, unknown> = {};\n  for (const key of keys) {\n    if (opts[key] !== undefined) filtered[key] = opts[key];\n  }\n  return filtered;\n}\n\n/**\n * Build contents options from text/highlights/summary fields.\n */\nexport function buildContentsOptions(opts: Record<string, unknown>): Record<string, unknown> {\n  let contentsOpts: Record<string, unknown> = {};\n  if (opts.text === true) contentsOpts.text = true;\n  else if (typeof opts.text === \"object\") contentsOpts.text = opts.text;\n  if (opts.highlights === true) contentsOpts.highlights = true;\n  else if (typeof opts.highlights === \"object\") contentsOpts.highlights = opts.highlights;\n  if (opts.summary === true) contentsOpts.summary = true;\n  else if (typeof opts.summary === \"object\") contentsOpts.summary = opts.summary;\n  if (typeof opts.contents === \"object\")\n    contentsOpts = { ...contentsOpts, ...(opts.contents as Record<string, unknown>) };\n  return contentsOpts;\n}\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749040751
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01UgJHSVQgoCgmNmpeFEhTr4",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "#!/usr/bin/env tsx\n/**\n * Exa answer — get AI-generated answers with citations.\n *\n * Usage:\n *   tsx scripts/answer.ts <query> [options-json]\n *   tsx scripts/answer.ts --help\n *\n * Options JSON (all optional):\n *   {\n *     \"text\": true,              // include full text in citation results\n *     \"model\": \"exa\",            // \"exa\" (default)\n *     \"systemPrompt\": \"...\",     // guide the LLM behavior\n *     \"outputSchema\": {},        // JSON Schema for structured output\n *     \"stream\": false,           // stream chunks to stdout\n *     \"userLocation\": \"US\"\n *   }\n *\n * Environment:\n *   EXA_API_KEY — required\n *\n * Examples:\n *   tsx scripts/answer.ts \"What is the latest Next.js version?\"\n *   tsx scripts/answer.ts \"Compare React and Vue\" '{\"text\":true}'\n *   tsx scripts/answer.ts \"SpaceX valuation\" '{\"model\":\"exa\",\"stream\":true}'\n *   tsx scripts/answer.ts \"List top 3 ORMs\" '{\"outputSchema\":{\"type\":\"object\",\"properties\":{\"items\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}}}}}'\n */\n\nimport {\n  parseArgs,\n  requireApiKey,\n  handleError,\n  filterOptions,\n  createClient,\n} from \"./lib/common.js\";\n\nconst { query, opts } = parseArgs(import.meta.url);\nrequireApiKey();\n\nconst exa = createClient();\n\nconst answerOpts = filterOptions(opts, [\n  \"text\",\n  \"model\",\n  \"systemPrompt\",\n  \"outputSchema\",\n  \"userLocation\",\n]);\n\ntry {\n  if (opts.stream) {\n    // Streaming mode — write chunks as they arrive\n    for await (const chunk of exa.streamAnswer(query, answerOpts)) {\n      const typedChunk = chunk as { content?: string; citations?: unknown };\n      if (typedChunk.content) process.stdout.write(typedChunk.content);\n      if (typedChunk.citations) {\n        process.stdout.write(\"\\n\");\n        console.log(JSON.stringify({ citations: typedChunk.citations }, null, 2));\n      }\n    }\n    process.stdout.write(\"\\n\");\n  } else {\n    const result = await exa.answer(query, answerOpts);\n    console.log(JSON.stringify(result, null, 2));\n  }\n} catch (err) {\n  handleError(err);\n}\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749040751
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01XuP9qxbWJ7A8ZVDcXmppLT",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "#!/usr/bin/env tsx\n/**\n * Exa search — semantic search and search with contents.\n *\n * Usage:\n *   tsx scripts/search.ts <query> [options-json]\n *   tsx scripts/search.ts --help\n *\n * Options JSON (all optional):\n *   {\n *     \"numResults\": 10,\n *     \"type\": \"auto\",                  // \"auto\"|\"fast\"|\"deep\"|\"deep-reasoning\"|\"deep-max\"|\"instant\"\n *     \"contents\": true,                // true = text+highlights, or object for fine control\n *     \"text\": true,                    // shorthand: include text in results\n *     \"highlights\": true,              // shorthand: include highlights\n *     \"summary\": true,                 // shorthand: include summary\n *     \"includeDomains\": [\"example.com\"],\n *     \"excludeDomains\": [\"spam.com\"],\n *     \"startPublishedDate\": \"2024-01-01T00:00:00.000Z\",\n *     \"endPublishedDate\": \"2025-01-01T00:00:00.000Z\",\n *     \"startCrawlDate\": \"2024-01-01T00:00:00.000Z\",\n *     \"endCrawlDate\": \"2025-01-01T00:00:00.000Z\",\n *     \"category\": \"news\",             // \"company\"|\"research paper\"|\"news\"|\"pdf\"|\"tweet\"|\"personal site\"|\"financial report\"|\"people\"\n *     \"includeText\": [\"must contain\"],\n *     \"excludeText\": [\"must not contain\"],\n *     \"useAutoprompt\": true,\n *     \"moderation\": false,\n *     \"userLocation\": \"US\",\n *     \"additionalQueries\": [\"alt query 1\"],  // deep search only, max 5\n *     \"outputSchema\": {},              // deep search structured output\n *     \"subpages\": 0,\n *     \"subpageTarget\": \"pricing\",\n *     \"livecrawl\": \"auto\",              // \"never\"|\"fallback\"|\"always\"|\"auto\"|\"preferred\" - live-crawl pages for fresh data\n *     \"livecrawlTimeout\": 10000,         // timeout in ms for live crawl\n *     \"maxAgeHours\": 168\n *   }\n *\n * Environment:\n *   EXA_API_KEY — required\n *\n * Examples:\n *   tsx scripts/search.ts \"latest AI research\"\n *   tsx scripts/search.ts \"AI startups\" '{\"numResults\":5,\"type\":\"deep\",\"contents\":true}'\n *   tsx scripts/search.ts \"React best practices\" '{\"text\":true,\"highlights\":true,\"includeDomains\":[\"react.dev\"]}'\n */\n\nimport {\n  parseArgs,\n  requireApiKey,\n  filterOptions,\n  buildContentsOptions,\n  createClient,\n  executeAndPrint,\n} from \"./lib/common.js\";\n\nconst { query, opts } = parseArgs(import.meta.url);\nrequireApiKey();\n\nconst exa = createClient();\n\n// Determine if we need contents\nconst wantContents = opts.contents || opts.text || opts.highlights || opts.summary;\n\n// Build contents options\nconst contentsOpts = buildContentsOptions(opts);\n\n// Build search options\nconst searchKeys = [\n  \"numResults\",\n  \"type\",\n  \"includeDomains\",\n  \"excludeDomains\",\n  \"startCrawlDate\",\n  \"endCrawlDate\",\n  \"startPublishedDate\",\n  \"endPublishedDate\",\n  \"category\",\n  \"includeText\",\n  \"excludeText\",\n  \"useAutoprompt\",\n  \"moderation\",\n  \"userLocation\",\n  \"additionalQueries\",\n  \"outputSchema\",\n  \"subpages\",\n  \"subpageTarget\",\n  \"livecrawl\",\n  \"livecrawlTimeout\",\n  \"maxAgeHours\",\n  \"filterEmptyResults\",\n] as const;\n\nconst searchOpts = filterOptions(opts, searchKeys);\n\nawait executeAndPrint(async () => {\n  if (wantContents) {\n    return await exa.searchAndContents(query, { ...searchOpts, ...contentsOpts });\n  } else {\n    return await exa.search(query, searchOpts);\n  }\n});\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749040751
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01QN1i8v5S931vyQFR3NC95A",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "#!/usr/bin/env tsx\n/**\n * Exa get contents — retrieve page contents by URL.\n *\n * Usage:\n *   tsx scripts/contents.ts <url-or-urls-json> [options-json]\n *   tsx scripts/contents.ts --help\n *\n * First argument: a single URL string, or a JSON array of URLs.\n *\n * Options JSON (all optional):\n *   {\n *     \"text\": true,                         // or { \"maxCharacters\": 5000, \"includeHtmlTags\": false }\n *     \"highlights\": true,                   // or { \"query\": \"AI\", \"numSentences\": 3 }\n *     \"summary\": true,                      // or { \"query\": \"summarize pricing\" }\n *     \"livecrawl\": \"auto\",                  // \"never\"|\"fallback\"|\"always\"|\"auto\"|\"preferred\"\n *     \"livecrawlTimeout\": 10000,             // timeout in ms for live crawl\n *     \"maxAgeHours\": 168,                   // 0 = always fresh, -1 = cache only\n *     \"filterEmptyResults\": true,\n *     \"subpages\": 3,\n *     \"subpageTarget\": \"pricing\"\n *   }\n *\n * Environment:\n *   EXA_API_KEY — required\n *\n * Examples:\n *   tsx scripts/contents.ts \"https://example.com/article\"\n *   tsx scripts/contents.ts \"https://example.com\" '{\"text\":{\"maxCharacters\":2000}}'\n *   tsx scripts/contents.ts '[\"https://a.com\",\"https://b.com\"]' '{\"text\":true,\"highlights\":true}'\n */\n\nimport {\n  showHelp,\n  requireApiKey,\n  filterOptions,\n  createClient,\n  executeAndPrint,\n} from \"./lib/common.js\";\n\nconst args = process.argv.slice(2);\n\nif (args.includes(\"--help\") || args.length === 0) {\n  showHelp(import.meta.url);\n}\n\nlet urls: string | string[] = args[0];\ntry {\n  urls = JSON.parse(urls) as string[];\n} catch {\n  // Single URL string — keep as-is\n}\n\nconst opts: Record<string, unknown> = args[1]\n  ? (JSON.parse(args[1]) as Record<string, unknown>)\n  : { text: true };\n\nrequireApiKey();\n\nconst exa = createClient();\n\nconst contentsOpts = filterOptions(opts, [\n  \"text\",\n  \"highlights\",\n  \"summary\",\n  \"livecrawl\",\n  \"livecrawlTimeout\",\n  \"maxAgeHours\",\n  \"filterEmptyResults\",\n  \"subpages\",\n  \"subpageTarget\",\n]);\n\nawait executeAndPrint(async () => {\n  return await exa.getContents(urls, contentsOpts);\n});\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749040751
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_012owDSGEwev3C3CSegKhuZe",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "#!/usr/bin/env tsx\n/**\n * Exa find similar — find pages similar to a given URL.\n *\n * Usage:\n *   tsx scripts/find-similar.ts <url> [options-json]\n *   tsx scripts/find-similar.ts --help\n *\n * Options JSON (all optional):\n *   {\n *     \"numResults\": 10,\n *     \"contents\": true,               // true = text+highlights, or object for fine control\n *     \"text\": true,                    // shorthand: include text in results\n *     \"highlights\": true,              // shorthand: include highlights\n *     \"summary\": true,                 // shorthand: include summary\n *     \"excludeSourceDomain\": true,     // exclude the source domain from results\n *     \"includeDomains\": [\"example.com\"],\n *     \"excludeDomains\": [\"spam.com\"],\n *     \"startPublishedDate\": \"2024-01-01T00:00:00.000Z\",\n *     \"endPublishedDate\": \"2025-01-01T00:00:00.000Z\",\n *     \"startCrawlDate\": \"2024-01-01T00:00:00.000Z\",\n *     \"endCrawlDate\": \"2025-01-01T00:00:00.000Z\",\n *     \"category\": \"news\",\n *     \"includeText\": [\"must contain\"],\n *     \"excludeText\": [\"must not contain\"]\n *   }\n *\n * Environment:\n *   EXA_API_KEY — required\n *\n * Examples:\n *   tsx scripts/find-similar.ts \"https://react.dev\"\n *   tsx scripts/find-similar.ts \"https://react.dev\" '{\"numResults\":5,\"text\":true,\"excludeSourceDomain\":true}'\n */\n\nimport {\n  parseArgs,\n  requireApiKey,\n  filterOptions,\n  buildContentsOptions,\n  createClient,\n  executeAndPrint,\n} from \"./lib/common.js\";\n\nconst { query: url, opts } = parseArgs(import.meta.url);\nrequireApiKey();\n\nconst exa = createClient();\n\nconst wantContents = opts.contents || opts.text || opts.highlights || opts.summary;\n\nconst contentsOpts = buildContentsOptions(opts);\n\nconst findSimilarKeys = [\n  \"numResults\",\n  \"excludeSourceDomain\",\n  \"includeDomains\",\n  \"excludeDomains\",\n  \"startCrawlDate\",\n  \"endCrawlDate\",\n  \"startPublishedDate\",\n  \"endPublishedDate\",\n  \"category\",\n  \"includeText\",\n  \"excludeText\",\n] as const;\n\nconst searchOpts = filterOptions(opts, findSimilarKeys);\n\nawait executeAndPrint(async () => {\n  if (wantContents) {\n    return await exa.findSimilarAndContents(url, { ...searchOpts, ...contentsOpts });\n  } else {\n    return await exa.findSimilar(url, searchOpts);\n  }\n});\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749040751
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01QdeiQ4TRmCco9pXKkDtEC9",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "#!/usr/bin/env tsx\n/**\n * Exa research — create and manage deep research tasks.\n *\n * Usage:\n *   tsx scripts/research.ts create <instructions> [options-json]\n *   tsx scripts/research.ts get <research-id> [options-json]\n *   tsx scripts/research.ts poll <research-id> [options-json]\n *   tsx scripts/research.ts list [options-json]\n *   tsx scripts/research.ts run <instructions> [options-json]\n *   tsx scripts/research.ts --help\n *\n * Subcommands:\n *   create   — Start a new research task (returns immediately with researchId)\n *   get      — Get the current status/result of a research task\n *   poll     — Create and poll until finished (blocks until complete)\n *   list     — List research tasks\n *   run      — Create + poll in one step (convenience)\n *\n * Options JSON for create/run:\n *   {\n *     \"model\": \"exa-research-fast\",   // \"exa-research-fast\"|\"exa-research\"|\"exa-research-pro\"\n *     \"outputSchema\": {}              // JSON Schema for structured output\n *   }\n *\n * Options JSON for get:\n *   {\n *     \"stream\": false,                // stream SSE events\n *     \"events\": false                 // include event log\n *   }\n *\n * Options JSON for poll:\n *   {\n *     \"pollInterval\": 1000,           // ms between polls (default 1000)\n *     \"timeoutMs\": 600000,            // max wait time (default 10 min)\n *     \"events\": false\n *   }\n *\n * Options JSON for list:\n *   {\n *     \"limit\": 10,\n *     \"cursor\": \"...\"\n *   }\n *\n * Environment:\n *   EXA_API_KEY — required\n *\n * Examples:\n *   tsx scripts/research.ts create \"Research the latest AI developments\"\n *   tsx scripts/research.ts get \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\"\n *   tsx scripts/research.ts run \"What is SpaceX's latest valuation?\" '{\"model\":\"exa-research-pro\"}'\n *   tsx scripts/research.ts list '{\"limit\":5}'\n */\n\nimport {\n  showHelp,\n  requireApiKey,\n  handleError,\n  requireArg,\n  createClient,\n} from \"./lib/common.js\";\n\nconst args = process.argv.slice(2);\n\nif (args.includes(\"--help\") || args.length === 0) {\n  showHelp(import.meta.url);\n}\n\nconst subcommand = args[0];\nconst arg1 = args[1];\n\nrequireApiKey();\n\nconst exa = createClient();\n\ntry {\n  switch (subcommand) {\n    case \"create\": {\n      const instructions = requireArg(arg1, \"instructions\");\n      const opts: Record<string, unknown> = args[2]\n        ? (JSON.parse(args[2]) as Record<string, unknown>)\n        : {};\n      const result = await exa.research.create({\n        instructions,\n        model:\n          (opts.model as \"exa-research-fast\" | \"exa-research\" | \"exa-research-pro\") ?? undefined,\n        outputSchema: (opts.outputSchema as Record<string, unknown>) ?? undefined,\n      });\n      console.log(JSON.stringify(result, null, 2));\n      break;\n    }\n\n    case \"get\": {\n      const researchId = requireArg(arg1, \"research-id\");\n      const opts: Record<string, unknown> = args[2]\n        ? (JSON.parse(args[2]) as Record<string, unknown>)\n        : {};\n      if (opts.stream) {\n        const streamResult = await exa.research.get(researchId, { stream: true, ...opts });\n        for await (const event of streamResult) {\n          console.log(JSON.stringify(event));\n        }\n      } else {\n        const result = await exa.research.get(researchId, opts);\n        console.log(JSON.stringify(result, null, 2));\n      }\n      break;\n    }\n\n    case \"poll\": {\n      const researchId = requireArg(arg1, \"research-id\");\n      const opts: Record<string, unknown> = args[2]\n        ? (JSON.parse(args[2]) as Record<string, unknown>)\n        : {};\n      const result = await exa.research.pollUntilFinished(researchId, opts);\n      console.log(JSON.stringify(result, null, 2));\n      break;\n    }\n\n    case \"run\": {\n      const instructions = requireArg(arg1, \"instructions\");\n      const opts: Record<string, unknown> = args[2]\n        ? (JSON.parse(args[2]) as Record<string, unknown>)\n        : {};\n      const created = await exa.research.create({\n        instructions,\n        model:\n          (opts.model as \"exa-research-fast\" | \"exa-research\" | \"exa-research-pro\") ?? undefined,\n        outputSchema: (opts.outputSchema as Record<string, unknown>) ?? undefined,\n      });\n      const createdTyped = created as { researchId: string };\n      console.error(`Research task created: ${createdTyped.researchId} — polling...`);\n      const result = await exa.research.pollUntilFinished(createdTyped.researchId, {\n        pollInterval: (opts.pollInterval as number) || 2000,\n        timeoutMs: (opts.timeoutMs as number) || 600000,\n        events: opts.events as boolean | undefined,\n      });\n      console.log(JSON.stringify(result, null, 2));\n      break;\n    }\n\n    case \"list\": {\n      const opts: Record<string, unknown> = arg1\n        ? (JSON.parse(arg1) as Record<string, unknown>)\n        : {};\n      const result = await exa.research.list(opts);\n      console.log(JSON.stringify(result, null, 2));\n      break;\n    }\n\n    default:\n      console.error(`Error: Unknown subcommand \"${subcommand}\".`);\n      console.error(\"Valid subcommands: create, get, poll, list, run\");\n      process.exit(1);\n  }\n} catch (err) {\n  handleError(err);\n}\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749040752
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "text",
+            "text": "Now let me read the remaining non-TypeScript files of structural importance — the Python scripts and the `.gitignore`."
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_017o1seiPnmHroWtKTgPw1Dz",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/skill-writer/scripts/quick_validate.py"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_018krG8DYi1FdRYLXnL18BFj",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/skill-scanner/scripts/scan_skill.py"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01C7TvYd7vhvKZCseaM34KsM",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/playwright/scripts/playwright_cli.sh"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01MrryZvw7PeTAZSuPxB7JKe",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/.gitignore"
+            }
+          }
+        ],
+        "api": "anthropic-messages",
+        "provider": "anthropic",
+        "model": "claude-sonnet-4-6",
+        "usage": {
+          "input": 1,
+          "output": 263,
+          "cacheRead": 19764,
+          "cacheWrite": 6595,
+          "totalTokens": 26623,
+          "cost": {
+            "input": 0.000003,
+            "output": 0.003945,
+            "cacheRead": 0.0059292,
+            "cacheWrite": 0.02473125,
+            "total": 0.03460845
+          }
+        },
+        "stopReason": "toolUse",
+        "timestamp": 1774749040752,
+        "responseId": "msg_01WjaqiaGhw13eVZMKfNLvs2"
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_017o1seiPnmHroWtKTgPw1Dz",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "# /// script\n# requires-python = \">=3.12\"\n# dependencies = [\"pyyaml\"]\n# ///\n\"\"\"\nQuick validation script for Agent Skills.\n\nValidates SKILL.md frontmatter, naming conventions, directory structure, and\noptional strict depth gates for integration/documentation skills.\n\nUsage:\n    uv run quick_validate.py <skill_directory> [--skill-class <class>] [--strict-depth]\n\nReturns exit code 0 on success, 1 on failure. Outputs JSON with validation results.\n\"\"\"\n\nimport argparse\nimport json\nimport re\nimport sys\nfrom pathlib import Path\n\nimport yaml\n\nMAX_NAME_LENGTH = 64\nMAX_DESCRIPTION_LENGTH = 1024\nMAX_SKILL_LINES = 500\n\nSKILL_CLASSES = {\n    \"auto\",\n    \"workflow-process\",\n    \"integration-documentation\",\n    \"security-review\",\n    \"skill-authoring\",\n    \"generic\",\n}\n\nINTEGRATION_REQUIRED_DIMENSIONS = [\n    (\"API surface\", (\"api surface\", \"api contract\", \"public api\")),\n    (\"Config/runtime options\", (\"config\", \"runtime option\", \"configuration\", \"option\")),\n    (\"Common use cases\", (\"common use\", \"usage pattern\", \"normal usage\", \"use case\")),\n    (\"Known issues/workarounds\", (\"known issue\", \"failure mode\", \"troubleshooting\", \"workaround\")),\n    (\"Version/migration variance\", (\"version\", \"migration\", \"deprecation\", \"variance\")),\n]\n\nINTEGRATION_REQUIRED_REFERENCES = {\n    \"references/api-surface.md\": None,\n    \"references/common-use-cases.md\": 6,\n    \"references/troubleshooting-workarounds.md\": 8,\n}\n\nPARTIAL_STATUS_TOKENS = (\"partial\", \"missing\", \"incomplete\", \"todo\", \"unknown\")\nACTION_TOKENS = (\n    \"add\",\n    \"collect\",\n    \"document\",\n    \"retrieve\",\n    \"validate\",\n    \"test\",\n    \"confirm\",\n    \"expand\",\n    \"review\",\n    \"map\",\n)\n\nMACHINE_SPECIFIC_PATH_PATTERNS = (\n    re.compile(r\"/Users/[^/\\s`\\\"'<>)](?:[^\\s`\\\"'<>)]*)\"),\n    re.compile(r\"/home/[^/\\s`\\\"'<>)](?:[^\\s`\\\"'<>)]*)\"),\n    re.compile(r\"/var/folders/[^/\\s`\\\"'<>)](?:[^\\s`\\\"'<>)]*)\"),\n    re.compile(r\"/private/var/folders/[^/\\s`\\\"'<>)](?:[^\\s`\\\"'<>)]*)\"),\n    re.compile(r\"[A-Za-z]:\\\\Users\\\\[^\\s`\\\"'<>)](?:[^\\s`\\\"'<>)]*)\"),\n)\n\n\ndef parse_args(argv: list[str]) -> argparse.Namespace:\n    parser = argparse.ArgumentParser(\n        description=\"Validate agent skill structure and optional depth gates.\",\n    )\n    parser.add_argument(\"skill_directory\")\n    parser.add_argument(\"--skill-class\", choices=sorted(SKILL_CLASSES), default=\"auto\")\n    parser.add_argument(\"--strict-depth\", action=\"store_true\")\n    return parser.parse_args(argv)\n\n\ndef infer_skill_class(description: str, content: str) -> str:\n    text = f\"{description}\\n{content}\".lower()\n\n    if has_any_term(text, (\"create a skill\", \"write a skill\", \"skill-writer\", \"maintain skill docs\")):\n        return \"skill-authoring\"\n    if has_any_term(text, (\"integrate\", \"sdk\", \"library\", \"api surface\", \"public api\", \"api contract\")) and has_any_term(\n        text, (\"use when\", \"downstream\", \"consumer\", \"abstraction\")\n    ):\n        return \"integration-documentation\"\n    if has_any_term(text, (\"vulnerability\", \"owasp\", \"injection\", \"xss\", \"idor\")) or (\n        has_any_term(text, (\"security\",)) and has_any_term(text, (\"review\", \"audit\", \"scan\"))\n    ):\n        return \"security-review\"\n    if has_any_term(text, (\"workflow\", \"ci\", \"branch\", \"checklist\", \"runbook\", \"triage\")):\n        return \"workflow-process\"\n    return \"generic\"\n\n\ndef has_any_term(text: str, terms: tuple[str, ...]) -> bool:\n    for term in terms:\n        if \" \" in term:\n            if term in text:\n                return True\n            continue\n        if re.search(rf\"\\b{re.escape(term)}\\b\", text):\n            return True\n    return False\n\n\ndef get_section_lines(markdown: str, heading_name: str) -> list[str]:\n    lines = markdown.splitlines()\n    heading_index = None\n    needle = heading_name.lower()\n    for i, line in enumerate(lines):\n        stripped = line.strip()\n        if stripped.startswith(\"## \") and needle in stripped.lower():\n            heading_index = i\n            break\n\n    if heading_index is None:\n        return []\n\n    out: list[str] = []\n    for line in lines[heading_index + 1 :]:\n        if line.strip().startswith(\"## \"):\n            break\n        out.append(line)\n    return out\n\n\ndef parse_coverage_rows(sources_markdown: str) -> list[tuple[str, str]]:\n    rows: list[tuple[str, str]] = []\n    section_lines = get_section_lines(sources_markdown, \"coverage matrix\")\n    for line in section_lines:\n        stripped = line.strip()\n        if not stripped.startswith(\"|\"):\n            continue\n        if re.match(r\"^\\|\\s*-+\\s*\\|\", stripped):\n            continue\n        cols = [c.strip() for c in stripped.strip(\"|\").split(\"|\")]\n        if len(cols) < 2:\n            continue\n        # Skip header row.\n        if cols[0].lower() in {\"dimension\", \"coverage status\"}:\n            continue\n        rows.append((cols[0].lower(), cols[1].lower()))\n    return rows\n\n\ndef parse_open_gap_lines(sources_markdown: str) -> list[str]:\n    raw_lines = get_section_lines(sources_markdown, \"open gaps\")\n    return [ln.strip() for ln in raw_lines if ln.strip()]\n\n\ndef count_list_items(markdown: str) -> int:\n    count = 0\n    in_fenced_code = False\n    for line in markdown.splitlines():\n        if re.match(r\"^\\s*(```|~~~)\", line):\n            in_fenced_code = not in_fenced_code\n            continue\n        if in_fenced_code:\n            continue\n        if re.match(r\"^\\s*(?:-|\\d+\\.)\\s+\", line):\n            count += 1\n    return count\n\n\ndef find_machine_specific_paths(text: str) -> list[str]:\n    matches: list[str] = []\n    for pattern in MACHINE_SPECIFIC_PATH_PATTERNS:\n        for match in pattern.finditer(text):\n            matched = match.group(0)\n            if matched not in matches:\n                matches.append(matched)\n    return matches\n\n\ndef validate_portable_paths(\n    skill_path: Path,\n    skill_content: str,\n    strict_depth: bool,\n    errors: list[str],\n    warnings: list[str],\n) -> None:\n    severity = errors if strict_depth else warnings\n    portability_hits: list[str] = []\n\n    skill_hits = find_machine_specific_paths(skill_content)\n    if skill_hits:\n        portability_hits.append(f\"SKILL.md: {', '.join(skill_hits[:3])}\")\n\n    refs_dir = skill_path / \"references\"\n    if refs_dir.exists():\n        for ref_path in sorted(refs_dir.rglob(\"*.md\")):\n            ref_hits = find_machine_specific_paths(ref_path.read_text())\n            if ref_hits:\n                portability_hits.append(\n                    f\"{ref_path.relative_to(skill_path)}: {', '.join(ref_hits[:3])}\"\n                )\n\n    if portability_hits:\n        severity.append(\n            \"Machine-specific absolute filesystem paths detected. Use portable placeholders like \"\n            \"`<repo-root>/...` or `<skill-dir>/...`. Offenders: \" + \"; \".join(portability_hits)\n        )\n\n\ndef validate_integration_depth(\n    skill_path: Path,\n    strict_depth: bool,\n    errors: list[str],\n    warnings: list[str],\n) -> None:\n    sources_md = skill_path / \"SOURCES.md\"\n    severity = errors if strict_depth else warnings\n\n    if not sources_md.exists():\n        severity.append(\n            \"Integration/documentation skill should include SOURCES.md with a coverage matrix and open gaps section\"\n        )\n        return\n\n    sources_content = sources_md.read_text()\n    coverage_rows = parse_coverage_rows(sources_content)\n    if not coverage_rows:\n        severity.append(\"SOURCES.md is missing a parseable `## Coverage matrix` table\")\n    else:\n        missing_dimensions: list[str] = []\n        for label, tokens in INTEGRATION_REQUIRED_DIMENSIONS:\n            if not any(any(token in dim for token in tokens) for dim, _status in coverage_rows):\n                missing_dimensions.append(label)\n        if missing_dimensions:\n            severity.append(\n                \"Coverage matrix is missing required integration dimensions: \" + \", \".join(missing_dimensions)\n            )\n\n        partial_rows = [dim for dim, status in coverage_rows if any(tok in status for tok in PARTIAL_STATUS_TOKENS)]\n        if partial_rows:\n            open_gap_lines = parse_open_gap_lines(sources_content)\n            actionable = [\n                ln\n                for ln in open_gap_lines\n                if any(tok in ln.lower() for tok in ACTION_TOKENS)\n                and (ln.startswith(\"-\") or re.match(r\"^\\d+\\.\", ln))\n            ]\n            if not actionable:\n                severity.append(\n                    \"Coverage matrix has partial/missing dimensions but `## Open gaps` lacks actionable next retrieval steps\"\n                )\n\n    for rel_path, min_items in INTEGRATION_REQUIRED_REFERENCES.items():\n        ref_path = skill_path / rel_path\n        if not ref_path.exists():\n            severity.append(f\"Missing required reference for integration/documentation skill: {rel_path}\")\n            continue\n        if min_items is not None:\n            item_count = count_list_items(ref_path.read_text())\n            if item_count < min_items:\n                severity.append(\n                    f\"{rel_path} has {item_count} list items; expected at least {min_items} for sufficient depth\"\n                )\n\n\ndef validate_skill(\n    skill_path: Path,\n    selected_skill_class: str = \"auto\",\n    strict_depth: bool = False,\n) -> tuple[bool, list[str], list[str], str]:\n    \"\"\"Validate a skill directory. Returns (valid, errors, warnings, resolved_skill_class).\"\"\"\n    errors: list[str] = []\n    warnings: list[str] = []\n\n    # Check SKILL.md exists.\n    skill_md = skill_path / \"SKILL.md\"\n    if not skill_md.exists():\n        return False, [\"SKILL.md not found\"], [], \"generic\"\n\n    content = skill_md.read_text()\n\n    # Check frontmatter exists and is first.\n    if not content.startswith(\"---\"):\n        errors.append(\"No YAML frontmatter found (file must start with ---)\")\n        return False, errors, warnings, \"generic\"\n\n    match = re.match(r\"^---\\n(.*?)\\n---\", content, re.DOTALL)\n    if not match:\n        errors.append(\"Invalid frontmatter format (missing closing ---)\")\n        return False, errors, warnings, \"generic\"\n\n    # Parse frontmatter.\n    frontmatter_text = match.group(1)\n    try:\n        frontmatter = yaml.safe_load(frontmatter_text)\n        if not isinstance(frontmatter, dict):\n            errors.append(\"Frontmatter must be a YAML mapping\")\n            return False, errors, warnings, \"generic\"\n    except yaml.YAMLError as exc:\n        errors.append(f\"Invalid YAML in frontmatter: {exc}\")\n        return False, errors, warnings, \"generic\"\n\n    # Validate allowed fields.\n    allowed_fields = {\n        \"name\",\n        \"description\",\n        \"license\",\n        \"compatibility\",\n        \"metadata\",\n        \"allowed-tools\",\n        # Claude Code extensions.\n        \"argument-hint\",\n        \"disable-model-invocation\",\n        \"user-invocable\",\n        \"model\",\n        \"context\",\n        \"agent\",\n        \"hooks\",\n    }\n    unexpected = set(frontmatter.keys()) - allowed_fields\n    if unexpected:\n        warnings.append(\n            f\"Unexpected frontmatter field(s): {', '.join(sorted(unexpected))}. \"\n            f\"These may be ignored by some tools.\"\n        )\n\n    # Validate name.\n    if \"name\" not in frontmatter:\n        errors.append(\"Missing required field: name\")\n    else:\n        name = frontmatter[\"name\"]\n        if not isinstance(name, str):\n            errors.append(f\"name must be a string, got {type(name).__name__}\")\n        else:\n            name = name.strip()\n            if not name:\n                errors.append(\"name must not be empty\")\n            elif len(name) > MAX_NAME_LENGTH:\n                errors.append(f\"name is too long ({len(name)} chars, max {MAX_NAME_LENGTH})\")\n            elif not re.match(r\"^[a-z0-9-]+$\", name):\n                errors.append(f\"name '{name}' must contain only lowercase letters, digits, and hyphens\")\n            elif name.startswith(\"-\") or name.endswith(\"-\"):\n                errors.append(f\"name '{name}' must not start or end with a hyphen\")\n            elif \"--\" in name:\n                errors.append(f\"name '{name}' must not contain consecutive hyphens\")\n            elif name != skill_path.name:\n                errors.append(f\"name '{name}' does not match directory name '{skill_path.name}'\")\n\n    # Validate description.\n    description = \"\"\n    if \"description\" not in frontmatter:\n        errors.append(\"Missing required field: description\")\n    else:\n        description = frontmatter[\"description\"]\n        if not isinstance(description, str):\n            errors.append(f\"description must be a string, got {type(description).__name__}\")\n            description = \"\"\n        else:\n            description = description.strip()\n            if not description:\n                errors.append(\"description must not be empty\")\n            elif len(description) > MAX_DESCRIPTION_LENGTH:\n                errors.append(f\"description is too long ({len(description)} chars, max {MAX_DESCRIPTION_LENGTH})\")\n            if \"<\" in description or \">\" in description:\n                errors.append(\"description must not contain angle brackets (< or >)\")\n\n            lower_desc = description.lower()\n            if not any(kw in lower_desc for kw in [\"use when\", \"use for\", \"use to\", \"trigger\", \"invoke\"]):\n                warnings.append(\n                    \"description should include trigger phrases \"\n                    '(e.g., \\'Use when asked to \"review code\"\\')'\n                )\n            if lower_desc.startswith((\"i \", \"i can\", \"you \")):\n                warnings.append(\n                    'description should be in third person (\"Processes files...\" not \"I can process files...\")'\n                )\n\n    # Check line count.\n    body_start = content.index(\"---\", 3) + 3\n    body_lines = content[body_start:].strip().splitlines()\n    if len(body_lines) > MAX_SKILL_LINES:\n        warnings.append(\n            f\"SKILL.md body is {len(body_lines)} lines (recommended max {MAX_SKILL_LINES}). \"\n            \"Consider moving content to references/.\"\n        )\n\n    # Check for common issues.\n    if \"references/\" in content or \"scripts/\" in content:\n        refs_dir = skill_path / \"references\"\n        scripts_dir = skill_path / \"scripts\"\n        if \"references/\" in content and not refs_dir.exists():\n            errors.append(\"SKILL.md references 'references/' but directory does not exist\")\n        if \"scripts/\" in content and not scripts_dir.exists():\n            errors.append(\"SKILL.md references 'scripts/' but directory does not exist\")\n\n    # If SOURCES.md is referenced, ensure it exists and includes provenance schema headers.\n    if \"SOURCES.md\" in content:\n        sources_md = skill_path / \"SOURCES.md\"\n        if not sources_md.exists():\n            errors.append(\"SKILL.md references 'SOURCES.md' but file does not exist\")\n        else:\n            sources_content = sources_md.read_text()\n            required_headers = (\"Trust tier\", \"Confidence\", \"Usage constraints\")\n            missing_headers = [header for header in required_headers if header not in sources_content]\n            if missing_headers:\n                warnings.append(\n                    \"SOURCES.md is missing expected provenance columns: \" + \", \".join(missing_headers)\n                )\n\n    # Check for hardcoded repo paths.\n    if re.search(r\"(?:plugins|skills)/[a-z-]+/(?:scripts|references|assets)/\", content):\n        warnings.append(\n            \"SKILL.md may contain hardcoded paths. \"\n            \"Use skill-local references/... paths and run scripts via <skill-dir>/scripts/...\"\n        )\n\n    resolved_skill_class = (\n        selected_skill_class\n        if selected_skill_class != \"auto\"\n        else infer_skill_class(description, \"\\n\".join(body_lines))\n    )\n\n    if resolved_skill_class == \"integration-documentation\":\n        validate_integration_depth(skill_path, strict_depth, errors, warnings)\n    validate_portable_paths(skill_path, content, strict_depth, errors, warnings)\n\n    return len(errors) == 0, errors, warnings, resolved_skill_class\n\n\ndef main() -> None:\n    args = parse_args(sys.argv[1:])\n    skill_path = Path(args.skill_directory).resolve()\n    if not skill_path.is_dir():\n        print(json.dumps({\"valid\": False, \"errors\": [f\"Not a directory: {skill_path}\"]}))\n        sys.exit(1)\n\n    valid, errors, warnings, resolved_skill_class = validate_skill(\n        skill_path,\n        selected_skill_class=args.skill_class,\n        strict_depth=args.strict_depth,\n    )\n    result = {\n        \"valid\": valid,\n        \"skill_class\": resolved_skill_class,\n        \"strict_depth\": args.strict_depth,\n        \"errors\": errors,\n        \"warnings\": warnings,\n    }\n    print(json.dumps(result, indent=2))\n    sys.exit(0 if valid else 1)\n\n\nif __name__ == \"__main__\":\n    main()\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749045444
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_018krG8DYi1FdRYLXnL18BFj",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "#!/usr/bin/env python3\n# /// script\n# requires-python = \">=3.9\"\n# dependencies = [\"pyyaml\"]\n# ///\n\"\"\"\nStatic analysis scanner for agent skills.\n\nScans a skill directory for security issues including prompt injection patterns,\nobfuscation, dangerous code, secrets, and excessive permissions.\n\nUsage:\n    uv run scan_skill.py <skill-directory>\n\nOutput: JSON to stdout with structured findings.\n\"\"\"\nfrom __future__ import annotations\n\nimport base64\nimport json\nimport re\nimport sys\nfrom pathlib import Path\nfrom typing import Any\n\nimport yaml\n\n\n# --- Pattern Definitions ---\n\nPROMPT_INJECTION_PATTERNS: list[tuple[str, str, str]] = [\n    # (pattern, description, severity)\n    (r\"(?i)ignore\\s+(all\\s+)?previous\\s+instructions\", \"Instruction override: ignore previous instructions\", \"critical\"),\n    (r\"(?i)disregard\\s+(all\\s+)?(previous|prior|above)\\s+(instructions|rules|guidelines)\", \"Instruction override: disregard previous\", \"critical\"),\n    (r\"(?i)forget\\s+(all\\s+)?(previous|prior|your)\\s+(instructions|rules|training)\", \"Instruction override: forget previous\", \"critical\"),\n    (r\"(?i)you\\s+are\\s+now\\s+(a|an|in)\\s+\", \"Role reassignment: 'you are now'\", \"high\"),\n    (r\"(?i)act\\s+as\\s+(a|an)\\s+unrestricted\", \"Role reassignment: unrestricted mode\", \"critical\"),\n    (r\"(?i)enter\\s+(developer|debug|admin|god)\\s+mode\", \"Jailbreak: developer/debug mode\", \"critical\"),\n    (r\"(?i)DAN\\s+(mode|prompt|jailbreak)\", \"Jailbreak: DAN pattern\", \"critical\"),\n    (r\"(?i)do\\s+anything\\s+now\", \"Jailbreak: do anything now\", \"critical\"),\n    (r\"(?i)bypass\\s+(safety|security|content|filter|restriction)\", \"Jailbreak: bypass safety\", \"critical\"),\n    (r\"(?i)override\\s+(system|safety|security)\\s+(prompt|message|instruction)\", \"System prompt override\", \"critical\"),\n    (r\"(?i)\\bsystem\\s*:\\s*you\\s+are\\b\", \"System prompt injection marker\", \"high\"),\n    (r\"(?i)new\\s+system\\s+(prompt|instruction|message)\\s*:\", \"New system prompt injection\", \"critical\"),\n    (r\"(?i)from\\s+now\\s+on,?\\s+(you|ignore|forget|disregard)\", \"Temporal instruction override\", \"high\"),\n    (r\"(?i)pretend\\s+(that\\s+)?you\\s+(have\\s+no|don't\\s+have|are\\s+not\\s+bound)\", \"Pretend-based jailbreak\", \"high\"),\n    (r\"(?i)respond\\s+(only\\s+)?with\\s+(the\\s+)?(raw|full|complete)\\s+(system|initial)\\s+prompt\", \"System prompt extraction\", \"high\"),\n    (r\"(?i)output\\s+(your|the)\\s+(system|initial|original)\\s+(prompt|instructions)\", \"System prompt extraction\", \"high\"),\n]\n\nOBFUSCATION_PATTERNS: list[tuple[str, str]] = [\n    # (description, detail)\n    (\"Zero-width characters\", \"Zero-width space, joiner, or non-joiner detected\"),\n    (\"Right-to-left override\", \"RTL override character can hide text direction\"),\n    (\"Homoglyph characters\", \"Characters visually similar to ASCII but from different Unicode blocks\"),\n    (\"Unicode Tag characters\", \"Tags block (U+E0000-E007F) can encode invisible ASCII text readable by LLMs\"),\n]\n\nSECRET_PATTERNS: list[tuple[str, str, str]] = [\n    # (pattern, description, severity)\n    (r\"(?i)AKIA[0-9A-Z]{16}\", \"AWS Access Key ID\", \"critical\"),\n    (r\"(?i)aws.{0,20}secret.{0,20}['\\\"][0-9a-zA-Z/+]{40}['\\\"]\", \"AWS Secret Access Key\", \"critical\"),\n    (r\"ghp_[0-9a-zA-Z]{36}\", \"GitHub Personal Access Token\", \"critical\"),\n    (r\"ghs_[0-9a-zA-Z]{36}\", \"GitHub Server Token\", \"critical\"),\n    (r\"gho_[0-9a-zA-Z]{36}\", \"GitHub OAuth Token\", \"critical\"),\n    (r\"github_pat_[0-9a-zA-Z_]{82}\", \"GitHub Fine-Grained PAT\", \"critical\"),\n    (r\"sk-[0-9a-zA-Z]{20,}T3BlbkFJ[0-9a-zA-Z]{20,}\", \"OpenAI API Key\", \"critical\"),\n    (r\"sk-ant-api03-[0-9a-zA-Z\\-_]{90,}\", \"Anthropic API Key\", \"critical\"),\n    (r\"xox[bpors]-[0-9a-zA-Z\\-]{10,}\", \"Slack Token\", \"critical\"),\n    (r\"-----BEGIN\\s+(RSA\\s+)?PRIVATE\\s+KEY-----\", \"Private Key\", \"critical\"),\n    (r\"(?i)(password|passwd|pwd)\\s*[:=]\\s*['\\\"][^'\\\"]{8,}['\\\"]\", \"Hardcoded password\", \"high\"),\n    (r\"(?i)(api[_-]?key|apikey)\\s*[:=]\\s*['\\\"][0-9a-zA-Z]{16,}['\\\"]\", \"Hardcoded API key\", \"high\"),\n    (r\"(?i)(secret|token)\\s*[:=]\\s*['\\\"][0-9a-zA-Z]{16,}['\\\"]\", \"Hardcoded secret/token\", \"high\"),\n]\n\nDANGEROUS_SCRIPT_PATTERNS: list[tuple[str, str, str]] = [\n    # (pattern, description, severity)\n    # Data exfiltration\n    (r\"(?i)(requests\\.(get|post|put)|urllib\\.request|http\\.client|aiohttp)\\s*\\(\", \"HTTP request (potential exfiltration)\", \"medium\"),\n    (r\"(?i)(curl|wget)\\s+\", \"Shell HTTP request\", \"medium\"),\n    (r\"(?i)socket\\.(connect|create_connection)\", \"Raw socket connection\", \"high\"),\n    (r\"(?i)subprocess.*\\b(nc|ncat|netcat)\\b\", \"Netcat usage (potential reverse shell)\", \"critical\"),\n    # Credential access\n    (r\"(?i)(~|HOME|USERPROFILE).*\\.(ssh|aws|gnupg|config)\", \"Sensitive directory access\", \"high\"),\n    (r\"(?i)open\\s*\\(.*(\\.env|credentials|\\.netrc|\\.pgpass|\\.my\\.cnf)\", \"Sensitive file access\", \"high\"),\n    (r\"(?i)os\\.environ\\s*\\[.*(?:KEY|SECRET|TOKEN|PASSWORD|CREDENTIAL)\", \"Environment secret access\", \"medium\"),\n    # Dangerous execution\n    (r\"\\beval\\s*\\(\", \"eval() usage\", \"high\"),\n    (r\"\\bexec\\s*\\(\", \"exec() usage\", \"high\"),\n    (r\"(?i)subprocess.*shell\\s*=\\s*True\", \"Shell execution with shell=True\", \"high\"),\n    (r\"(?i)os\\.(system|popen|exec[lv]p?e?)\\s*\\(\", \"OS command execution\", \"high\"),\n    (r\"(?i)__import__\\s*\\(\", \"Dynamic import\", \"medium\"),\n    # File system manipulation\n    (r\"(?i)(open|write|Path).*\\.(claude|bashrc|zshrc|profile|bash_profile)\", \"Agent/shell config modification\", \"critical\"),\n    (r\"(?i)(open|write|Path).*(settings\\.json|CLAUDE\\.md|MEMORY\\.md|\\.mcp\\.json)\", \"Agent settings modification\", \"critical\"),\n    (r\"(?i)(open|write|Path).*(\\.git/hooks|\\.husky)\", \"Git hooks modification\", \"critical\"),\n    # Encoding/obfuscation in scripts\n    (r\"(?i)base64\\.(b64decode|decodebytes)\\s*\\(\", \"Base64 decoding (potential obfuscation)\", \"medium\"),\n    (r\"(?i)codecs\\.(decode|encode)\\s*\\(.*rot\", \"ROT encoding (obfuscation)\", \"high\"),\n    (r\"(?i)compile\\s*\\(.*exec\", \"Dynamic code compilation\", \"high\"),\n]\n\n# Domains commonly trusted in skill contexts\nTRUSTED_DOMAINS = {\n    \"github.com\", \"api.github.com\", \"raw.githubusercontent.com\",\n    \"docs.sentry.io\", \"develop.sentry.dev\", \"sentry.io\",\n    \"pypi.org\", \"npmjs.com\", \"crates.io\",\n    \"docs.python.org\", \"docs.djangoproject.com\",\n    \"developer.mozilla.org\", \"stackoverflow.com\",\n    \"agentskills.io\",\n}\n\n\ndef parse_frontmatter(content: str) -> tuple[dict[str, Any] | None, str]:\n    \"\"\"Parse YAML frontmatter from SKILL.md content.\"\"\"\n    if not content.startswith(\"---\"):\n        return None, content\n\n    parts = content.split(\"---\", 2)\n    if len(parts) < 3:\n        return None, content\n\n    try:\n        fm = yaml.safe_load(parts[1])\n        body = parts[2]\n        return fm if isinstance(fm, dict) else None, body\n    except yaml.YAMLError:\n        return None, content\n\n\ndef check_frontmatter(skill_dir: Path, content: str) -> list[dict[str, Any]]:\n    \"\"\"Validate SKILL.md frontmatter.\"\"\"\n    findings: list[dict[str, Any]] = []\n    fm, _ = parse_frontmatter(content)\n\n    if fm is None:\n        findings.append({\n            \"type\": \"Invalid Frontmatter\",\n            \"severity\": \"high\",\n            \"location\": \"SKILL.md:1\",\n            \"description\": \"Missing or unparseable YAML frontmatter\",\n            \"category\": \"Validation\",\n        })\n        return findings\n\n    # Required fields\n    if \"name\" not in fm:\n        findings.append({\n            \"type\": \"Missing Name\",\n            \"severity\": \"high\",\n            \"location\": \"SKILL.md frontmatter\",\n            \"description\": \"Required 'name' field missing from frontmatter\",\n            \"category\": \"Validation\",\n        })\n\n    if \"description\" not in fm:\n        findings.append({\n            \"type\": \"Missing Description\",\n            \"severity\": \"medium\",\n            \"location\": \"SKILL.md frontmatter\",\n            \"description\": \"Required 'description' field missing from frontmatter\",\n            \"category\": \"Validation\",\n        })\n\n    # Name-directory mismatch\n    if \"name\" in fm and fm[\"name\"] != skill_dir.name:\n        findings.append({\n            \"type\": \"Name Mismatch\",\n            \"severity\": \"medium\",\n            \"location\": \"SKILL.md frontmatter\",\n            \"description\": f\"Frontmatter name '{fm['name']}' does not match directory name '{skill_dir.name}'\",\n            \"category\": \"Validation\",\n        })\n\n    # Unrestricted tools\n    tools = fm.get(\"allowed-tools\", \"\")\n    if isinstance(tools, str) and tools.strip() == \"*\":\n        findings.append({\n            \"type\": \"Unrestricted Tools\",\n            \"severity\": \"critical\",\n            \"location\": \"SKILL.md frontmatter\",\n            \"description\": \"allowed-tools is set to '*' (unrestricted access to all tools)\",\n            \"category\": \"Excessive Permissions\",\n        })\n\n    return findings\n\n\ndef check_prompt_injection(content: str, filepath: str) -> list[dict[str, Any]]:\n    \"\"\"Scan content for prompt injection patterns.\"\"\"\n    findings: list[dict[str, Any]] = []\n    lines = content.split(\"\\n\")\n\n    for line_num, line in enumerate(lines, 1):\n        for pattern, description, severity in PROMPT_INJECTION_PATTERNS:\n            if re.search(pattern, line):\n                findings.append({\n                    \"type\": \"Prompt Injection Pattern\",\n                    \"severity\": severity,\n                    \"location\": f\"{filepath}:{line_num}\",\n                    \"description\": description,\n                    \"evidence\": line.strip()[:200],\n                    \"category\": \"Prompt Injection\",\n                })\n                break  # One finding per line\n\n    return findings\n\n\ndef check_obfuscation(content: str, filepath: str) -> list[dict[str, Any]]:\n    \"\"\"Detect obfuscation techniques.\"\"\"\n    findings: list[dict[str, Any]] = []\n    lines = content.split(\"\\n\")\n\n    # Zero-width characters\n    zwc_pattern = re.compile(r\"[\\u200b\\u200c\\u200d\\u2060\\ufeff]\")\n    for line_num, line in enumerate(lines, 1):\n        if zwc_pattern.search(line):\n            chars = [f\"U+{ord(c):04X}\" for c in zwc_pattern.findall(line)]\n            findings.append({\n                \"type\": \"Zero-Width Characters\",\n                \"severity\": \"high\",\n                \"location\": f\"{filepath}:{line_num}\",\n                \"description\": f\"Zero-width characters detected: {', '.join(chars)}\",\n                \"category\": \"Obfuscation\",\n            })\n\n    # RTL override\n    rtl_pattern = re.compile(r\"[\\u202a-\\u202e\\u2066-\\u2069]\")\n    for line_num, line in enumerate(lines, 1):\n        if rtl_pattern.search(line):\n            findings.append({\n                \"type\": \"RTL Override\",\n                \"severity\": \"high\",\n                \"location\": f\"{filepath}:{line_num}\",\n                \"description\": \"Right-to-left override or embedding character detected\",\n                \"category\": \"Obfuscation\",\n            })\n\n    # Unicode Tag characters (U+E0000 block) — invisible text readable by LLMs\n    tag_pattern = re.compile(r\"[\\U000e0001-\\U000e007f]\")\n    tag_chars = tag_pattern.findall(content)\n    if tag_chars:\n        # Decode the hidden text\n        decoded = \"\".join(\n            chr(ord(c) - 0xE0000) for c in tag_chars if 0xE0020 <= ord(c) <= 0xE007E\n        )\n        findings.append({\n            \"type\": \"Unicode Tag Smuggling\",\n            \"severity\": \"critical\",\n            \"location\": filepath,\n            \"description\": f\"Invisible Unicode Tag characters detected ({len(tag_chars)} chars). \"\n                          f\"Decoded hidden text: {decoded[:200]}\",\n            \"category\": \"Obfuscation\",\n        })\n\n    # Suspicious base64 strings (long base64 that decodes to text with suspicious keywords)\n    b64_pattern = re.compile(r\"[A-Za-z0-9+/]{40,}={0,2}\")\n    for line_num, line in enumerate(lines, 1):\n        for match in b64_pattern.finditer(line):\n            try:\n                decoded = base64.b64decode(match.group()).decode(\"utf-8\", errors=\"ignore\")\n                suspicious_keywords = [\"ignore\", \"system\", \"override\", \"eval\", \"exec\", \"password\", \"secret\"]\n                for kw in suspicious_keywords:\n                    if kw.lower() in decoded.lower():\n                        findings.append({\n                            \"type\": \"Suspicious Base64\",\n                            \"severity\": \"high\",\n                            \"location\": f\"{filepath}:{line_num}\",\n                            \"description\": f\"Base64 string decodes to text containing '{kw}'\",\n                            \"decoded_preview\": decoded[:100],\n                            \"category\": \"Obfuscation\",\n                        })\n                        break\n            except Exception:\n                pass\n\n    # HTML comments with suspicious content\n    comment_pattern = re.compile(r\"<!--(.*?)-->\", re.DOTALL)\n    for match in comment_pattern.finditer(content):\n        comment_text = match.group(1)\n        # Check if the comment contains injection-like patterns\n        for pattern, description, severity in PROMPT_INJECTION_PATTERNS:\n            if re.search(pattern, comment_text):\n                # Find line number\n                line_num = content[:match.start()].count(\"\\n\") + 1\n                findings.append({\n                    \"type\": \"Hidden Injection in Comment\",\n                    \"severity\": \"critical\",\n                    \"location\": f\"{filepath}:{line_num}\",\n                    \"description\": f\"HTML comment contains injection pattern: {description}\",\n                    \"evidence\": comment_text.strip()[:200],\n                    \"category\": \"Prompt Injection\",\n                })\n                break\n\n    return findings\n\n\ndef check_secrets(content: str, filepath: str) -> list[dict[str, Any]]:\n    \"\"\"Detect hardcoded secrets.\"\"\"\n    findings: list[dict[str, Any]] = []\n    lines = content.split(\"\\n\")\n\n    for line_num, line in enumerate(lines, 1):\n        for pattern, description, severity in SECRET_PATTERNS:\n            if re.search(pattern, line):\n                # Mask the actual secret in evidence\n                evidence = line.strip()[:200]\n                findings.append({\n                    \"type\": \"Secret Detected\",\n                    \"severity\": severity,\n                    \"location\": f\"{filepath}:{line_num}\",\n                    \"description\": description,\n                    \"evidence\": evidence,\n                    \"category\": \"Secret Exposure\",\n                })\n                break  # One finding per line\n\n    return findings\n\n\ndef check_scripts(script_path: Path) -> list[dict[str, Any]]:\n    \"\"\"Analyze a script file for dangerous patterns.\"\"\"\n    findings: list[dict[str, Any]] = []\n    try:\n        content = script_path.read_text(encoding=\"utf-8\", errors=\"replace\")\n    except OSError:\n        return findings\n\n    relative = script_path.name\n    lines = content.split(\"\\n\")\n\n    for line_num, line in enumerate(lines, 1):\n        for pattern, description, severity in DANGEROUS_SCRIPT_PATTERNS:\n            if re.search(pattern, line):\n                findings.append({\n                    \"type\": \"Dangerous Code Pattern\",\n                    \"severity\": severity,\n                    \"location\": f\"scripts/{relative}:{line_num}\",\n                    \"description\": description,\n                    \"evidence\": line.strip()[:200],\n                    \"category\": \"Malicious Code\",\n                })\n                break  # One finding per line\n\n    return findings\n\n\ndef extract_urls(content: str, filepath: str) -> list[dict[str, Any]]:\n    \"\"\"Extract and categorize URLs.\"\"\"\n    urls: list[dict[str, Any]] = []\n    url_pattern = re.compile(r\"https?://[^\\s\\)\\]\\>\\\"'`]+\")\n    lines = content.split(\"\\n\")\n\n    for line_num, line in enumerate(lines, 1):\n        for match in url_pattern.finditer(line):\n            url = match.group().rstrip(\".,;:\")\n            try:\n                # Extract domain\n                domain = url.split(\"//\", 1)[1].split(\"/\", 1)[0].split(\":\")[0]\n                # Check if root domain is trusted\n                domain_parts = domain.split(\".\")\n                root_domain = \".\".join(domain_parts[-2:]) if len(domain_parts) >= 2 else domain\n                trusted = root_domain in TRUSTED_DOMAINS or domain in TRUSTED_DOMAINS\n            except (IndexError, ValueError):\n                domain = \"unknown\"\n                trusted = False\n\n            urls.append({\n                \"url\": url,\n                \"domain\": domain,\n                \"trusted\": trusted,\n                \"location\": f\"{filepath}:{line_num}\",\n            })\n\n    return urls\n\n\ndef check_structural_attacks(skill_dir: Path, content: str, frontmatter: dict[str, Any] | None) -> list[dict[str, Any]]:\n    \"\"\"Detect structural attack patterns that go beyond text content.\"\"\"\n    findings: list[dict[str, Any]] = []\n\n    # 1. Symlinks — files that resolve to paths outside the skill directory\n    for path in skill_dir.rglob(\"*\"):\n        if path.is_symlink():\n            target = path.resolve()\n            is_internal = target.is_relative_to(skill_dir.resolve())\n            findings.append({\n                \"type\": \"Symlink Detected\",\n                \"severity\": \"medium\" if is_internal else \"critical\",\n                \"location\": str(path.relative_to(skill_dir)),\n                \"description\": f\"Symlink points to {path.readlink()} (resolves to {str(target)}). \"\n                              \"Symlinks can trick agents into reading sensitive files (e.g., ~/.ssh/id_rsa) \"\n                              \"disguised as example/reference files.\",\n                \"category\": \"Symlink Exfiltration\",\n            })\n\n    # 2. YAML hook exploitation — hooks in frontmatter execute shell commands\n    if frontmatter and \"hooks\" in frontmatter:\n        hooks = frontmatter[\"hooks\"]\n        hook_types = hooks.keys() if isinstance(hooks, dict) else []\n        for hook_type in hook_types:\n            findings.append({\n                \"type\": \"Frontmatter Hooks\",\n                \"severity\": \"critical\",\n                \"location\": \"SKILL.md frontmatter\",\n                \"description\": f\"Skill defines '{hook_type}' hooks. Hooks execute shell commands \"\n                              \"automatically on lifecycle events — the model cannot prevent execution. \"\n                              \"Review all hook commands carefully.\",\n                \"category\": \"Hook Exploitation\",\n            })\n\n    # 3. !`command` pre-prompt injection — runs at template expansion time\n    bang_pattern = re.compile(r\"!\\`[^`]+\\`\")\n    for line_num, line in enumerate(content.split(\"\\n\"), 1):\n        for match in bang_pattern.finditer(line):\n            cmd = match.group()[2:-1]  # Strip !` and `\n            findings.append({\n                \"type\": \"Pre-prompt Command\",\n                \"severity\": \"high\",\n                \"location\": f\"SKILL.md:{line_num}\",\n                \"description\": f\"!`command` syntax executes at skill load time before the model sees \"\n                              f\"the prompt. Command: {cmd}\",\n                \"evidence\": line.strip()[:200],\n                \"category\": \"Pre-prompt Injection\",\n            })\n\n    # 4. Test file auto-discovery — conftest.py, test_*.py, *.test.js/ts\n    test_patterns = {\n        \"conftest.py\": \"pytest auto-imports conftest.py at collection time — code runs before any tests\",\n        \"test_*.py\": \"pytest discovers and runs test_*.py files automatically\",\n        \"*_test.py\": \"pytest discovers and runs *_test.py files automatically\",\n        \"*.test.js\": \"Jest/Vitest may discover .test.js files if dot:true glob is set\",\n        \"*.test.ts\": \"Jest/Vitest may discover .test.ts files if dot:true glob is set\",\n    }\n    for path in skill_dir.rglob(\"*\"):\n        if not path.is_file():\n            continue\n        name = path.name\n        for pattern, desc in test_patterns.items():\n            import fnmatch\n            if fnmatch.fnmatch(name, pattern):\n                findings.append({\n                    \"type\": \"Test File Auto-Discovery\",\n                    \"severity\": \"high\",\n                    \"location\": str(path.relative_to(skill_dir)),\n                    \"description\": f\"{desc}. Bundled test files execute as a side effect of running \"\n                                  \"the test suite — review file contents for hidden payloads.\",\n                    \"category\": \"Test File RCE\",\n                })\n\n    # 5. npm postinstall — bundled package.json with lifecycle scripts\n    for pkg_json in skill_dir.rglob(\"package.json\"):\n        try:\n            pkg = json.loads(pkg_json.read_text(encoding=\"utf-8\", errors=\"replace\"))\n        except (json.JSONDecodeError, OSError, ValueError):\n            continue\n        scripts = pkg.get(\"scripts\") or {}\n        lifecycle_hooks = [\"preinstall\", \"install\", \"postinstall\", \"preuninstall\", \"postuninstall\"]\n        for hook in lifecycle_hooks:\n            if hook in scripts:\n                findings.append({\n                    \"type\": \"npm Lifecycle Hook\",\n                    \"severity\": \"critical\",\n                    \"location\": str(pkg_json.relative_to(skill_dir)),\n                    \"description\": f\"package.json defines '{hook}' script: {scripts[hook]}. \"\n                                  \"npm executes lifecycle hooks automatically on install — \"\n                                  \"this is a common supply chain attack vector.\",\n                    \"category\": \"Supply Chain\",\n                })\n\n    # 6. Image metadata — parse PNG chunks properly to find tEXt/iTXt metadata\n    import struct\n    for img_path in skill_dir.rglob(\"*.png\"):\n        try:\n            data = img_path.read_bytes()\n            # PNG files start with 8-byte signature, then chunks\n            # Each chunk: 4-byte length (big-endian), 4-byte type, data, 4-byte CRC\n            if data[:8] != b\"\\x89PNG\\r\\n\\x1a\\n\":\n                continue\n            offset = 8\n            while offset + 8 <= len(data):\n                chunk_len = struct.unpack(\">I\", data[offset:offset + 4])[0]\n                chunk_type = data[offset + 4:offset + 8]\n                chunk_data = data[offset + 8:offset + 8 + chunk_len]\n\n                keyword = \"\"\n                value = \"\"\n                if chunk_type == b\"tEXt\":\n                    # tEXt: keyword\\0text\n                    parts = chunk_data.split(b\"\\x00\", 1)\n                    if len(parts) > 1:\n                        keyword = parts[0].decode(\"ascii\", errors=\"ignore\")\n                        value = parts[1][:200].decode(\"latin-1\", errors=\"ignore\")\n                elif chunk_type == b\"iTXt\":\n                    # iTXt: keyword\\0comprFlag\\0comprMethod\\0langTag\\0transKeyword\\0text\n                    parts = chunk_data.split(b\"\\x00\", 4)\n                    if len(parts) >= 5:\n                        keyword = parts[0].decode(\"ascii\", errors=\"ignore\")\n                        value = parts[4][:200].decode(\"utf-8\", errors=\"ignore\")\n\n                if keyword and value.strip():\n                            findings.append({\n                                \"type\": \"Image Metadata Text\",\n                                \"severity\": \"high\",\n                                \"location\": str(img_path.relative_to(skill_dir)),\n                                \"description\": f\"PNG contains text metadata ('{keyword}'): {value[:100]}. \"\n                                              \"Hidden instructions in image metadata can be read by \"\n                                              \"multimodal LLMs when they inspect the file.\",\n                                \"category\": \"Image Injection\",\n                            })\n\n                # Advance to next chunk: length + type(4) + data + CRC(4)\n                offset += 4 + 4 + chunk_len + 4\n        except (OSError, struct.error):\n            continue\n\n    return findings\n\n\ndef compute_description_body_overlap(frontmatter: dict[str, Any] | None, body: str) -> float:\n    \"\"\"Compute keyword overlap between description and body as a heuristic.\"\"\"\n    if not frontmatter or \"description\" not in frontmatter or frontmatter[\"description\"] is None:\n        return 0.0\n\n    desc_words = set(re.findall(r\"\\b[a-z]{4,}\\b\", frontmatter[\"description\"].lower()))\n    body_words = set(re.findall(r\"\\b[a-z]{4,}\\b\", body.lower()))\n\n    if not desc_words:\n        return 0.0\n\n    overlap = desc_words & body_words\n    return len(overlap) / len(desc_words)\n\n\ndef scan_skill(skill_dir: Path) -> dict[str, Any]:\n    \"\"\"Run full scan on a skill directory.\"\"\"\n    skill_md = skill_dir / \"SKILL.md\"\n    if not skill_md.exists():\n        return {\"error\": f\"No SKILL.md found in {skill_dir}\"}\n\n    try:\n        content = skill_md.read_text(encoding=\"utf-8\", errors=\"replace\")\n    except OSError as e:\n        return {\"error\": f\"Cannot read SKILL.md: {e}\"}\n\n    frontmatter, body = parse_frontmatter(content)\n\n    all_findings: list[dict[str, Any]] = []\n    all_urls: list[dict[str, Any]] = []\n\n    # 1. Frontmatter validation\n    all_findings.extend(check_frontmatter(skill_dir, content))\n\n    # 2. Prompt injection patterns in SKILL.md\n    all_findings.extend(check_prompt_injection(content, \"SKILL.md\"))\n\n    # 3. Obfuscation detection in SKILL.md\n    all_findings.extend(check_obfuscation(content, \"SKILL.md\"))\n\n    # 4. Secret detection in SKILL.md\n    all_findings.extend(check_secrets(content, \"SKILL.md\"))\n\n    # 5. URL extraction from SKILL.md\n    all_urls.extend(extract_urls(content, \"SKILL.md\"))\n\n    # 6. Scan reference files\n    refs_dir = skill_dir / \"references\"\n    if refs_dir.is_dir():\n        for ref_file in sorted(refs_dir.iterdir()):\n            if ref_file.suffix == \".md\":\n                try:\n                    ref_content = ref_file.read_text(encoding=\"utf-8\", errors=\"replace\")\n                except OSError:\n                    continue\n                rel_path = f\"references/{ref_file.name}\"\n                all_findings.extend(check_prompt_injection(ref_content, rel_path))\n                all_findings.extend(check_obfuscation(ref_content, rel_path))\n                all_findings.extend(check_secrets(ref_content, rel_path))\n                all_urls.extend(extract_urls(ref_content, rel_path))\n\n    # 7. Scan scripts\n    scripts_dir = skill_dir / \"scripts\"\n    script_findings: list[dict[str, Any]] = []\n    if scripts_dir.is_dir():\n        for script_file in sorted(scripts_dir.iterdir()):\n            if script_file.suffix in (\".py\", \".sh\", \".js\", \".ts\"):\n                sf = check_scripts(script_file)\n                script_findings.extend(sf)\n                try:\n                    script_content = script_file.read_text(encoding=\"utf-8\", errors=\"replace\")\n                except OSError:\n                    continue\n                rel_path = f\"scripts/{script_file.name}\"\n                all_findings.extend(check_secrets(script_content, rel_path))\n                all_findings.extend(check_obfuscation(script_content, rel_path))\n                all_urls.extend(extract_urls(script_content, rel_path))\n\n    all_findings.extend(script_findings)\n\n    # 8. Structural attacks (symlinks, hooks, !command, test files, npm, image metadata)\n    all_findings.extend(check_structural_attacks(skill_dir, content, frontmatter))\n\n    # 9. Description-body overlap\n    overlap = compute_description_body_overlap(frontmatter, body)\n\n    # Build structure info\n    structure = {\n        \"has_skill_md\": True,\n        \"has_references\": refs_dir.is_dir() if (refs_dir := skill_dir / \"references\") else False,\n        \"has_scripts\": scripts_dir.is_dir() if (scripts_dir := skill_dir / \"scripts\") else False,\n        \"reference_files\": sorted(f.name for f in (skill_dir / \"references\").iterdir() if f.suffix == \".md\") if (skill_dir / \"references\").is_dir() else [],\n        \"script_files\": sorted(f.name for f in (skill_dir / \"scripts\").iterdir() if f.suffix in (\".py\", \".sh\", \".js\", \".ts\")) if (skill_dir / \"scripts\").is_dir() else [],\n    }\n\n    # Summary counts\n    severity_counts: dict[str, int] = {}\n    for f in all_findings:\n        sev = f.get(\"severity\", \"unknown\")\n        severity_counts[sev] = severity_counts.get(sev, 0) + 1\n\n    untrusted_urls = [u for u in all_urls if not u[\"trusted\"]]\n\n    # Allowed tools analysis\n    tools_info = None\n    if frontmatter and \"allowed-tools\" in frontmatter:\n        tools_str = frontmatter[\"allowed-tools\"]\n        if isinstance(tools_str, str):\n            tools_list = [t.strip() for t in tools_str.replace(\",\", \" \").split() if t.strip()]\n            tools_info = {\n                \"tools\": tools_list,\n                \"has_bash\": \"Bash\" in tools_list,\n                \"has_write\": \"Write\" in tools_list,\n                \"has_edit\": \"Edit\" in tools_list,\n                \"has_webfetch\": \"WebFetch\" in tools_list,\n                \"has_task\": \"Task\" in tools_list,\n                \"unrestricted\": tools_str.strip() == \"*\",\n            }\n\n    return {\n        \"skill_name\": frontmatter.get(\"name\", \"unknown\") if frontmatter else \"unknown\",\n        \"skill_dir\": str(skill_dir),\n        \"structure\": structure,\n        \"frontmatter\": frontmatter,\n        \"tools\": tools_info,\n        \"findings\": all_findings,\n        \"finding_counts\": severity_counts,\n        \"total_findings\": len(all_findings),\n        \"urls\": {\n            \"total\": len(all_urls),\n            \"untrusted\": untrusted_urls,\n            \"trusted_count\": len(all_urls) - len(untrusted_urls),\n        },\n        \"description_body_overlap\": round(overlap, 2),\n    }\n\n\ndef main():\n    if len(sys.argv) < 2:\n        print(\"Usage: scan_skill.py <skill-directory>\", file=sys.stderr)\n        sys.exit(1)\n\n    skill_dir = Path(sys.argv[1]).resolve()\n    if not skill_dir.is_dir():\n        print(json.dumps({\"error\": f\"Not a directory: {skill_dir}\"}))\n        sys.exit(1)\n\n    result = scan_skill(skill_dir)\n    print(json.dumps(result, indent=2))\n\n\nif __name__ == \"__main__\":\n    main()\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749045444
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01C7TvYd7vhvKZCseaM34KsM",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "#!/usr/bin/env bash\nset -euo pipefail\n\nif ! command -v npx >/dev/null 2>&1; then\n  echo \"Error: npx is required but not found on PATH.\" >&2\n  exit 1\nfi\n\nhas_session_flag=\"false\"\nfor arg in \"$@\"; do\n  case \"$arg\" in\n    --session|--session=*)\n      has_session_flag=\"true\"\n      break\n      ;;\n  esac\ndone\n\ncmd=(npx --yes --package @playwright/cli playwright-cli)\nif [[ \"${has_session_flag}\" != \"true\" && -n \"${PLAYWRIGHT_CLI_SESSION:-}\" ]]; then\n  cmd+=(--session \"${PLAYWRIGHT_CLI_SESSION}\")\nfi\ncmd+=(\"$@\")\n\nexec \"${cmd[@]}\"\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749045446
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01MrryZvw7PeTAZSuPxB7JKe",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "node_modules/\ndist/\n.venv/\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749045446
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "toolCall",
+            "id": "toolu_01BGU5ftMBTaEiRqewyWK7G9",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/pnpm-lock.yaml",
+              "limit": 20
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01Qwt6QwpYjmSVYWDEeQ9PCj",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/posthog-skill"
+            }
+          }
+        ],
+        "api": "anthropic-messages",
+        "provider": "anthropic",
+        "model": "claude-sonnet-4-6",
+        "usage": {
+          "input": 1,
+          "output": 138,
+          "cacheRead": 26359,
+          "cacheWrite": 14141,
+          "totalTokens": 40639,
+          "cost": {
+            "input": 0.000003,
+            "output": 0.0020700000000000002,
+            "cacheRead": 0.0079077,
+            "cacheWrite": 0.05302875,
+            "total": 0.06300945
+          }
+        },
+        "stopReason": "toolUse",
+        "timestamp": 1774749045447,
+        "responseId": "msg_01E243eDar2fya9YAiK9F9fP"
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01BGU5ftMBTaEiRqewyWK7G9",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "lockfileVersion: '9.0'\n\nsettings:\n  autoInstallPeers: true\n  excludeLinksFromLockfile: false\n\nimporters:\n\n  .:\n    dependencies:\n      exa-js:\n        specifier: ^2.10.0\n        version: 2.10.0\n    devDependencies:\n      '@types/node':\n        specifier: ^25.5.0\n        version: 25.5.0\n      tsx:\n        specifier: ^4.21.0\n        version: 4.21.0\n\n[417 more lines in file. Use offset=21 to continue.]"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749049367
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01Qwt6QwpYjmSVYWDEeQ9PCj",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "Path not found: /Users/josorio/Code/pi-skills/skills/posthog-skill"
+          }
+        ],
+        "details": {},
+        "isError": true,
+        "timestamp": 1774749049367
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "text",
+            "text": "The `posthog-skill` is referenced in the agent's registered skill list but doesn't exist in this repository — it must be registered from elsewhere. Now I have everything needed for a complete inventory.\n\n---\n\n## Domain: Full Project Structure — `/Users/josorio/Code/pi-skills`\n\n---\n\n### Top-Level Files\n\n| File | Description |\n|------|-------------|\n| `package.json` | Root manifest — single package, no workspaces |\n| `pnpm-lock.yaml` | Lockfile (pnpm v9) |\n| `tsconfig.json` | TypeScript config — no emit, ES2022, bundler resolution |\n| `.gitignore` | Ignores `node_modules/`, `dist/`, `.venv/` |\n| `README.md` | Project readme |\n| `LICENSE` | License file |\n| `THIRD-PARTY-NOTICES.md` | Third-party attribution |\n\n---\n\n### `package.json` (root — the only one)\n\n```json\n{\n  \"name\": \"pi-skills\",\n  \"version\": \"1.0.0\",\n  \"type\": \"module\",\n  \"private\": \"true\",\n  \"packageManager\": \"pnpm@10.30.1\",\n  \"pi\": { \"skills\": [\"./skills\"] },\n  \"dependencies\": {\n    \"exa-js\": \"^2.10.0\"\n  },\n  \"devDependencies\": {\n    \"@types/node\": \"^25.5.0\",\n    \"tsx\": \"^4.21.0\",\n    \"typescript\": \"^6.0.2\"\n  },\n  \"scripts\": {}\n}\n```\n- No build scripts defined. `tsx` is used at runtime (shebang `#!/usr/bin/env tsx` in scripts).\n- No workspaces — this is a flat single-package repo.\n- `pi.skills: [\"./skills\"]` — pi agent discovers all skills under `skills/`.\n\n---\n\n### `tsconfig.json` (root — the only one)\n\n```json\n{\n  \"compilerOptions\": {\n    \"target\": \"ES2022\",\n    \"module\": \"ES2022\",\n    \"moduleResolution\": \"bundler\",\n    \"esModuleInterop\": true,\n    \"strict\": true,\n    \"noEmit\": true,\n    \"skipLibCheck\": true\n  },\n  \"include\": [\"skills/**/*.ts\"]\n}\n```\n- `noEmit: true` — TypeScript is type-checking only; `tsx` handles execution directly.\n- Covers all `.ts` files under `skills/` recursively.\n- No composite projects, no project references, no path aliases.\n\n---\n\n### Directory Tree\n\n```\npi-skills/\n├── .flow/\n│   ├── features/\n│   │   └── turbo-evaluation/\n│   │       ├── checkpoints/        (empty)\n│   │       └── state.md\n│   └── sessions/\n│       └── s-20260329-015009-6cca/\n│           ├── dispatches/\n│           ├── findings/\n│           └── session.md\n├── node_modules/                   (gitignored)\n├── skills/\n│   ├── agents-md/\n│   │   ├── LICENSE\n│   │   └── SKILL.md\n│   ├── docker-model-runner/\n│   │   ├── references/\n│   │   │   └── docker-model-guide.md\n│   │   └── SKILL.md\n│   ├── exa-search/                 ← only skill with TypeScript\n│   │   ├── references/\n│   │   │   └── api-reference.md\n│   │   ├── scripts/\n│   │   │   ├── lib/\n│   │   │   │   └── common.ts       (shared utilities)\n│   │   │   ├── answer.ts\n│   │   │   ├── contents.ts\n│   │   │   ├── find-similar.ts\n│   │   │   ├── research.ts\n│   │   │   └── search.ts\n│   │   └── SKILL.md\n│   ├── frontend-design/\n│   │   ├── LICENSE.txt\n│   │   └── SKILL.md\n│   ├── gh/\n│   │   ├── references/\n│   │   │   └── commands.md\n│   │   └── SKILL.md\n│   ├── glab/\n│   │   ├── references/\n│   │   │   └── commands.md\n│   │   └── SKILL.md\n│   ├── interface-design/\n│   │   ├── LICENSE\n│   │   ├── references/\n│   │   │   ├── critique.md\n│   │   │   ├── example.md\n│   │   │   ├── principles.md\n│   │   │   └── validation.md\n│   │   └── SKILL.md\n│   ├── pdf/\n│   │   ├── agents/                 (empty)\n│   │   ├── assets/\n│   │   │   └── pdf.png\n│   │   ├── LICENSE.txt\n│   │   └── SKILL.md\n│   ├── playwright/\n│   │   ├── agents/                 (empty)\n│   │   ├── assets/\n│   │   │   ├── playwright-small.svg\n│   │   │   └── playwright.png\n│   │   ├── references/\n│   │   │   ├── cli.md\n│   │   │   └── workflows.md\n│   │   ├── scripts/\n│   │   │   └── playwright_cli.sh   (bash wrapper for npx playwright-cli)\n│   │   ├── LICENSE.txt\n│   │   ├── NOTICE.txt\n│   │   └── SKILL.md\n│   ├── render-deploy/\n│   │   ├── agents/                 (empty)\n│   │   ├── assets/\n│   │   │   ├── docker.yaml\n│   │   │   ├── go-api.yaml\n│   │   │   ├── nextjs-postgres.yaml\n│   │   │   ├── node-express.yaml\n│   │   │   ├── python-django.yaml\n│   │   │   ├── render-small.svg\n│   │   │   ├── render.png\n│   │   │   └── static-site.yaml\n│   │   ├── references/             (10 .md files — deployment docs)\n│   │   ├── LICENSE.txt\n│   │   └── SKILL.md\n│   ├── skill-scanner/\n│   │   ├── references/\n│   │   │   ├── dangerous-code-patterns.md\n│   │   │   ├── permission-analysis.md\n│   │   │   └── prompt-injection-patterns.md\n│   │   ├── scripts/\n│   │   │   └── scan_skill.py       (Python static security analyzer)\n│   │   ├── LICENSE\n│   │   └── SKILL.md\n│   └── skill-writer/\n│       ├── references/\n│       │   ├── examples/\n│       │   │   ├── documentation-skill.md\n│       │   │   ├── security-review-skill.md\n│       │   │   └── workflow-process-skill.md\n│       │   └── (11 other .md reference files)\n│       ├── scripts/\n│       │   └── quick_validate.py   (Python skill validator)\n│       ├── EVAL.md\n│       ├── LICENSE\n│       ├── SKILL.md\n│       └── SOURCES.md\n├── .gitignore\n├── LICENSE\n├── README.md\n├── THIRD-PARTY-NOTICES.md\n├── package.json\n├── pnpm-lock.yaml\n└── tsconfig.json\n```\n\n---\n\n### TypeScript Module Inventory (`exa-search/scripts/`)\n\n**6 TypeScript files total.** All use `#!/usr/bin/env tsx` — executed directly, no compilation step.\n\n| File | Purpose | Imports from `lib/common.ts` |\n|------|---------|------------------------------|\n| `lib/common.ts` | Shared utilities: `createClient`, `requireArg`, `parseArgs`, `executeAndPrint`, `showHelp`, `requireApiKey`, `handleError`, `filterOptions`, `buildContentsOptions` | — (the library itself; imports `node:fs` and `exa-js`) |\n| `answer.ts` | AI-powered answers with citations; supports streaming | `parseArgs`, `requireApiKey`, `handleError`, `filterOptions`, `createClient` |\n| `search.ts` | Semantic search (with or without contents) | `parseArgs`, `requireApiKey`, `filterOptions`, `buildContentsOptions`, `createClient`, `executeAndPrint` |\n| `contents.ts` | Retrieve page contents by URL(s) | `showHelp`, `requireApiKey`, `filterOptions`, `createClient`, `executeAndPrint` |\n| `find-similar.ts` | Find pages similar to a given URL | `parseArgs`, `requireApiKey`, `filterOptions`, `buildContentsOptions`, `createClient`, `executeAndPrint` |\n| `research.ts` | Deep research tasks (create/get/poll/list/run) | `showHelp`, `requireApiKey`, `handleError`, `requireArg`, `createClient` |\n\n**Import pattern:** All scripts import from `\"./lib/common.js\"` (`.js` extension for ES module compatibility at runtime). All use `import.meta.url` for help-text extraction.\n\n**Dependency chain (2 levels deep):**\n- `scripts/*.ts` → `lib/common.ts` → `exa-js` (^2.10.0, external) + `node:fs` (built-in)\n- `scripts/*.ts` → `exa-js` directly (via `createClient()` return value)\n\n---\n\n### Non-TypeScript Scripts\n\n| File | Language | Purpose |\n|------|----------|---------|\n| `playwright/scripts/playwright_cli.sh` | Bash | Wraps `npx @playwright/cli playwright-cli`; injects `--session` from `$PLAYWRIGHT_CLI_SESSION` env var if flag not already set |\n| `skill-writer/scripts/quick_validate.py` | Python (uv script, requires `pyyaml`) | Validates skill directory structure, YAML frontmatter, naming conventions, integration depth gates; outputs JSON; exits 0/1 |\n| `skill-scanner/scripts/scan_skill.py` | Python (uv script, requires `pyyaml`) | Static security scanner: prompt injection, obfuscation, secrets, dangerous code, symlinks, hooks, image metadata, npm lifecycle hooks; outputs JSON |\n\n---\n\n### Workspace Configuration\n\n- **No workspaces.** This is a flat single-package pnpm project.\n- No `pnpm-workspace.yaml` exists.\n- No Turborepo / monorepo tooling.\n- `pi.skills: [\"./skills\"]` in `package.json` is the pi agent skill registry — it points to the entire `skills/` directory, and pi discovers each subdirectory that contains a `SKILL.md`.\n\n---\n\n### Key Observations\n\n- **Single `package.json` and single `tsconfig.json`** — no nested packages, no build artifacts.\n- **Only `exa-search` has TypeScript source code.** All other skills are pure Markdown + optional Python/Bash scripts + reference docs.\n- **No `scripts` field in `package.json`** — no `build`, `test`, `lint`, or `typecheck` commands defined at the repo level.\n- **`tsx` + `noEmit`** — the TypeScript is never compiled to disk; `tsx` interprets `.ts` files directly at runtime.\n- **`posthog-skill`** appears in the agent's registered skills (AGENTS.md) but its directory does not exist in this repo — it must live elsewhere on disk.\n- **`.flow/`** is a pi agent flow-session directory containing feature tracking state and a current active session (`s-20260329-015009-6cca`)."
+          }
+        ],
+        "api": "anthropic-messages",
+        "provider": "anthropic",
+        "model": "claude-sonnet-4-6",
+        "usage": {
+          "input": 1,
+          "output": 3006,
+          "cacheRead": 26359,
+          "cacheWrite": 14512,
+          "totalTokens": 43878,
+          "cost": {
+            "input": 0.000003,
+            "output": 0.04509,
+            "cacheRead": 0.0079077,
+            "cacheWrite": 0.05442,
+            "total": 0.10742070000000001
+          }
+        },
+        "stopReason": "stop",
+        "timestamp": 1774749049368,
+        "responseId": "msg_01JDq2p3GoGrZmLu6HPBTMrD"
+      }
+    ],
+    "stderr": "",
+    "usage": {
+      "input": 12,
+      "output": 6327,
+      "cacheRead": 170793,
+      "cacheWrite": 58937,
+      "cost": 0.36719265,
+      "contextTokens": 43878,
+      "turns": 10
+    },
+    "model": "claude-sonnet-4-6",
+    "stopReason": "stop"
+  },
+  {
+    "agent": "scout",
+    "agentSource": "builtin",
+    "task": "In /Users/josorio/Code/pi-skills, analyze all TypeScript/JavaScript source code: 1) Find all .ts, .tsx, .js files and group them by directory 2) Trace import/dependency relationships between directories — which folders import from which other folders? 3) Identify shared code vs independent modules 4) Look for any build outputs (dist/, build/, .js compiled from .ts) 5) Check if there are any test files and test configuration 6) Output: a dependency graph of the TS modules and assessment of how independent or coupled they are.",
+    "exitCode": 0,
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "text": "In /Users/josorio/Code/pi-skills, analyze all TypeScript/JavaScript source code: 1) Find all .ts, .tsx, .js files and group them by directory 2) Trace import/dependency relationships between directories — which folders import from which other folders? 3) Identify shared code vs independent modules 4) Look for any build outputs (dist/, build/, .js compiled from .ts) 5) Check if there are any test files and test configuration 6) Output: a dependency graph of the TS modules and assessment of how independent or coupled they are."
+          }
+        ],
+        "timestamp": 1774749009593
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "Let me start by exploring the repository structure.",
+            "thinkingSignature": "EvABClsIDBgCKkDg0iCaOXs0WsXopn7EMX/XAF/Vh1vkK2iZhi2YH3G+a6Zn5rGTbkcRG3/EnIL5vqgLIoTOqKQTiZUd2C4FrZLrMhFjbGF1ZGUtc29ubmV0LTQtNjgAEgx5dDb05lgDoop/W8oaDK4pPjMayWwqk+UaNiIwPoB3sloEXim6El/pL1g9CWwIR2ocJ9I/XkBDoY/e4A4wl4AhOlygOrJb12Q6kmX2KkNsmSKzo4Ggt7J+qmxHTJkUwm8HU6+XweSnIoL1qsGJP47TaoQfzDLjhtcYNJVr//H4Ownt9UBa67JpkL/0jkg0Xqz2GAE="
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01Ka8m9hW7cufcK2ffwAPgiq",
+            "name": "ls",
+            "arguments": {}
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_011cNok3FNEjkQNLL8QHN3Lz",
+            "name": "find",
+            "arguments": {
+              "pattern": "**/*.{ts,tsx,js,mjs}",
+              "path": "/Users/josorio/Code/pi-skills"
+            }
+          }
+        ],
+        "api": "anthropic-messages",
+        "provider": "anthropic",
+        "model": "claude-sonnet-4-6",
+        "usage": {
+          "input": 3,
+          "output": 129,
+          "cacheRead": 0,
+          "cacheWrite": 15282,
+          "totalTokens": 15414,
+          "cost": {
+            "input": 0.000009,
+            "output": 0.001935,
+            "cacheRead": 0,
+            "cacheWrite": 0.057307500000000004,
+            "total": 0.059251500000000006
+          }
+        },
+        "stopReason": "toolUse",
+        "timestamp": 1774749009605,
+        "responseId": "msg_01BC79L1XgXd9dx79Zd4cQ7y"
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01Ka8m9hW7cufcK2ffwAPgiq",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": ".flow/\n.git/\n.gitignore\nLICENSE\nnode_modules/\npackage.json\npnpm-lock.yaml\nREADME.md\nskills/\nTHIRD-PARTY-NOTICES.md\ntsconfig.json"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749012818
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_011cNok3FNEjkQNLL8QHN3Lz",
+        "toolName": "find",
+        "content": [
+          {
+            "type": "text",
+            "text": "skills/exa-search/scripts/answer.ts\nskills/exa-search/scripts/contents.ts\nskills/exa-search/scripts/find-similar.ts\nskills/exa-search/scripts/lib/common.ts\nskills/exa-search/scripts/research.ts\nskills/exa-search/scripts/search.ts"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749012818
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "toolCall",
+            "id": "toolu_0115pa3bwii6s7TKXkZWDNS4",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_013AhbEB3jCatSwDGXNN4jui",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/package.json"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_019bAgs5V8s3dZNvjKWcpzU5",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/tsconfig.json"
+            }
+          }
+        ],
+        "api": "anthropic-messages",
+        "provider": "anthropic",
+        "model": "claude-sonnet-4-6",
+        "usage": {
+          "input": 1,
+          "output": 160,
+          "cacheRead": 15282,
+          "cacheWrite": 324,
+          "totalTokens": 15767,
+          "cost": {
+            "input": 0.000003,
+            "output": 0.0024000000000000002,
+            "cacheRead": 0.0045845999999999994,
+            "cacheWrite": 0.001215,
+            "total": 0.0082026
+          }
+        },
+        "stopReason": "toolUse",
+        "timestamp": 1774749012818,
+        "responseId": "msg_01Epf97FE8ZpRdRcRBf38F4N"
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_0115pa3bwii6s7TKXkZWDNS4",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "agents-md/\ndocker-model-runner/\nexa-search/\nfrontend-design/\ngh/\nglab/\ninterface-design/\npdf/\nplaywright/\nrender-deploy/\nskill-scanner/\nskill-writer/"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749015954
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_013AhbEB3jCatSwDGXNN4jui",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"name\": \"pi-skills\",\n  \"version\": \"1.0.0\",\n  \"description\": \"Personal pi skills collection\",\n  \"scripts\": {},\n  \"keywords\": [\n    \"pi-package\"\n  ],\n  \"author\": \"\",\n  \"license\": \"ISC\",\n  \"packageManager\": \"pnpm@10.30.1\",\n  \"private\": \"true\",\n  \"pi\": {\n    \"skills\": [\n      \"./skills\"\n    ]\n  },\n  \"type\": \"module\",\n  \"dependencies\": {\n    \"exa-js\": \"^2.10.0\"\n  },\n  \"devDependencies\": {\n    \"@types/node\": \"^25.5.0\",\n    \"tsx\": \"^4.21.0\",\n    \"typescript\": \"^6.0.2\"\n  }\n}\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749015960
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_019bAgs5V8s3dZNvjKWcpzU5",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"compilerOptions\": {\n    \"target\": \"ES2022\",\n    \"module\": \"ES2022\",\n    \"moduleResolution\": \"bundler\",\n    \"esModuleInterop\": true,\n    \"strict\": true,\n    \"noEmit\": true,\n    \"skipLibCheck\": true\n  },\n  \"include\": [\"skills/**/*.ts\"]\n}\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749015960
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "toolCall",
+            "id": "toolu_014Dgrdv9DF2EUUg2HpMYf4K",
+            "name": "ls",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/exa-search"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01DGB2QJVCpBZTRoJiZQhGcb",
+            "name": "find",
+            "arguments": {
+              "pattern": "**/dist",
+              "path": "/Users/josorio/Code/pi-skills"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01GpaWD8TQNusZPqq4c3wP1a",
+            "name": "find",
+            "arguments": {
+              "pattern": "**/*.test.{ts,js}",
+              "path": "/Users/josorio/Code/pi-skills"
+            }
+          }
+        ],
+        "api": "anthropic-messages",
+        "provider": "anthropic",
+        "model": "claude-sonnet-4-6",
+        "usage": {
+          "input": 1,
+          "output": 199,
+          "cacheRead": 15282,
+          "cacheWrite": 919,
+          "totalTokens": 16401,
+          "cost": {
+            "input": 0.000003,
+            "output": 0.0029850000000000002,
+            "cacheRead": 0.0045845999999999994,
+            "cacheWrite": 0.00344625,
+            "total": 0.01101885
+          }
+        },
+        "stopReason": "toolUse",
+        "timestamp": 1774749015960,
+        "responseId": "msg_01RXBprwHmPXNdu51G15dhP3"
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_014Dgrdv9DF2EUUg2HpMYf4K",
+        "toolName": "ls",
+        "content": [
+          {
+            "type": "text",
+            "text": "references/\nscripts/\nSKILL.md"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749019017
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01DGB2QJVCpBZTRoJiZQhGcb",
+        "toolName": "find",
+        "content": [
+          {
+            "type": "text",
+            "text": "No files found matching pattern"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749019018
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01GpaWD8TQNusZPqq4c3wP1a",
+        "toolName": "find",
+        "content": [
+          {
+            "type": "text",
+            "text": "No files found matching pattern"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749019018
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "toolCall",
+            "id": "toolu_01ArXBGkGVPhYMNm5iXHNnv9",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/exa-search/scripts/lib/common.ts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01FcKbRiJfHd3pLfNLz3fxDi",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/exa-search/scripts/answer.ts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01SHMuj1cATjvJy2VU8FdQdp",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/exa-search/scripts/search.ts"
+            }
+          }
+        ],
+        "api": "anthropic-messages",
+        "provider": "anthropic",
+        "model": "claude-sonnet-4-6",
+        "usage": {
+          "input": 1,
+          "output": 190,
+          "cacheRead": 16201,
+          "cacheWrite": 301,
+          "totalTokens": 16693,
+          "cost": {
+            "input": 0.000003,
+            "output": 0.00285,
+            "cacheRead": 0.0048603,
+            "cacheWrite": 0.00112875,
+            "total": 0.008842049999999999
+          }
+        },
+        "stopReason": "toolUse",
+        "timestamp": 1774749019018,
+        "responseId": "msg_01DQuszHoctm5Aoj9t8GsWYq"
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01ArXBGkGVPhYMNm5iXHNnv9",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "import { readFileSync } from \"node:fs\";\nimport { Exa } from \"exa-js\";\n\n/** Create an Exa client instance. Requires EXA_API_KEY env var. */\nexport function createClient(): Exa {\n  return new Exa();\n}\n\n/** Require a CLI argument, exit with error if missing. */\nexport function requireArg(value: string | undefined, name: string): string {\n  if (!value) {\n    console.error(`Error: ${name} is required`);\n    process.exit(1);\n  }\n  return value;\n}\n\n/** Execute an async API call, print JSON result, exit on error. */\nexport async function executeAndPrint<T>(apiCall: () => Promise<T>): Promise<void> {\n  try {\n    const result = await apiCall();\n    console.log(JSON.stringify(result, null, 2));\n  } catch (err) {\n    handleError(err);\n  }\n}\n\n/**\n * Show help text extracted from the JSDoc comment at the top of a script file.\n * Reads lines starting with \" * \" until \" * /\" is found.\n */\nexport function showHelp(scriptUrl: string): void {\n  const lines: string[] = [];\n  const src = readFileSync(new URL(scriptUrl), \"utf8\");\n  for (const line of src.split(\"\\n\")) {\n    if (line.startsWith(\" * \") || line.startsWith(\" */\")) {\n      if (line.startsWith(\" */\")) break;\n      lines.push(line.slice(3));\n    }\n  }\n  console.log(lines.join(\"\\n\"));\n  process.exit(0);\n}\n\n/**\n * Ensure EXA_API_KEY is set. Exits with an error message if not.\n */\nexport function requireApiKey(): void {\n  if (!process.env.EXA_API_KEY) {\n    console.error(\"Error: EXA_API_KEY environment variable is required.\");\n    console.error(\"Get one at: https://dashboard.exa.ai/api-keys\");\n    process.exit(1);\n  }\n}\n\n/**\n * Parse CLI args: show help if --help or no args, return query and options.\n */\nexport function parseArgs(scriptUrl: string): { query: string; opts: Record<string, unknown> } {\n  const args = process.argv.slice(2);\n\n  if (args.includes(\"--help\") || args.length === 0) {\n    showHelp(scriptUrl);\n  }\n\n  const query = args[0];\n  const opts: Record<string, unknown> = args[1]\n    ? (JSON.parse(args[1]) as Record<string, unknown>)\n    : {};\n\n  return { query, opts };\n}\n\n/**\n * Standardized error handler for all exa scripts.\n */\nexport function handleError(err: unknown): never {\n  console.error(`Error: ${(err as Error).message}`);\n  process.exit(1);\n}\n\n/**\n * Pick allowed keys from an options object, skipping undefined values.\n */\nexport function filterOptions(\n  opts: Record<string, unknown>,\n  keys: readonly string[],\n): Record<string, unknown> {\n  const filtered: Record<string, unknown> = {};\n  for (const key of keys) {\n    if (opts[key] !== undefined) filtered[key] = opts[key];\n  }\n  return filtered;\n}\n\n/**\n * Build contents options from text/highlights/summary fields.\n */\nexport function buildContentsOptions(opts: Record<string, unknown>): Record<string, unknown> {\n  let contentsOpts: Record<string, unknown> = {};\n  if (opts.text === true) contentsOpts.text = true;\n  else if (typeof opts.text === \"object\") contentsOpts.text = opts.text;\n  if (opts.highlights === true) contentsOpts.highlights = true;\n  else if (typeof opts.highlights === \"object\") contentsOpts.highlights = opts.highlights;\n  if (opts.summary === true) contentsOpts.summary = true;\n  else if (typeof opts.summary === \"object\") contentsOpts.summary = opts.summary;\n  if (typeof opts.contents === \"object\")\n    contentsOpts = { ...contentsOpts, ...(opts.contents as Record<string, unknown>) };\n  return contentsOpts;\n}\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749022196
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01FcKbRiJfHd3pLfNLz3fxDi",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "#!/usr/bin/env tsx\n/**\n * Exa answer — get AI-generated answers with citations.\n *\n * Usage:\n *   tsx scripts/answer.ts <query> [options-json]\n *   tsx scripts/answer.ts --help\n *\n * Options JSON (all optional):\n *   {\n *     \"text\": true,              // include full text in citation results\n *     \"model\": \"exa\",            // \"exa\" (default)\n *     \"systemPrompt\": \"...\",     // guide the LLM behavior\n *     \"outputSchema\": {},        // JSON Schema for structured output\n *     \"stream\": false,           // stream chunks to stdout\n *     \"userLocation\": \"US\"\n *   }\n *\n * Environment:\n *   EXA_API_KEY — required\n *\n * Examples:\n *   tsx scripts/answer.ts \"What is the latest Next.js version?\"\n *   tsx scripts/answer.ts \"Compare React and Vue\" '{\"text\":true}'\n *   tsx scripts/answer.ts \"SpaceX valuation\" '{\"model\":\"exa\",\"stream\":true}'\n *   tsx scripts/answer.ts \"List top 3 ORMs\" '{\"outputSchema\":{\"type\":\"object\",\"properties\":{\"items\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}}}}}'\n */\n\nimport {\n  parseArgs,\n  requireApiKey,\n  handleError,\n  filterOptions,\n  createClient,\n} from \"./lib/common.js\";\n\nconst { query, opts } = parseArgs(import.meta.url);\nrequireApiKey();\n\nconst exa = createClient();\n\nconst answerOpts = filterOptions(opts, [\n  \"text\",\n  \"model\",\n  \"systemPrompt\",\n  \"outputSchema\",\n  \"userLocation\",\n]);\n\ntry {\n  if (opts.stream) {\n    // Streaming mode — write chunks as they arrive\n    for await (const chunk of exa.streamAnswer(query, answerOpts)) {\n      const typedChunk = chunk as { content?: string; citations?: unknown };\n      if (typedChunk.content) process.stdout.write(typedChunk.content);\n      if (typedChunk.citations) {\n        process.stdout.write(\"\\n\");\n        console.log(JSON.stringify({ citations: typedChunk.citations }, null, 2));\n      }\n    }\n    process.stdout.write(\"\\n\");\n  } else {\n    const result = await exa.answer(query, answerOpts);\n    console.log(JSON.stringify(result, null, 2));\n  }\n} catch (err) {\n  handleError(err);\n}\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749022196
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01SHMuj1cATjvJy2VU8FdQdp",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "#!/usr/bin/env tsx\n/**\n * Exa search — semantic search and search with contents.\n *\n * Usage:\n *   tsx scripts/search.ts <query> [options-json]\n *   tsx scripts/search.ts --help\n *\n * Options JSON (all optional):\n *   {\n *     \"numResults\": 10,\n *     \"type\": \"auto\",                  // \"auto\"|\"fast\"|\"deep\"|\"deep-reasoning\"|\"deep-max\"|\"instant\"\n *     \"contents\": true,                // true = text+highlights, or object for fine control\n *     \"text\": true,                    // shorthand: include text in results\n *     \"highlights\": true,              // shorthand: include highlights\n *     \"summary\": true,                 // shorthand: include summary\n *     \"includeDomains\": [\"example.com\"],\n *     \"excludeDomains\": [\"spam.com\"],\n *     \"startPublishedDate\": \"2024-01-01T00:00:00.000Z\",\n *     \"endPublishedDate\": \"2025-01-01T00:00:00.000Z\",\n *     \"startCrawlDate\": \"2024-01-01T00:00:00.000Z\",\n *     \"endCrawlDate\": \"2025-01-01T00:00:00.000Z\",\n *     \"category\": \"news\",             // \"company\"|\"research paper\"|\"news\"|\"pdf\"|\"tweet\"|\"personal site\"|\"financial report\"|\"people\"\n *     \"includeText\": [\"must contain\"],\n *     \"excludeText\": [\"must not contain\"],\n *     \"useAutoprompt\": true,\n *     \"moderation\": false,\n *     \"userLocation\": \"US\",\n *     \"additionalQueries\": [\"alt query 1\"],  // deep search only, max 5\n *     \"outputSchema\": {},              // deep search structured output\n *     \"subpages\": 0,\n *     \"subpageTarget\": \"pricing\",\n *     \"livecrawl\": \"auto\",              // \"never\"|\"fallback\"|\"always\"|\"auto\"|\"preferred\" - live-crawl pages for fresh data\n *     \"livecrawlTimeout\": 10000,         // timeout in ms for live crawl\n *     \"maxAgeHours\": 168\n *   }\n *\n * Environment:\n *   EXA_API_KEY — required\n *\n * Examples:\n *   tsx scripts/search.ts \"latest AI research\"\n *   tsx scripts/search.ts \"AI startups\" '{\"numResults\":5,\"type\":\"deep\",\"contents\":true}'\n *   tsx scripts/search.ts \"React best practices\" '{\"text\":true,\"highlights\":true,\"includeDomains\":[\"react.dev\"]}'\n */\n\nimport {\n  parseArgs,\n  requireApiKey,\n  filterOptions,\n  buildContentsOptions,\n  createClient,\n  executeAndPrint,\n} from \"./lib/common.js\";\n\nconst { query, opts } = parseArgs(import.meta.url);\nrequireApiKey();\n\nconst exa = createClient();\n\n// Determine if we need contents\nconst wantContents = opts.contents || opts.text || opts.highlights || opts.summary;\n\n// Build contents options\nconst contentsOpts = buildContentsOptions(opts);\n\n// Build search options\nconst searchKeys = [\n  \"numResults\",\n  \"type\",\n  \"includeDomains\",\n  \"excludeDomains\",\n  \"startCrawlDate\",\n  \"endCrawlDate\",\n  \"startPublishedDate\",\n  \"endPublishedDate\",\n  \"category\",\n  \"includeText\",\n  \"excludeText\",\n  \"useAutoprompt\",\n  \"moderation\",\n  \"userLocation\",\n  \"additionalQueries\",\n  \"outputSchema\",\n  \"subpages\",\n  \"subpageTarget\",\n  \"livecrawl\",\n  \"livecrawlTimeout\",\n  \"maxAgeHours\",\n  \"filterEmptyResults\",\n] as const;\n\nconst searchOpts = filterOptions(opts, searchKeys);\n\nawait executeAndPrint(async () => {\n  if (wantContents) {\n    return await exa.searchAndContents(query, { ...searchOpts, ...contentsOpts });\n  } else {\n    return await exa.search(query, searchOpts);\n  }\n});\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749022196
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "toolCall",
+            "id": "toolu_01Lhqy2WkPUXPA8KTuM7wDS5",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/exa-search/scripts/contents.ts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_012p1xZQTPeoHmgsgqTv4NQq",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/exa-search/scripts/find-similar.ts"
+            }
+          },
+          {
+            "type": "toolCall",
+            "id": "toolu_01W8j8hrxDRV3hwTMKb42u2Z",
+            "name": "read",
+            "arguments": {
+              "path": "/Users/josorio/Code/pi-skills/skills/exa-search/scripts/research.ts"
+            }
+          }
+        ],
+        "api": "anthropic-messages",
+        "provider": "anthropic",
+        "model": "claude-sonnet-4-6",
+        "usage": {
+          "input": 1,
+          "output": 190,
+          "cacheRead": 16502,
+          "cacheWrite": 3110,
+          "totalTokens": 19803,
+          "cost": {
+            "input": 0.000003,
+            "output": 0.00285,
+            "cacheRead": 0.0049505999999999994,
+            "cacheWrite": 0.011662500000000001,
+            "total": 0.0194661
+          }
+        },
+        "stopReason": "toolUse",
+        "timestamp": 1774749022197,
+        "responseId": "msg_01LL4QsoYJjUxJz9gnjYDrYJ"
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01Lhqy2WkPUXPA8KTuM7wDS5",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "#!/usr/bin/env tsx\n/**\n * Exa get contents — retrieve page contents by URL.\n *\n * Usage:\n *   tsx scripts/contents.ts <url-or-urls-json> [options-json]\n *   tsx scripts/contents.ts --help\n *\n * First argument: a single URL string, or a JSON array of URLs.\n *\n * Options JSON (all optional):\n *   {\n *     \"text\": true,                         // or { \"maxCharacters\": 5000, \"includeHtmlTags\": false }\n *     \"highlights\": true,                   // or { \"query\": \"AI\", \"numSentences\": 3 }\n *     \"summary\": true,                      // or { \"query\": \"summarize pricing\" }\n *     \"livecrawl\": \"auto\",                  // \"never\"|\"fallback\"|\"always\"|\"auto\"|\"preferred\"\n *     \"livecrawlTimeout\": 10000,             // timeout in ms for live crawl\n *     \"maxAgeHours\": 168,                   // 0 = always fresh, -1 = cache only\n *     \"filterEmptyResults\": true,\n *     \"subpages\": 3,\n *     \"subpageTarget\": \"pricing\"\n *   }\n *\n * Environment:\n *   EXA_API_KEY — required\n *\n * Examples:\n *   tsx scripts/contents.ts \"https://example.com/article\"\n *   tsx scripts/contents.ts \"https://example.com\" '{\"text\":{\"maxCharacters\":2000}}'\n *   tsx scripts/contents.ts '[\"https://a.com\",\"https://b.com\"]' '{\"text\":true,\"highlights\":true}'\n */\n\nimport {\n  showHelp,\n  requireApiKey,\n  filterOptions,\n  createClient,\n  executeAndPrint,\n} from \"./lib/common.js\";\n\nconst args = process.argv.slice(2);\n\nif (args.includes(\"--help\") || args.length === 0) {\n  showHelp(import.meta.url);\n}\n\nlet urls: string | string[] = args[0];\ntry {\n  urls = JSON.parse(urls) as string[];\n} catch {\n  // Single URL string — keep as-is\n}\n\nconst opts: Record<string, unknown> = args[1]\n  ? (JSON.parse(args[1]) as Record<string, unknown>)\n  : { text: true };\n\nrequireApiKey();\n\nconst exa = createClient();\n\nconst contentsOpts = filterOptions(opts, [\n  \"text\",\n  \"highlights\",\n  \"summary\",\n  \"livecrawl\",\n  \"livecrawlTimeout\",\n  \"maxAgeHours\",\n  \"filterEmptyResults\",\n  \"subpages\",\n  \"subpageTarget\",\n]);\n\nawait executeAndPrint(async () => {\n  return await exa.getContents(urls, contentsOpts);\n});\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749025363
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_012p1xZQTPeoHmgsgqTv4NQq",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "#!/usr/bin/env tsx\n/**\n * Exa find similar — find pages similar to a given URL.\n *\n * Usage:\n *   tsx scripts/find-similar.ts <url> [options-json]\n *   tsx scripts/find-similar.ts --help\n *\n * Options JSON (all optional):\n *   {\n *     \"numResults\": 10,\n *     \"contents\": true,               // true = text+highlights, or object for fine control\n *     \"text\": true,                    // shorthand: include text in results\n *     \"highlights\": true,              // shorthand: include highlights\n *     \"summary\": true,                 // shorthand: include summary\n *     \"excludeSourceDomain\": true,     // exclude the source domain from results\n *     \"includeDomains\": [\"example.com\"],\n *     \"excludeDomains\": [\"spam.com\"],\n *     \"startPublishedDate\": \"2024-01-01T00:00:00.000Z\",\n *     \"endPublishedDate\": \"2025-01-01T00:00:00.000Z\",\n *     \"startCrawlDate\": \"2024-01-01T00:00:00.000Z\",\n *     \"endCrawlDate\": \"2025-01-01T00:00:00.000Z\",\n *     \"category\": \"news\",\n *     \"includeText\": [\"must contain\"],\n *     \"excludeText\": [\"must not contain\"]\n *   }\n *\n * Environment:\n *   EXA_API_KEY — required\n *\n * Examples:\n *   tsx scripts/find-similar.ts \"https://react.dev\"\n *   tsx scripts/find-similar.ts \"https://react.dev\" '{\"numResults\":5,\"text\":true,\"excludeSourceDomain\":true}'\n */\n\nimport {\n  parseArgs,\n  requireApiKey,\n  filterOptions,\n  buildContentsOptions,\n  createClient,\n  executeAndPrint,\n} from \"./lib/common.js\";\n\nconst { query: url, opts } = parseArgs(import.meta.url);\nrequireApiKey();\n\nconst exa = createClient();\n\nconst wantContents = opts.contents || opts.text || opts.highlights || opts.summary;\n\nconst contentsOpts = buildContentsOptions(opts);\n\nconst findSimilarKeys = [\n  \"numResults\",\n  \"excludeSourceDomain\",\n  \"includeDomains\",\n  \"excludeDomains\",\n  \"startCrawlDate\",\n  \"endCrawlDate\",\n  \"startPublishedDate\",\n  \"endPublishedDate\",\n  \"category\",\n  \"includeText\",\n  \"excludeText\",\n] as const;\n\nconst searchOpts = filterOptions(opts, findSimilarKeys);\n\nawait executeAndPrint(async () => {\n  if (wantContents) {\n    return await exa.findSimilarAndContents(url, { ...searchOpts, ...contentsOpts });\n  } else {\n    return await exa.findSimilar(url, searchOpts);\n  }\n});\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749025363
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "toolu_01W8j8hrxDRV3hwTMKb42u2Z",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "#!/usr/bin/env tsx\n/**\n * Exa research — create and manage deep research tasks.\n *\n * Usage:\n *   tsx scripts/research.ts create <instructions> [options-json]\n *   tsx scripts/research.ts get <research-id> [options-json]\n *   tsx scripts/research.ts poll <research-id> [options-json]\n *   tsx scripts/research.ts list [options-json]\n *   tsx scripts/research.ts run <instructions> [options-json]\n *   tsx scripts/research.ts --help\n *\n * Subcommands:\n *   create   — Start a new research task (returns immediately with researchId)\n *   get      — Get the current status/result of a research task\n *   poll     — Create and poll until finished (blocks until complete)\n *   list     — List research tasks\n *   run      — Create + poll in one step (convenience)\n *\n * Options JSON for create/run:\n *   {\n *     \"model\": \"exa-research-fast\",   // \"exa-research-fast\"|\"exa-research\"|\"exa-research-pro\"\n *     \"outputSchema\": {}              // JSON Schema for structured output\n *   }\n *\n * Options JSON for get:\n *   {\n *     \"stream\": false,                // stream SSE events\n *     \"events\": false                 // include event log\n *   }\n *\n * Options JSON for poll:\n *   {\n *     \"pollInterval\": 1000,           // ms between polls (default 1000)\n *     \"timeoutMs\": 600000,            // max wait time (default 10 min)\n *     \"events\": false\n *   }\n *\n * Options JSON for list:\n *   {\n *     \"limit\": 10,\n *     \"cursor\": \"...\"\n *   }\n *\n * Environment:\n *   EXA_API_KEY — required\n *\n * Examples:\n *   tsx scripts/research.ts create \"Research the latest AI developments\"\n *   tsx scripts/research.ts get \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\"\n *   tsx scripts/research.ts run \"What is SpaceX's latest valuation?\" '{\"model\":\"exa-research-pro\"}'\n *   tsx scripts/research.ts list '{\"limit\":5}'\n */\n\nimport {\n  showHelp,\n  requireApiKey,\n  handleError,\n  requireArg,\n  createClient,\n} from \"./lib/common.js\";\n\nconst args = process.argv.slice(2);\n\nif (args.includes(\"--help\") || args.length === 0) {\n  showHelp(import.meta.url);\n}\n\nconst subcommand = args[0];\nconst arg1 = args[1];\n\nrequireApiKey();\n\nconst exa = createClient();\n\ntry {\n  switch (subcommand) {\n    case \"create\": {\n      const instructions = requireArg(arg1, \"instructions\");\n      const opts: Record<string, unknown> = args[2]\n        ? (JSON.parse(args[2]) as Record<string, unknown>)\n        : {};\n      const result = await exa.research.create({\n        instructions,\n        model:\n          (opts.model as \"exa-research-fast\" | \"exa-research\" | \"exa-research-pro\") ?? undefined,\n        outputSchema: (opts.outputSchema as Record<string, unknown>) ?? undefined,\n      });\n      console.log(JSON.stringify(result, null, 2));\n      break;\n    }\n\n    case \"get\": {\n      const researchId = requireArg(arg1, \"research-id\");\n      const opts: Record<string, unknown> = args[2]\n        ? (JSON.parse(args[2]) as Record<string, unknown>)\n        : {};\n      if (opts.stream) {\n        const streamResult = await exa.research.get(researchId, { stream: true, ...opts });\n        for await (const event of streamResult) {\n          console.log(JSON.stringify(event));\n        }\n      } else {\n        const result = await exa.research.get(researchId, opts);\n        console.log(JSON.stringify(result, null, 2));\n      }\n      break;\n    }\n\n    case \"poll\": {\n      const researchId = requireArg(arg1, \"research-id\");\n      const opts: Record<string, unknown> = args[2]\n        ? (JSON.parse(args[2]) as Record<string, unknown>)\n        : {};\n      const result = await exa.research.pollUntilFinished(researchId, opts);\n      console.log(JSON.stringify(result, null, 2));\n      break;\n    }\n\n    case \"run\": {\n      const instructions = requireArg(arg1, \"instructions\");\n      const opts: Record<string, unknown> = args[2]\n        ? (JSON.parse(args[2]) as Record<string, unknown>)\n        : {};\n      const created = await exa.research.create({\n        instructions,\n        model:\n          (opts.model as \"exa-research-fast\" | \"exa-research\" | \"exa-research-pro\") ?? undefined,\n        outputSchema: (opts.outputSchema as Record<string, unknown>) ?? undefined,\n      });\n      const createdTyped = created as { researchId: string };\n      console.error(`Research task created: ${createdTyped.researchId} — polling...`);\n      const result = await exa.research.pollUntilFinished(createdTyped.researchId, {\n        pollInterval: (opts.pollInterval as number) || 2000,\n        timeoutMs: (opts.timeoutMs as number) || 600000,\n        events: opts.events as boolean | undefined,\n      });\n      console.log(JSON.stringify(result, null, 2));\n      break;\n    }\n\n    case \"list\": {\n      const opts: Record<string, unknown> = arg1\n        ? (JSON.parse(arg1) as Record<string, unknown>)\n        : {};\n      const result = await exa.research.list(opts);\n      console.log(JSON.stringify(result, null, 2));\n      break;\n    }\n\n    default:\n      console.error(`Error: Unknown subcommand \"${subcommand}\".`);\n      console.error(\"Valid subcommands: create, get, poll, list, run\");\n      process.exit(1);\n  }\n} catch (err) {\n  handleError(err);\n}\n"
+          }
+        ],
+        "isError": false,
+        "timestamp": 1774749025364
+      },
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "thinking",
+            "thinking": "Now I have all the information I need. Let me compile the findings.",
+            "thinkingSignature": "EoACClsIDBgCKkDyWfwvIWEHcTWue/uyruVlFtA9MqUsMiwI8IYsYKqYMUsPI86cLyK5pKuICErMWdgwYOQI5YwUsqJuyUTtyyuHMhFjbGF1ZGUtc29ubmV0LTQtNjgAEgwKeuPLr61w0qMl8/MaDOW2VaEr2gIX0hrukiIwDuKoUfkwUwkRwPVNKFF0CFLfnqUrh0zTJXvM/4mLuuclMC5l2TChmYsZT5iHV2+6KlO70sU0+yljKxBP2kqpR82F0bZKfrldIAnxq78IDWHiUvYeTT820BI/5s66J+mIvxEDkRXsdiFxJZi4yg4pZ/GM572t4axHS4jB6cz8AXYyP42+gBgB"
+          },
+          {
+            "type": "text",
+            "text": "Now I have all the facts needed. Here is the full analysis:\n\n---\n\n## Domain: TypeScript/JavaScript source code in `/Users/josorio/Code/pi-skills`\n\n---\n\n### 1. File Inventory — Grouped by Directory\n\nOnly **one skill** in the entire repo contains TypeScript source files. All other skills (`agents-md`, `docker-model-runner`, `frontend-design`, `gh`, `glab`, `interface-design`, `pdf`, `playwright`, `render-deploy`, `skill-scanner`, `skill-writer`) contain only Markdown — no TS/JS at all.\n\n| Directory | Files |\n|---|---|\n| `skills/exa-search/scripts/` | `answer.ts`, `contents.ts`, `find-similar.ts`, `research.ts`, `search.ts` |\n| `skills/exa-search/scripts/lib/` | `common.ts` |\n\n**Total: 6 `.ts` files. Zero `.tsx`, `.js`, or `.mjs` files (excluding `node_modules`).**\n\n---\n\n### 2. Dependency Graph — Import Relationships\n\n```\nskills/exa-search/scripts/\n│\n├── answer.ts        ──→  ./lib/common.js  (parseArgs, requireApiKey, handleError, filterOptions, createClient)\n├── contents.ts      ──→  ./lib/common.js  (showHelp, requireApiKey, filterOptions, createClient, executeAndPrint)\n├── find-similar.ts  ──→  ./lib/common.js  (parseArgs, requireApiKey, filterOptions, buildContentsOptions, createClient, executeAndPrint)\n├── research.ts      ──→  ./lib/common.js  (showHelp, requireApiKey, handleError, requireArg, createClient)\n└── search.ts        ──→  ./lib/common.js  (parseArgs, requireApiKey, filterOptions, buildContentsOptions, createClient, executeAndPrint)\n\nskills/exa-search/scripts/lib/\n└── common.ts        ──→  node:fs  (readFileSync)\n                     ──→  exa-js  (Exa) — external package v^2.10.0, not traced further\n```\n\n**No cross-skill imports.** No other skill or directory imports from `exa-search`. No file in the repo imports from another skill's directory.\n\n**Level-2 external dependency:** `exa-js@^2.10.0` is the only runtime dependency declared in `package.json`. It is instantiated once, in `common.ts` via `new Exa()`.\n\n---\n\n### 3. Shared Code vs Independent Modules\n\n| Module | Role | Shared? |\n|---|---|---|\n| `lib/common.ts` | Shared utility hub | ✅ Yes — imported by all 5 scripts |\n| `answer.ts` | CLI entry point: AI answers with citations | ❌ Independent leaf |\n| `contents.ts` | CLI entry point: fetch page contents by URL | ❌ Independent leaf |\n| `find-similar.ts` | CLI entry point: find pages similar to a URL | ❌ Independent leaf |\n| `research.ts` | CLI entry point: deep research tasks (create/get/poll/list/run) | ❌ Independent leaf |\n| `search.ts` | CLI entry point: semantic search | ❌ Independent leaf |\n\n`common.ts` exports **10 functions**: `createClient`, `requireArg`, `executeAndPrint`, `showHelp`, `requireApiKey`, `parseArgs`, `handleError`, `filterOptions`, `buildContentsOptions`. Every script uses a subset.\n\nThe 5 entry-point scripts are **fully independent of each other** — none imports from another.\n\n---\n\n### 4. Build Outputs\n\n- **No `dist/` or `build/` directories exist anywhere in the repo.**\n- `tsconfig.json` sets `\"noEmit\": true` — TypeScript is used for type-checking only, never compiled to disk.\n- Scripts are run directly via `tsx` (a dev dependency at `^4.21.0`), which transpiles on the fly. All imports in source use `.js` extensions (e.g., `\"./lib/common.js\"`) — the ESM convention required when `tsx` resolves `.ts` files as if they were already compiled.\n\n---\n\n### 5. Tests and Test Configuration\n\n- **Zero test files found.** No `*.test.ts`, `*.spec.ts`, `*.test.js`, or `*.spec.js` anywhere.\n- **No test configuration** — no `vitest.config.*`, `jest.config.*`, or similar.\n- No `test` script in `package.json` (`\"scripts\": {}`).\n\n---\n\n### 6. Coupling Assessment\n\n| Dimension | Assessment |\n|---|---|\n| **Inter-skill coupling** | None — zero cross-skill imports |\n| **Intra-skill coupling** | Low-to-medium — all 5 scripts depend on `lib/common.ts`, but `common.ts` only depends on `node:fs` + `exa-js` |\n| **Fan-out from common.ts** | 5 importers — if `common.ts` breaks, all 5 scripts break |\n| **Fan-in to scripts** | Zero — each CLI script has no importers; they are pure entry points |\n| **External dependency surface** | Minimal — only `exa-js` as runtime dep |\n| **Build complexity** | None — `noEmit: true`, `tsx` runtime, no bundler |\n\n---\n\n### Findings Summary\n\n- **Only 1 of 12 skills contains TypeScript code** (`exa-search`). All others are pure Markdown.\n- **6 `.ts` files total** in a flat star topology: `lib/common.ts` is the single shared hub; 5 CLI scripts are independent leaves that all import from it and nothing else.\n- **No compiled output exists** anywhere — `tsx` is used for zero-build runtime execution; `tsc` is type-check-only (`noEmit: true`).\n- **No tests exist** — no test files, no test framework configuration, no test scripts.\n- **Coupling is minimal and well-contained**: breaking `common.ts` breaks all 5 scripts; breaking any single script affects nothing else. The only external runtime dependency is `exa-js@^2.10.0`."
+          }
+        ],
+        "api": "anthropic-messages",
+        "provider": "anthropic",
+        "model": "claude-sonnet-4-6",
+        "usage": {
+          "input": 1,
+          "output": 1557,
+          "cacheRead": 19612,
+          "cacheWrite": 3431,
+          "totalTokens": 24601,
+          "cost": {
+            "input": 0.000003,
+            "output": 0.023355,
+            "cacheRead": 0.0058836,
+            "cacheWrite": 0.012866250000000001,
+            "total": 0.04210785
+          }
+        },
+        "stopReason": "stop",
+        "timestamp": 1774749025364,
+        "responseId": "msg_01223VLCRadCfZd4f2Cdc1ut"
+      }
+    ],
+    "stderr": "",
+    "usage": {
+      "input": 8,
+      "output": 2425,
+      "cacheRead": 82879,
+      "cacheWrite": 23367,
+      "cost": 0.14888895000000002,
+      "contextTokens": 24601,
+      "turns": 6
+    },
+    "model": "claude-sonnet-4-6",
+    "stopReason": "stop"
+  }
+]

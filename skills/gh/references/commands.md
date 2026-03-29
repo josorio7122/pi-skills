@@ -103,8 +103,8 @@ Full command reference for `gh`. For workflows and decision guidance, see the ma
 
 ## Releases
 
-| Task                     | Command                                                   |
-| ------------------------ | --------------------------------------------------------- |
+| Task                     | Command                                                  |
+| ------------------------ | -------------------------------------------------------- |
 | Create release           | `gh release create v1.0.0 --notes "Release notes"`       |
 | Create release from file | `gh release create v1.0.0 --notes-file CHANGELOG.md`     |
 | Create draft release     | `gh release create v1.0.0 --draft --notes "WIP"`         |
@@ -140,7 +140,7 @@ Full command reference for `gh`. For workflows and decision guidance, see the ma
 | Watch run in real time | `gh run watch <run-id>`                              |
 | Rerun failed jobs      | `gh run rerun <run-id> --failed`                     |
 | Rerun entire run       | `gh run rerun <run-id>`                              |
-| Cancel a run           | `gh run cancel <run-id>`                              |
+| Cancel a run           | `gh run cancel <run-id>`                             |
 | Download run artifacts | `gh run download <run-id>`                           |
 | Delete a run           | `gh run delete <run-id>`                             |
 
