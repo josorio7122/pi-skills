@@ -1,8 +1,10 @@
-This skill includes material derived from the Microsoft playwright-cli repository.
+This skill is extracted from the Microsoft playwright-cli repository.
+It should be kept in sync with the upstream source.
 
 Source:
-- Repository: microsoft/playwright-cli
-- Path: skills/playwright-cli/SKILL.md
+- Repository: https://github.com/microsoft/playwright-cli
+- Path: skills/playwright-cli/
+- Version: @latest (pinned at time of extraction: v0.1.4, 2026-04-01)
 
 Copyright (c) Microsoft Corporation.
 
@@ -10,5 +12,9 @@ Licensed under the Apache License, Version 2.0.
 See LICENSE.txt in this directory.
 
 Modifications:
-- Adapted for the pi skill collection.
-- Added a wrapper script and local reference guides.
+- Frontmatter adapted for pi-skills format (name, description only).
+- No content changes to SKILL.md or reference files.
+
+To update: clone https://github.com/microsoft/playwright-cli and copy
+skills/playwright-cli/SKILL.md and skills/playwright-cli/references/
+into this directory.
