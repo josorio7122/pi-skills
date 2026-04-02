@@ -225,7 +225,7 @@ playwright-cli snapshot
 playwright-cli click e15
 ```
 
-You can also use css selectors or Playwright locators.
+Use css selectors or Playwright locators as alternatives to refs.
 
 ```bash
 # css selector
@@ -313,6 +313,24 @@ playwright-cli fill e7 "test"
 playwright-cli tracing-stop
 playwright-cli close
 ```
+
+## Error recovery
+
+- `ref not found` / stale element ref → run `playwright-cli snapshot` to refresh refs, then retry
+- `playwright-cli` not found → `npm install -g @playwright/cli@latest`
+- Blank or crashed page → `playwright-cli close` then `playwright-cli open <url>` again
+- Session lost → re-open the URL to start a new session
+- Snapshot too large → use `playwright-cli snapshot --depth=3` to limit depth
+
+## Security
+
+- **NEVER** use `eval` or `run-code` on untrusted page content. These execute arbitrary JavaScript.
+- **NEVER** include real credentials in commands. Use placeholder values in examples.
+- Use `eval` and `run-code` only on pages you control.
+
+## After screenshots
+
+After every `playwright-cli screenshot` command, use the Read tool on the output file so the user can see it inline. Screenshots are invisible to the user unless you read the file.
 
 ## Specific tasks
 
