@@ -258,16 +258,17 @@ playwright-cli kill-all
 
 ## Installation
 
-If global `playwright-cli` command is not available, try a local version via `npx playwright-cli`:
+Check if playwright-cli is available:
 
 ```bash
-npx --no-install playwright-cli --version
+command -v playwright-cli >/dev/null 2>&1 && echo "READY" || echo "NEEDS_SETUP"
 ```
 
-When local version is available, use `npx playwright-cli` in all commands. Otherwise, install `playwright-cli` as a global command:
+If `NEEDS_SETUP`, install globally:
 
 ```bash
 npm install -g @playwright/cli@latest
+playwright-cli --help
 ```
 
 ## Example: Form submission
