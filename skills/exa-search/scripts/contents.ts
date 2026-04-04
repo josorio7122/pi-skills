@@ -30,21 +30,15 @@
  *   tsx scripts/contents.ts '["https://a.com","https://b.com"]' '{"text":true,"highlights":true}'
  */
 
-import {
-	createClient,
-	executeAndPrint,
-	filterOptions,
-	parseArgs,
-	requireApiKey,
-} from './lib/common.js'
+import { createClient, executeAndPrint, filterOptions, parseArgs, requireApiKey } from './lib/common.js'
 
 const { target: urlArg, opts: rawOpts } = parseArgs(import.meta.url)
 
 let urls: string | string[] = urlArg
 try {
-	urls = JSON.parse(urlArg) as string[]
+  urls = JSON.parse(urlArg) as string[]
 } catch {
-	// Single URL string — keep as-is
+  // Single URL string — keep as-is
 }
 
 const opts: Record<string, unknown> = Object.keys(rawOpts).length > 0 ? rawOpts : { text: true }
@@ -53,18 +47,21 @@ requireApiKey()
 
 const exa = createClient()
 
-const contentsOpts = filterOptions(opts, [
-	'text',
-	'highlights',
-	'summary',
-	'livecrawl',
-	'livecrawlTimeout',
-	'maxAgeHours',
-	'filterEmptyResults',
-	'subpages',
-	'subpageTarget',
-])
+const contentsOpts = filterOptions({
+  opts,
+  keys: [
+    'text',
+    'highlights',
+    'summary',
+    'livecrawl',
+    'livecrawlTimeout',
+    'maxAgeHours',
+    'filterEmptyResults',
+    'subpages',
+    'subpageTarget',
+  ],
+})
 
 await executeAndPrint(async () => {
-	return await exa.getContents(urls, contentsOpts)
+  return await exa.getContents(urls, contentsOpts)
 })

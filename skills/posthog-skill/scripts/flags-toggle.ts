@@ -23,15 +23,15 @@ const { target: id } = parseArgs(import.meta.url)
 const config = resolveConfig()
 requireToken(config)
 
-const client = createClient(config)
+const client = createClient({ config })
 
 await executeAndPrint(async () => {
-	const current = await client.getFeatureFlag(id)
-	await client.patchFeatureFlag(id, { active: !current.active })
-	return {
-		id: current.id,
-		key: current.key,
-		active_before: current.active,
-		active_after: !current.active,
-	}
+  const current = await client.getFeatureFlag(id)
+  await client.patchFeatureFlag({ id, body: { active: !current.active } })
+  return {
+    id: current.id,
+    key: current.key,
+    active_before: current.active,
+    active_after: !current.active,
+  }
 })

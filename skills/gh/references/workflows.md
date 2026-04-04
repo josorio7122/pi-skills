@@ -20,7 +20,7 @@ gh pr create --title "feat: add X" --body "..." # Manual title/body
 
 ## Check CI
 
-Before merging, verify the pipeline passed. `--watch` blocks until all checks finish — useful in scripts or when you want to wait.
+Before merging, verify the pipeline passed. `--watch` blocks until all checks finish — useful in scripts or when waiting is preferred.
 
 ```bash
 gh pr checks                  # Current PR's check status
@@ -37,7 +37,7 @@ gh run rerun <run-id> --failed # Retry only failed jobs
 
 ## Review a PR
 
-Check out the code locally, read it, then leave your verdict.
+Check out the code locally, read it, then leave a verdict.
 
 ```bash
 gh pr checkout <number>                                  # Get the code
@@ -61,7 +61,7 @@ gh pr merge <number> --delete-branch           # Merge commit (preserves branch 
 
 - **Squash** — default for most projects. One commit per PR on main. Clean log.
 - **Rebase** — when individual commits are meaningful and well-structured.
-- **Merge commit** — when you need to preserve the branch topology (rare).
+- **Merge commit** — when preserving the branch topology (rare).
 
 ## Work with Issues
 
@@ -94,7 +94,7 @@ Confirm with the user before triggering any workflow on a production branch (mai
 
 ## Use the API
 
-`gh api` is your escape hatch for anything gh doesn't have a built-in command for. It handles auth, pagination, and formatting automatically.
+`gh api` is the escape hatch for anything gh lacks a built-in command for. It handles auth, pagination, and formatting automatically.
 
 ```bash
 # REST

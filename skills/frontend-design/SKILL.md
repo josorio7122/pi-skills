@@ -7,7 +7,7 @@ Create distinctive, production-grade frontend interfaces. Prioritize aesthetic q
 
 ## Design Thinking
 
-**Rule 1 (non-negotiable):** State your aesthetic direction in one sentence before writing any code.
+**Rule 1 (non-negotiable):** State the aesthetic direction in one sentence before writing any code.
 **Rule 2:** Match implementation complexity to the aesthetic vision.
 
 Before coding, understand the context and commit to a BOLD aesthetic direction:
@@ -41,20 +41,13 @@ Focus on:
 - **Spatial Composition**: Unexpected layouts. Asymmetry. Overlap. Diagonal flow. Grid-breaking elements. Generous negative space OR controlled density.
 - **Backgrounds & Visual Details**: Create atmosphere and depth rather than defaulting to solid colors. Add contextual effects and textures that match the overall aesthetic. Apply creative forms like gradient meshes, noise textures, geometric patterns, layered transparencies, dramatic shadows, decorative borders, custom cursors, and grain overlays.
 
-## Prohibitions
+## Rules
 
 Never use these as primary display fonts: Inter, Roboto, Arial, system-ui — use Fraunces, Playfair Display, or Space Grotesk instead.
 Never use purple gradient on white as a primary color scheme — commit to a named alternative palette.
 Never use card grids with uniform rounded corners and drop shadows as a default layout — use [asymmetric grid / editorial split / overlapping panels] instead.
 
 Interpret creatively and make unexpected choices that feel genuinely designed for the context. Do not default to the same aesthetic across invocations. Let the context — purpose, tone, constraints — guide each design's uniqueness.
-
-## Error Recovery
-
-- Unknown framework → default to plain HTML/CSS/JS. State the assumption.
-- Font CDN blocked or unavailable → fall back to system-serif. Note the substitution.
-- Contradictory requirements → prioritize the technical constraint (accessibility, performance). Name the trade-off.
-- Ambiguous aesthetic direction → pick the direction least likely to match AI defaults. State why.
 
 ## Output Format
 
@@ -65,3 +58,17 @@ When scaffolding is requested, produce a file tree first (as a fenced code block
 Include inline comments only for design decisions that cannot be inferred from the visual output (e.g., why a specific font pairing was chosen, why an unconventional layout was used).
 
 Commit fully to the chosen direction — one well-executed detail outweighs ten generic ones.
+
+```
+project/
+├── index.html       ← all styles and scripts inlined (single-file default)
+├── styles.css       ← extracted only when scaffolding is requested
+└── script.js        ← extracted only when scaffolding is requested
+```
+
+## Error Recovery
+
+- Unknown framework → default to plain HTML/CSS/JS. State the assumption.
+- Font CDN blocked or unavailable → fall back to system-serif. Note the substitution.
+- Contradictory requirements → prioritize the technical constraint (accessibility, performance). Name the trade-off.
+- Ambiguous aesthetic direction → pick the direction least likely to match AI defaults. State why.

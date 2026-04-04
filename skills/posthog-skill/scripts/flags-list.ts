@@ -33,7 +33,7 @@ const { opts } = parseArgsOptional(import.meta.url)
 const config = resolveConfig()
 requireToken(config)
 
-const client = createClient(config)
+const client = createClient({ config })
 
 const params: Record<string, string | number> = {}
 if (typeof opts.search === 'string') params.search = opts.search

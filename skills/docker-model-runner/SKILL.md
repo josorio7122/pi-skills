@@ -42,19 +42,54 @@ When helping users with local LLM inference using Docker Model Runner:
 
 > **Output rule:** Display the model's response content directly — not the raw JSON wrapper.
 
+## Choosing the Right Command
+
+| Goal | Command |
+|------|---------|
+| Verify runner is available | `docker model version` |
+| List pulled models | `docker model list` |
+| Search for a model | `docker model search <query>` |
+| Pull a model | `docker model pull <model>` |
+| Run a one-time prompt | `docker model run <model> "prompt"` |
+| Start interactive chat | `docker model run <model>` |
+| Pre-load model (keep warm) | `docker model run --detach <model>` |
+| Programmatic / SDK access | POST to `http://localhost:12434/engines/llama.cpp/v1/chat/completions` |
+
+## Rules
+
+- Always run `docker model version` before any other command — never assume the runner is active.
+- Always pull a model before running it — `docker model run` does not auto-pull.
+- Display model response content directly — never show the raw JSON API wrapper unless explicitly requested.
+- On Linux without Docker Desktop, load `references/docker-model-guide.md` for Docker Engine installation before proceeding.
+
 ## Output Format
 
 Display the model's response content directly — not the raw JSON wrapper. For multi-turn conversations, show each response as plain text. If the user asks for raw API output, show the full JSON in a fenced code block.
 
-## Reference
+```
+# One-time prompt output
+$ docker model run ai/smollm2 "What is 2+2?"
+4
 
-Load [references/docker-model-guide.md](references/docker-model-guide.md) when:
+# API response content (default — extracted from JSON)
+The answer is 4.
 
-- User asks for SDK examples in a specific language
-- Full CLI command reference needed
-- Installation instructions for Linux/Docker Engine
-- Configuration options (env vars, ctx-size)
+# API response raw JSON (only when explicitly requested)
+{
+  "choices": [{ "message": { "role": "assistant", "content": "The answer is 4." } }]
+}
+```
 
 ## Error Recovery
 
-If you hit an error, load [references/docker-model-guide.md](references/docker-model-guide.md) § Troubleshooting.
+On error, load `references/docker-model-guide.md` § Troubleshooting for resolution steps.
+
+## References
+
+Load [references/docker-model-guide.md](references/docker-model-guide.md) when:
+
+- SDK examples in a specific language are needed
+- Full CLI command reference is needed
+- Installation instructions for Linux/Docker Engine are needed
+- Configuration options (env vars, ctx-size) are needed
+- Troubleshooting steps are needed

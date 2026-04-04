@@ -29,8 +29,8 @@ const { target: id, opts } = parseArgs(import.meta.url)
 const config = resolveConfig()
 requireToken(config)
 
-const client = createClient(config)
+const client = createClient({ config })
 
-await executeAndPrint(() =>
-	client.getFeatureFlagActivity(id, (opts.limit as number | undefined) ?? 10),
-)
+const limit = typeof opts.limit === 'number' ? opts.limit : 10
+
+await executeAndPrint(() => client.getFeatureFlagActivity({ id, limit }))

@@ -23,6 +23,6 @@ const { target: id } = parseArgs(import.meta.url)
 const config = resolveConfig()
 requireToken(config)
 
-const client = createClient(config)
+const client = createClient({ config })
 
 await executeAndPrint(() => client.getFeatureFlag(id))

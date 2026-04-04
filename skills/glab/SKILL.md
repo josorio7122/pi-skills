@@ -5,7 +5,7 @@ description: Interact with GitLab from the command line using the glab CLI. Use 
 
 # GitLab CLI (glab)
 
-You operate the `glab` CLI for all GitLab tasks. Run `glab auth status` before the first command in any session.
+Operate the `glab` CLI for all GitLab tasks. Run `glab auth status` before the first command in any session.
 
 ## Prerequisites
 
@@ -40,21 +40,11 @@ For command syntax, load [references/commands.md](references/commands.md).
 
 ---
 
-## Destructive Operations
+## Rules
 
 - **Never** pass secret values as CLI arguments — pipe via stdin: `printf '%s' "$SECRET" | glab variable set KEY`
 - **`glab mr merge`** is irreversible — confirm the MR ID and target branch before running
 - **`glab variable set`** overwrites silently — check existing values with `glab variable list` first
-
----
-
-## Error Recovery
-
-- **Auth failure / `HTTP 401`** — run `glab auth status`; re-authenticate with `glab auth login`
-- **Wrong remote detected** — use `--repo owner/repo` or set `GITLAB_HOST` for self-hosted instances
-- **SSH remote but glab expects HTTPS** — `git remote set-url origin https://gitlab.com/owner/repo.git`
-- **Pipeline stuck / no CI configured** — verify `.gitlab-ci.yml` exists in the repo
-- **Permission denied on merge** — check MR approval rules; you may need approvals first
 
 ---
 
@@ -64,6 +54,36 @@ For command syntax, load [references/commands.md](references/commands.md).
 - **CI status:** summarize as job name → status → duration in a table.
 - **MR/Issue lists:** bullet list with ID, title, and URL.
 - **Errors:** quote the glab error verbatim, then apply Troubleshooting steps.
+
+```
+# Commands run
+$ glab mr create --title "Add login page" --assignee @me
+https://gitlab.com/owner/repo/-/merge_requests/42
+
+# CI status table
+| Job            | Status  | Duration |
+|----------------|---------|----------|
+| lint           | passed  | 1m 12s   |
+| test           | failed  | 3m 44s   |
+| deploy-staging | skipped | —        |
+
+# MR/Issue list
+- !42 Add login page — https://gitlab.com/owner/repo/-/merge_requests/42
+- #17 Fix null pointer in auth — https://gitlab.com/owner/repo/-/issues/17
+
+# Error (quoted verbatim)
+ERROR: GET /projects/owner%2Frepo: 401 Unauthorized
+```
+
+---
+
+## Error Recovery
+
+- **Auth failure / `HTTP 401`** — run `glab auth status`; re-authenticate with `glab auth login`
+- **Wrong remote detected** — use `--repo owner/repo` or set `GITLAB_HOST` for self-hosted instances
+- **SSH remote but glab expects HTTPS** — `git remote set-url origin https://gitlab.com/owner/repo.git`
+- **Pipeline stuck / no CI configured** — verify `.gitlab-ci.yml` exists in the repo
+- **Permission denied on merge** — check MR approval rules; ensure required approvals are obtained first
 
 ---
 

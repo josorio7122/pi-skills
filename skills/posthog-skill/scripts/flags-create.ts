@@ -30,10 +30,10 @@ const { target: key, opts } = parseArgs(import.meta.url)
 const config = resolveConfig()
 requireToken(config)
 
-const client = createClient(config)
+const client = createClient({ config })
 
 const body: Record<string, unknown> = {}
 if (opts.name !== undefined) body.name = opts.name
 if (opts.tags !== undefined) body.tags = opts.tags
 
-await executeAndPrint(() => client.createFeatureFlag(key, body))
+await executeAndPrint(() => client.createFeatureFlag({ key, body }))

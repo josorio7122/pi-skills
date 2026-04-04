@@ -136,7 +136,7 @@ Full command reference for `glab`. For workflows and decision guidance, see the 
 | Fork a project           | `glab repo fork <owner/repo>`                              |
 | Create a new project     | `glab repo create <name>`                                  |
 | Search projects          | `glab repo search --search "query"`                        |
-| List your projects       | `glab repo list`                                           |
+| List owned projects      | `glab repo list`                                           |
 | List contributors        | `glab repo contributors`                                   |
 | List project members     | `glab repo members list`                                   |
 | Update project settings  | `glab repo update <project> --description "New desc"`      |
@@ -170,7 +170,7 @@ Full command reference for `glab`. For workflows and decision guidance, see the 
 
 ## Stacked Diffs
 
-Stacked diffs let you break large features into small, reviewable MRs that build on each other. Each "entry" in a stack is a separate MR.
+Stacked diffs break large features into small, reviewable MRs that build on each other. Each "entry" in a stack is a separate MR.
 
 | Task                          | Command                                |
 | ----------------------------- | -------------------------------------- |

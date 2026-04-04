@@ -5,24 +5,36 @@ description: Automate a real browser from the terminal using playwright-cli. Nav
 
 # Browser Automation with playwright-cli
 
-## Quick start
+Automate a real browser from the terminal using `playwright-cli`. Navigate pages, interact with elements, take screenshots, extract data, fill forms, test UI flows, manage sessions, and mock network requests. Run commands sequentially — each returns a snapshot of the current browser state for the next step.
+
+## Prerequisites
+
+Check if playwright-cli is available:
 
 ```bash
-# open new browser
-playwright-cli open
-# navigate to a page
-playwright-cli goto https://playwright.dev
-# interact with the page using refs from the snapshot
-playwright-cli click e15
-playwright-cli type "page.click"
-playwright-cli press Enter
-# take a screenshot (rarely used, as snapshot is more common)
-playwright-cli screenshot
-# close the browser
-playwright-cli close
+command -v playwright-cli >/dev/null 2>&1 && echo "READY" || echo "NEEDS_SETUP"
 ```
 
-## Commands
+If `NEEDS_SETUP`, install globally:
+
+```bash
+npm install -g @playwright/cli@latest
+playwright-cli --help
+```
+
+## Choosing the Right Command
+
+| Goal | Commands |
+|------|---------|
+| Open a browser or navigate | `open`, `goto`, `go-back`, `go-forward`, `reload` |
+| Interact with elements | `click`, `fill`, `type`, `press`, `hover`, `drag`, `check`, `select`, `upload` |
+| Capture page state | `snapshot`, `screenshot`, `pdf` |
+| Manage tabs | `tab-new`, `tab-list`, `tab-select`, `tab-close` |
+| Manage storage and sessions | `state-save`, `state-load`, `cookie-*`, `localstorage-*`, `sessionstorage-*` |
+| Mock or inspect network | `route`, `unroute`, `route-list`, `network` |
+| Inspect attributes or run JS | `eval`, `run-code`, `console` |
+| Record video or traces | `video-start`, `video-chapter`, `video-stop`, `tracing-start`, `tracing-stop` |
+| Handle dialogs | `dialog-accept`, `dialog-dismiss` |
 
 ### Core
 
@@ -160,6 +172,7 @@ playwright-cli video-stop
 ```
 
 ## Open parameters
+
 ```bash
 # Use specific browser when creating session
 playwright-cli open --browser=chrome
@@ -196,7 +209,7 @@ After each command, playwright-cli provides a snapshot of the current browser st
 [Snapshot](.playwright-cli/page-2026-02-14T19-22-42-679Z.yml)
 ```
 
-You can also take a snapshot on demand using `playwright-cli snapshot` command. All the options below can be combined as needed.
+Take a snapshot on demand using `playwright-cli snapshot`. All the options below can be combined as needed.
 
 ```bash
 # default - save to a file with timestamp-based name
@@ -256,19 +269,21 @@ playwright-cli close-all
 playwright-cli kill-all
 ```
 
-## Installation
-
-Check if playwright-cli is available:
+## Quick Start
 
 ```bash
-command -v playwright-cli >/dev/null 2>&1 && echo "READY" || echo "NEEDS_SETUP"
-```
-
-If `NEEDS_SETUP`, install globally:
-
-```bash
-npm install -g @playwright/cli@latest
-playwright-cli --help
+# open new browser
+playwright-cli open
+# navigate to a page
+playwright-cli goto https://playwright.dev
+# interact with the page using refs from the snapshot
+playwright-cli click e15
+playwright-cli type "page.click"
+playwright-cli press Enter
+# take a screenshot (rarely used, as snapshot is more common)
+playwright-cli screenshot
+# close the browser
+playwright-cli close
 ```
 
 ## Example: Form submission
@@ -315,7 +330,45 @@ playwright-cli tracing-stop
 playwright-cli close
 ```
 
-## Error recovery
+## Rules
+
+- **NEVER** use `eval` or `run-code` on untrusted page content — these execute arbitrary JavaScript.
+- **NEVER** include real credentials in commands. Use placeholder values in examples.
+- Use `eval` and `run-code` only on trusted pages.
+- After every `playwright-cli screenshot` command, use the Read tool on the output file so the user can see it inline. Screenshots are invisible to the user unless the file is read.
+
+## Output Format
+
+Each command returns a snapshot of the current browser state:
+
+```
+### Page
+- Page URL: https://example.com/
+- Page Title: Example Domain
+### Snapshot
+[Snapshot](.playwright-cli/page-2026-02-14T19-22-42-679Z.yml)
+```
+
+`eval` returns the evaluated value directly:
+
+```
+"Example Domain"
+```
+
+`screenshot` returns the saved file path:
+
+```
+Screenshot saved to .playwright-cli/page-2026-02-14T19-22-43-000Z.png
+```
+
+`console` returns captured log entries:
+
+```
+[log] Page loaded
+[error] Failed to fetch /api/data
+```
+
+## Error Recovery
 
 - `ref not found` / stale element ref → run `playwright-cli snapshot` to refresh refs, then retry
 - `playwright-cli` not found → `npm install -g @playwright/cli@latest`
@@ -323,17 +376,7 @@ playwright-cli close
 - Session lost → re-open the URL to start a new session
 - Snapshot too large → use `playwright-cli snapshot --depth=3` to limit depth
 
-## Security
-
-- **NEVER** use `eval` or `run-code` on untrusted page content. These execute arbitrary JavaScript.
-- **NEVER** include real credentials in commands. Use placeholder values in examples.
-- Use `eval` and `run-code` only on pages you control.
-
-## After screenshots
-
-After every `playwright-cli screenshot` command, use the Read tool on the output file so the user can see it inline. Screenshots are invisible to the user unless you read the file.
-
-## Specific tasks
+## References
 
 * **Running and Debugging Playwright tests** [references/playwright-tests.md](references/playwright-tests.md)
 * **Request mocking** [references/request-mocking.md](references/request-mocking.md)

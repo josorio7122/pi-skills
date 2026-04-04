@@ -5,7 +5,7 @@ description: Create and maintain minimal, high-signal AGENTS.md files. Use when 
 
 # Maintaining AGENTS.md
 
-You write and maintain AGENTS.md files — the shortest possible agent instructions that make agents effective.
+Create and maintain AGENTS.md files — the shortest possible agent instructions that make agents effective.
 
 > **Hard limit:** never exceed 100 lines. Target 60.
 
@@ -23,6 +23,16 @@ Analyze the project to understand what belongs in the file:
 3. **CI/build commands** — Check `Makefile`, `package.json` scripts, CI configs for canonical commands
 4. **Monorepo indicators** — Check for `pnpm-workspace.yaml`, `nx.json`, Cargo workspace, or subdirectory `package.json` files
 5. **Existing conventions** — Check for existing CONTRIBUTING.md, docs/, or README patterns
+
+## Choosing the Right Command
+
+| Situation | Action |
+| --------- | ------ |
+| No `AGENTS.md` exists | Run **File Setup** → **Before Writing** → **Writing Rules** |
+| `AGENTS.md` exists, under 100 lines | Skip File Setup — run Before Writing, then update relevant sections |
+| `AGENTS.md` exists, over 100 lines | Trim to required sections first, confirm with user, then update |
+| Provider-specific file needed (e.g., `CLAUDE.md`) | After creating `AGENTS.md`, add the appropriate symlink |
+| Monorepo with multiple sub-packages | Create root `AGENTS.md` + per-package overrides where conventions differ |
 
 ## Writing Rules
 
@@ -62,7 +72,7 @@ Per-file commands are faster and cheaper than full project builds. Always includ
 
 ### Commit Attribution
 
-Always include this section. Agents should use their own identity:
+Always include this section. Agents must use their own identity:
 
 ```
 Co-Authored-By: AI Agent <ai@noreply.example.com>
@@ -89,7 +99,30 @@ Add only if truly needed:
 - Conflicting conventions: defer to the most recently modified config file
 - No recognizable project structure: create a minimal AGENTS.md with only Package Manager and Commit Attribution, then ask the user what else to include
 
-If you need a full template or anti-pattern examples, read [references/example-structure.md](references/example-structure.md).
+## Output Format
+
+**NEVER** write the file without explicit user confirmation.
+
+Present the generated AGENTS.md in a fenced code block. For updates, present the full updated file (not a diff).
+
+```markdown
+# Agent Instructions
+
+## Package Manager
+Use **pnpm**: `pnpm install`, `pnpm dev`, `pnpm test`
+
+## File-Scoped Commands
+| Task      | Command                             |
+| --------- | ----------------------------------- |
+| Typecheck | `pnpm tsc --noEmit path/to/file.ts` |
+| Lint      | `pnpm eslint path/to/file.ts`       |
+| Test      | `pnpm jest path/to/file.test.ts`    |
+
+## Commit Attribution
+Never add `Co-Authored-By` trailers.
+```
+
+If a blocking edge case applies (unknown package manager, missing lock file), ask the clarifying question before generating.
 
 ## Error Recovery
 
@@ -98,10 +131,6 @@ If you need a full template or anti-pattern examples, read [references/example-s
 - Generated file exceeds 100 lines → cut lowest-value sections. Prioritize: commands > boundaries > code standards.
 - User declines confirmation → ask what to change. Do not write without approval.
 
-## Output Format
+## References
 
-**NEVER** write the file without explicit user confirmation.
-
-Present the generated AGENTS.md in a fenced code block. For updates, present the full updated file (not a diff).
-
-If a blocking edge case applies (unknown package manager, missing lock file), ask the clarifying question before generating.
+- [references/example-structure.md](references/example-structure.md) — full template and anti-pattern examples

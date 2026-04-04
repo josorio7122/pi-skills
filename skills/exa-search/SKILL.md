@@ -3,7 +3,7 @@ name: exa-search
 description: Search the web, extract page content, get AI-powered answers with citations, find similar pages, and run deep multi-step research via the Exa API. Use when asked to "search the web", "look something up", "find docs for", "what does X's documentation say", "research this topic", "extract content from this URL", "find pages similar to", or when any information may be more current than training data.
 ---
 
-Run live web searches via the Exa API. All queries go to the network — results are current, not from training data. Pick the right script or you waste API credits.
+Run live web searches via the Exa API. All queries go to the network — results are current, not from training data. Pick the right script to avoid wasting API credits.
 
 > Resolve all script paths relative to the directory containing this SKILL.md.
 
@@ -22,8 +22,8 @@ Get an API key at: https://dashboard.exa.ai/api-keys
 
 | When...                                               | Use                                                         |
 | ----------------------------------------------------- | ----------------------------------------------------------- |
-| You have a URL and want its content                   | `scripts/contents.ts`                                       |
-| You have a URL and want related pages                 | `scripts/find-similar.ts`                                   |
+| Have a URL and want its content                       | `scripts/contents.ts`                                       |
+| Have a URL and want related pages                     | `scripts/find-similar.ts`                                   |
 | Direct factual question (single sourced answer)       | `scripts/answer.ts` — cited answer, not a list of links     |
 | Browse/explore results; add `includeDomains` for docs | `scripts/search.ts` with `text: true`                       |
 | Complex multi-source synthesis                        | `scripts/research.ts run` — slow + expensive; use sparingly |
@@ -41,10 +41,39 @@ Get an API key at: https://dashboard.exa.ai/api-keys
 
 ## Output Format
 
-- `search.ts` / `find-similar.ts`: JSON array of results. Summarize top 3–5 with title + URL + snippet.
-- `answer.ts`: answer text + citations. Present the answer directly, cite sources inline.
-- `contents.ts`: extracted text. Present key content, note page title and URL.
-- `research.ts`: research report. Present findings with section headers and citations.
+All scripts write JSON to stdout. Pipe through `jq` for filtering.
+
+`search.ts` / `find-similar.ts` — array of result objects:
+
+```json
+{
+  "results": [
+    {
+      "title": "Example Page",
+      "url": "https://example.com/article",
+      "score": 0.87,
+      "publishedDate": "2024-06-01T00:00:00.000Z",
+      "text": "Full page text if requested...",
+      "highlights": ["...relevant excerpt..."],
+      "summary": "AI-generated summary if requested"
+    }
+  ]
+}
+```
+
+`answer.ts` — synthesized answer with citations:
+
+```json
+{
+  "answer": "Next.js 14.2 was released in April 2024...",
+  "citations": [
+    { "title": "Next.js 14.2", "url": "https://nextjs.org/blog/next-14-2" }
+  ]
+}
+```
+
+- `contents.ts`: extracted text object per URL. Present key content, note page title and URL.
+- `research.ts`: research report object. Present findings with section headers and citations.
 
 ## Error Recovery
 

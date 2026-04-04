@@ -3,7 +3,7 @@ name: posthog-skill
 description: Automate PostHog feature flags and API interactions — list, inspect, toggle, create, update, and audit feature flags; query dashboards and insights; run HogQL queries. Use when asked to "manage PostHog flags", "check PostHog status", "create a PostHog dashboard", "run a PostHog query", "toggle a feature flag in PostHog", "audit PostHog flag changes", "enable a feature flag", "disable a feature flag", "check feature flags", "set up PostHog SDK", "PostHog Python integration", or "query PostHog events".
 ---
 
-Automate PostHog reads and writes through the scripts documented here. Pick the right script or you waste API credits.
+Automate PostHog reads and writes through the scripts documented here. Pick the right script to avoid wasting API credits.
 
 > Resolve all script paths relative to the directory containing this SKILL.md.
 
@@ -76,6 +76,36 @@ PostHog uses three distinct key types — do not mix them up:
 - `flags-update.ts`: JSON object of the updated flag.
 - `flags-activity.ts`: JSON with `results` array of activity entries.
 
+```json
+// status.ts
+{
+  "host": "https://us.posthog.com",
+  "project_id": "<POSTHOG_PROJECT_ID>",
+  "token": "*** (present)",
+  "token_present": true
+}
+
+// flags-toggle.ts
+{
+  "id": 101,
+  "key": "my-feature-flag",
+  "active_before": true,
+  "active_after": false
+}
+
+// flags-create.ts
+{
+  "id": 201,
+  "key": "my-new-flag",
+  "name": "My New Flag",
+  "active": true,
+  "deleted": false,
+  "created_at": "2024-01-15T10:30:00Z",
+  "filters": { "groups": [{ "properties": [], "rollout_percentage": 0 }] },
+  "tags": []
+}
+```
+
 ## Error Recovery
 
 - **Exit code 1** → verify `POSTHOG_PROJECT_ID` and `POSTHOG_PERSONAL_API_KEY` are set and valid.
@@ -83,8 +113,8 @@ PostHog uses three distinct key types — do not mix them up:
 - **Exit code 1 with 403** → API key missing required scopes.
 - **Exit code 1 with 429** → rate limited; client retried 3 times with exponential backoff. Wait 60 seconds and retry.
 - **"options argument is not valid JSON"** → check that the options string is valid JSON (keys must be quoted).
-- **Exit code 1 with 404 on flag operations** → you passed a flag key instead of a numeric ID. Use `flags-list.ts` to find the numeric ID first.
-- **Exit code 1 with 401 on SDK `feature_enabled()`** → you used a personal API key (`phx_`) instead of the project token (`phc_`). See API Key Types.
+- **Exit code 1 with 404 on flag operations** → a flag key was passed instead of a numeric ID. Use `flags-list.ts` to find the numeric ID first.
+- **Exit code 1 with 401 on SDK `feature_enabled()`** → a personal API key (`phx_`) was used instead of the project token (`phc_`). See API Key Types.
 - **Empty results** → broaden search term or check that flags exist in the project.
 
 ## TypeScript Client

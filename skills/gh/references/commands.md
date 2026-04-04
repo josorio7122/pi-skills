@@ -92,7 +92,7 @@ Full command reference for `gh`. For workflows and decision guidance, see the ma
 | Create a new repo       | `gh repo create my-repo --public`                                                 |
 | Create private repo     | `gh repo create my-repo --private`                                                |
 | Create from template    | `gh repo create my-repo --template owner/template`                                |
-| List your repos         | `gh repo list`                                                                    |
+| List owned repos        | `gh repo list`                                                                    |
 | List org repos          | `gh repo list <org>`                                                              |
 | Edit repo settings      | `gh repo edit --description "New description"`                                    |
 | Rename repo             | `gh repo rename new-name`                                                         |
@@ -205,7 +205,7 @@ gh config clear-cache               # Clear CLI cache
 
 ## JSON Output
 
-> Always summarize JSON output — do not paste raw JSON into the response. Use `--jq` to extract only the fields you need.
+> Always summarize JSON output — do not paste raw JSON into the response. Use `--jq` to extract only the required fields.
 
 Most commands support `--json` for structured output:
 

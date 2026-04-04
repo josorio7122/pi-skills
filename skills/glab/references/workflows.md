@@ -6,7 +6,7 @@ Step-by-step flows for common GitLab operations.
 
 ## Create an MR
 
-`--fill` pulls title and description from your commit messages — always use it rather than writing MR descriptions from scratch.
+`--fill` pulls title and description from the branch's commit messages — always use it rather than writing MR descriptions from scratch.
 
 ```bash
 git push -u origin HEAD
@@ -29,7 +29,7 @@ If `--fill` produces a blank title (no commits or WIP message), add `--title 'fe
 
 ## Check CI/CD
 
-Before merging, verify the pipeline passed. `glab ci view` opens an interactive TUI where you can navigate jobs and read logs.
+Before merging, verify the pipeline passed. `glab ci view` opens an interactive TUI to navigate jobs and read logs.
 
 ```bash
 glab ci status              # Quick one-line status
@@ -62,7 +62,7 @@ glab ci run                       # Trigger a new pipeline on the current branch
 
 ## Review an MR
 
-Check out the code locally, read it, then leave your verdict.
+Check out the code locally, read it, then leave a verdict.
 
 ```bash
 glab mr checkout <id>                      # Get the code
@@ -147,7 +147,7 @@ glab stack next / glab stack prev  # Navigate between entries
 
 ## Use the API
 
-`glab api` is your escape hatch for anything glab doesn't have a built-in command for. It handles auth, pagination, and supports both REST and GraphQL. Placeholder values like `:fullpath` are auto-resolved from the current git directory.
+`glab api` is the escape hatch for anything glab doesn't have a built-in command for. It handles auth, pagination, and supports both REST and GraphQL. Placeholder values like `:fullpath` are auto-resolved from the current git directory.
 
 ```bash
 # REST

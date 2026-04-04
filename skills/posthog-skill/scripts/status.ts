@@ -22,8 +22,8 @@ parseArgsOptional(import.meta.url)
 const config = resolveConfig()
 
 out({
-	host: config.host,
-	project_id: config.projectId,
-	token: config.token ? '*** (present)' : 'NOT SET',
-	token_present: Boolean(config.token),
+  host: config.host,
+  project_id: config.projectId,
+  token: config.token ? '*** (present)' : 'NOT SET',
+  token_present: Boolean(config.token),
 })

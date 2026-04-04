@@ -5,7 +5,7 @@ description: Interact with GitHub from the command line using the gh CLI. Use wh
 
 # GitHub CLI (gh)
 
-You operate the `gh` CLI. Run `gh auth status` before the first command in any session. Prefer built-in commands over `gh api`.
+Operate the `gh` CLI. Run `gh auth status` before the first command in any session. Prefer built-in commands over `gh api`.
 
 ## Prerequisites
 
@@ -20,7 +20,7 @@ Verify before any command:
 
 | Goal                                       | Workflow         |
 | ------------------------------------------ | ---------------- |
-| Push your work and get it reviewed         | Create a PR      |
+| Push work and get it reviewed              | Create a PR      |
 | Check if CI passed before merging          | Check CI         |
 | Review someone else's PR                   | Review a PR      |
 | Ship a PR to main                          | Merge a PR       |
@@ -33,7 +33,7 @@ Read [references/workflows.md](references/workflows.md) for the complete step-by
 
 ---
 
-## Destructive Operations
+## Rules
 
 **Never execute these without explicit user confirmation in the current message:**
 
@@ -53,6 +53,19 @@ State what will be destroyed and wait for confirmation before running any of the
 - **List/view commands:** Summarize key fields (PR: number, title, status, author, checks, URL; Issue: number, title, state, labels; Run: ID, workflow, status, conclusion). Never dump raw JSON.
 - **Create/merge commands:** Confirm the action and return the resulting URL.
 
+```
+## PR #42 — Add dark mode support
+Status: OPEN | Author: jsmith | Checks: ✓ passing (3/3)
+URL: https://github.com/owner/repo/pull/42
+
+## Issue #17 — Login fails on Safari
+State: OPEN | Labels: bug, priority:high
+URL: https://github.com/owner/repo/issues/17
+
+## Run #9876543210 — CI / test (push)
+Workflow: ci.yml | Status: completed | Conclusion: success
+```
+
 ---
 
 ## Error Recovery
@@ -62,13 +75,13 @@ State what will be destroyed and wait for confirmation before running any of the
 - **SAML/SSO enforcement** — run `gh auth refresh --scopes read:org` and authorize via org SSO page
 - **Merge conflict on `gh pr merge`** — run `gh pr update-branch` to rebase, then retry
 - **`gh pr checks` returns nothing** — CI may not be configured for this repo; proceed with manual review
-- **Permission denied on merge** — you may not be a maintainer; open a review request instead
+- **Permission denied on merge** — the account may lack maintainer rights; open a review request instead
 - **Wrong repo detected** — use `--repo owner/repo` to specify explicitly
 - **Unrecognized error** — run `gh <command> --help` or check https://cli.github.com/manual/
 
 ---
 
-## Reference
+## References
 
 - Full workflow sequences: [references/workflows.md](references/workflows.md)
 - Complete command table: [references/commands.md](references/commands.md)

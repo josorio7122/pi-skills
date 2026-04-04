@@ -31,11 +31,11 @@ const { target: id, opts } = parseArgs(import.meta.url)
 const config = resolveConfig()
 requireToken(config)
 
-const client = createClient(config)
+const client = createClient({ config })
 
 const body: Record<string, unknown> = {}
 if (opts.name !== undefined) body.name = opts.name
 if (opts.active !== undefined) body.active = opts.active
 if (opts.tags !== undefined) body.tags = opts.tags
 
-await executeAndPrint(() => client.patchFeatureFlag(id, body))
+await executeAndPrint(() => client.patchFeatureFlag({ id, body }))

@@ -45,12 +45,12 @@
  */
 
 import {
-	buildContentsOptions,
-	createClient,
-	executeAndPrint,
-	filterOptions,
-	parseArgs,
-	requireApiKey,
+  buildContentsOptions,
+  createClient,
+  executeAndPrint,
+  filterOptions,
+  parseArgs,
+  requireApiKey,
 } from './lib/common.js'
 
 const { target: query, opts } = parseArgs(import.meta.url)
@@ -66,37 +66,37 @@ const contentsOpts = buildContentsOptions(opts)
 
 // Build search options
 const searchKeys = [
-	'numResults',
-	'type',
-	'includeDomains',
-	'excludeDomains',
-	'startCrawlDate',
-	'endCrawlDate',
-	'startPublishedDate',
-	'endPublishedDate',
-	'category',
-	'includeText',
-	'excludeText',
-	'useAutoprompt',
-	'moderation',
-	'userLocation',
-	'additionalQueries',
-	'outputSchema',
-	'subpages',
-	'subpageTarget',
-	'livecrawl',
-	'livecrawlTimeout',
-	'maxAgeHours',
-	'filterEmptyResults',
-	'systemPrompt',
+  'numResults',
+  'type',
+  'includeDomains',
+  'excludeDomains',
+  'startCrawlDate',
+  'endCrawlDate',
+  'startPublishedDate',
+  'endPublishedDate',
+  'category',
+  'includeText',
+  'excludeText',
+  'useAutoprompt',
+  'moderation',
+  'userLocation',
+  'additionalQueries',
+  'outputSchema',
+  'subpages',
+  'subpageTarget',
+  'livecrawl',
+  'livecrawlTimeout',
+  'maxAgeHours',
+  'filterEmptyResults',
+  'systemPrompt',
 ] as const
 
-const searchOpts = filterOptions(opts, searchKeys)
+const searchOpts = filterOptions({ opts, keys: searchKeys })
 
 await executeAndPrint(async () => {
-	if (wantContents) {
-		return await exa.searchAndContents(query, { ...searchOpts, ...contentsOpts })
-	} else {
-		return await exa.search(query, searchOpts)
-	}
+  if (wantContents) {
+    return await exa.searchAndContents(query, { ...searchOpts, ...contentsOpts })
+  } else {
+    return await exa.search(query, searchOpts)
+  }
 })

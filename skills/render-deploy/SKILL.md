@@ -5,7 +5,7 @@ description: Deploy applications to Render. Use when the user wants to deploy, h
 
 # Deploy to Render
 
-You are the Render deployment agent. Analyze the codebase, select the right service type, and produce a working deployment.
+Analyze the codebase, select the right service type, and produce a working deployment on Render's cloud platform.
 
 Render supports **Git-backed** services and **prebuilt Docker image** services.
 
@@ -21,72 +21,136 @@ If there is no Git remote, stop and ask the user to either:
 - Create/push a Git remote (can be minimal if only the Blueprint is needed), or
 - Use the Render Dashboard/API to deploy a prebuilt Docker image (the CLI cannot create image-backed services).
 
-## Happy Path
+## Prerequisites
 
-Ask these questions before deep analysis:
+Verify these requirements before proceeding.
 
-1. **Source:** Git repo or prebuilt Docker image?
-   - **Prebuilt Docker image:** Guide to Dashboard image deploy or add a minimal Git remote with `runtime: image`. Ask for image URL, registry auth (if private), service type, and port. The CLI cannot create image-backed services.
-   - **Git repo:** Must be pushed to GitHub, GitLab, or Bitbucket. Verify with `git remote -v`.
-2. **Complexity:** Does your app need a database, background worker, or cache? (yes / no / not sure)
+**1. Confirm Git remote**
 
-Then proceed to Method Selection below.
+The repo must be pushed to GitHub, GitLab, or Bitbucket:
 
-## Method Selection
+```bash
+git remote -v
+```
 
-Analyze the codebase first; only ask if deployment intent is unclear.
+If no remote exists, stop and ask the user to create/push a remote **or** switch to Docker image deploy.
 
-| Method                  | Best For                           | Pros                             |
-| ----------------------- | ---------------------------------- | -------------------------------- |
-| **Blueprint**           | Multi-service apps, IaC workflows  | Version controlled, reproducible |
-| **Direct CLI Creation** | Single services, quick deployments | Instant, no render.yaml needed   |
+**2. Install the Render CLI**
 
-**Use Direct CLI Creation when ALL are true:**
+```bash
+render --version
+```
 
-- Single service with no workers, cron, or datastores
-- Simple env vars only (no shared env groups)
+If not installed:
 
-**Use Blueprint when ANY are true:**
+- macOS: `brew install render`
+- Linux/macOS: See https://render.com/docs/cli for official installation instructions.
 
-- Multiple services, databases, Redis/Key Value, cron jobs, or workers
-- Want reproducible IaC committed to the repo
-- Monorepo or multi-env setup
+> ⚠️ **Security:** Piping to shell (`curl | sh`) executes remote code. Use `brew install render` or review the script before running.
 
-If unsure, default to Blueprint for safety.
+**3. Authenticate**
+
+```bash
+render whoami -o json
+```
+
+If the command fails or returns empty data, authenticate using one of:
+
+- **API Key**: `export RENDER_API_KEY="rnd_xxxxx"` (Get from https://dashboard.render.com/u/*/settings#api-keys)
+- **Login**: `render login` (opens browser for OAuth)
+
+> **Note:** Database creation and metrics queries require `RENDER_API_KEY`.
+
+**4. Check workspace context**
+
+```bash
+render workspace current
+```
+
+To list available workspaces: `render workspaces --output json`  
+To switch: `render workspace set <WORKSPACE_ID>`
+
+## Choosing the Right Command
+
+Analyze the codebase first; ask only if deployment intent is unclear.
+
+| Goal / Situation                                                                 | Use                     |
+| -------------------------------------------------------------------------------- | ----------------------- |
+| Single service, no workers, cron, or datastores, simple env vars only            | Direct CLI Creation     |
+| Multiple services, databases, Redis/Key Value, cron jobs, or workers             | Blueprint               |
+| Want reproducible IaC committed to the repo                                      | Blueprint               |
+| Monorepo or multi-environment setup                                              | Blueprint               |
+| Prebuilt Docker image (no build step needed)                                     | Blueprint (`runtime: image`) or Dashboard |
+| Unsure                                                                           | Blueprint (safer default) |
+
+Load `references/direct-creation.md` for Direct CLI Creation steps.  
+Load `references/blueprint-workflow.md` for Blueprint steps.
+
+## Rules
+
+**Before starting**
+
+- Ask two questions before deep analysis: (1) Is the source a Git repo or a prebuilt Docker image? (2) Does the app need a database, background worker, or cache?
+- For prebuilt Docker images: guide to Dashboard image deploy or add a minimal Git remote with `runtime: image`. Ask for image URL, registry auth (if private), service type, and port. The CLI cannot create image-backed services.
+- For Git repos: verify the remote is pushed to GitHub, GitLab, or Bitbucket before proceeding.
+- If no Git remote exists, stop — do not attempt to deploy until the remote is confirmed or the user switches to Docker image deploy.
+
+**Blueprint rules**
+
+- Always use `plan: free` unless the user specifies otherwise.
+- Include ALL environment variables the app needs.
+- Mark secrets with `sync: false` — the user fills these in the Dashboard.
+- Ensure `render.yaml` is committed and pushed before sending the Dashboard deeplink — Render reads the file from the repository at deploy time.
+
+**Post-deploy verification (all methods)**
+
+1. Confirm the latest deploy status is `live` and serving traffic.
+2. Hit the health endpoint (or root) and verify a 200 response.
+3. Scan recent error logs for a clear failure signature.
+4. Verify required env vars and port binding (`0.0.0.0:$PORT`).
 
 ## Output Format
 
 Output the complete render.yaml as a single fenced YAML code block. Add brief inline comments for fields requiring user action.
 
----
+```yaml
+services:
+  - type: web
+    name: my-app
+    runtime: node
+    plan: free
+    buildCommand: npm ci
+    startCommand: npm start
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: postgres
+          property: connectionString
+      - key: JWT_SECRET
+        sync: false # User fills in Dashboard
 
-## Method 1: Blueprint Deployment
-
-Load [references/blueprint-workflow.md](references/blueprint-workflow.md) and follow it.
-
----
-
-## Method 2: Direct Service Creation
-
-For simple single-service deployments without IaC. Load [references/direct-creation.md](references/direct-creation.md) and follow it.
-
----
-
-## Post-deploy Verification (All Methods)
-
-1. Confirm the latest deploy is `live` and serving traffic
-2. Hit the health endpoint (or root) and verify a 200 response
-3. Scan recent error logs for a clear failure signature
-4. Verify required env vars and port binding (`0.0.0.0:$PORT`)
-
-Detailed checklist: [references/post-deploy-checks.md](references/post-deploy-checks.md)
-
-If health checks fail: [references/troubleshooting-basics.md](references/troubleshooting-basics.md)
-
-Error catalog: [references/error-patterns.md](references/error-patterns.md)
-
----
+databases:
+  - name: postgres
+    databaseName: myapp_db
+    plan: free
+```
 
 ## Error Recovery
 
-If deployment fails, load [references/troubleshooting-basics.md](references/troubleshooting-basics.md) for diagnostic steps.
+If deployment fails, load `references/troubleshooting-basics.md` for diagnostic steps and `references/error-patterns.md` for the error catalog.
+
+## References
+
+Load these files when the described situation applies:
+
+- `references/blueprint-workflow.md` — full step-by-step Blueprint deployment workflow (CLI install, auth, workspace setup, render.yaml generation, deeplink, verification)
+- `references/direct-creation.md` — Direct CLI Creation steps for single-service deployments
+- `references/post-deploy-checks.md` — detailed post-deploy verification checklist
+- `references/troubleshooting-basics.md` — diagnostic steps when health checks fail
+- `references/error-patterns.md` — catalog of known deployment errors and fixes
+- `references/blueprint-spec.md` — full render.yaml field reference
+- `references/codebase-analysis.md` — checklists for framework/runtime detection
+- `references/service-types.md` — service type details and selection guidance
+- `references/runtimes.md` — runtime options and configuration
+- `references/configuration-guide.md` — configuration validation and common mistakes
+- `references/render-api.md` — REST API commands for metrics, database operations, and advanced queries
