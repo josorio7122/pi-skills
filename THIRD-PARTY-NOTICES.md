@@ -18,8 +18,6 @@ original license in its directory.
 ## Sentry Skills
 
 - **agents-md** — [getsentry/skills](https://github.com/getsentry/skills)
-- **skill-scanner** — [getsentry/skills](https://github.com/getsentry/skills)
-- **skill-writer** — [getsentry/skills](https://github.com/getsentry/skills)
 - License: Apache 2.0 (see LICENSE in each skill directory)
 
 ## Dammyjay93
@@ -33,7 +31,3 @@ original license in its directory.
 - **docker-model-runner** — Installed via `docker model skills` CLI
 - Source: [Docker Docs](https://docs.docker.com/reference/cli/docker/model/skills/)
 - License: Distributed by Docker, Inc. as part of Docker Desktop
-
-## Original Skills
-
-- **exa-search**, **gh**, **glab** — Original work from [pi-packages](https://github.com/josorio7122/pi-packages)

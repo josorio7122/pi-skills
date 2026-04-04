@@ -9,7 +9,7 @@ description: Test any prompt before deployment using RED-GREEN-REFACTOR applied 
 
 **Core principle:** If you didn't watch an agent fail without the prompt, you don't know what the prompt needs to fix.
 
-**Related skill:** [prompt-engineering](../prompt-engineering/SKILL.md) — provides writing techniques. This skill provides the testing methodology.
+**Related skill:** prompt-engineering (moved to pi-teams-catalog) — provides writing techniques. This skill provides the testing methodology.
 
 ## Output Format
 

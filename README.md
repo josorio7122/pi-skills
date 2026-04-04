@@ -22,8 +22,6 @@ pi install git:github.com/josorio7122/pi-skills
 | **pdf** | Read, create, and review PDF files | [openai/skills](https://github.com/openai/skills) |
 | **playwright** | Browser automation via Playwright CLI | [openai/skills](https://github.com/openai/skills) |
 | **render-deploy** | Deploy applications to Render | [openai/skills](https://github.com/openai/skills) |
-| **skill-scanner** | Security audit for agent skills | [getsentry/skills](https://github.com/getsentry/skills) |
-| **skill-writer** | Create, synthesize, and improve agent skills | [getsentry/skills](https://github.com/getsentry/skills) |
 
 ## Setup
 
