@@ -26,12 +26,11 @@
  *   tsx scripts/answer.ts "List top 3 ORMs" '{"outputSchema":{"type":"object","properties":{"items":{"type":"array","items":{"type":"string"}}}}}'
  */
 
-import { createClient, filterOptions, handleError, isRecord, out, parseArgs, requireApiKey } from './lib/common.js'
+import { createAuthenticatedClient, filterOptions, handleError, isRecord, out, parseArgs } from './lib/common.js'
 
 const { target: query, opts } = parseArgs(import.meta.url)
-requireApiKey()
 
-const exa = createClient()
+const exa = createAuthenticatedClient()
 
 const answerOpts = filterOptions({ opts, keys: ['text', 'model', 'systemPrompt', 'outputSchema', 'userLocation'] })
 

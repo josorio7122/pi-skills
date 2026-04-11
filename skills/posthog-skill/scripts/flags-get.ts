@@ -15,14 +15,10 @@
  *   tsx scripts/flags-get.ts 101
  */
 
-import { executeAndPrint, parseArgs, requireToken, resolveConfig } from './lib/common.js'
-import { createClient } from './lib/posthog-client.js'
+import { createAuthenticatedClient, executeAndPrint, parseArgs } from './lib/common.js'
 
 const { target: id } = parseArgs(import.meta.url)
 
-const config = resolveConfig()
-requireToken(config)
-
-const client = createClient({ config })
+const client = createAuthenticatedClient()
 
 await executeAndPrint(() => client.getFeatureFlag(id))

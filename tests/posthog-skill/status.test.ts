@@ -4,7 +4,7 @@ import { runScript } from '../helpers/run-script.js'
 const STATUS_SCRIPT = new URL('../../skills/posthog-skill/scripts/status.ts', import.meta.url).pathname
 
 function runStatus(env: Record<string, string> = {}) {
-  return runScript({ scriptPath: STATUS_SCRIPT, env })
+  return runScript({ scriptPath: STATUS_SCRIPT, env: { POSTHOG_PROJECT_ID: 'test-project-123', ...env } })
 }
 
 describe('status script', () => {

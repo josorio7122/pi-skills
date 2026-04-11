@@ -3,6 +3,7 @@ import { isRecord } from '../../../../scripts/lib/shared.js'
 
 export {
   executeAndPrint,
+  filterOptions,
   handleError,
   isRecord,
   out,
@@ -28,21 +29,15 @@ export function requireApiKey() {
   }
 }
 
-/**
- * Pick allowed keys from an options object, skipping undefined values.
- */
-export function filterOptions({
-  opts,
-  keys,
-}: {
-  readonly opts: Readonly<Record<string, unknown>>
-  readonly keys: readonly string[]
-}): Readonly<Record<string, unknown>> {
-  const filtered: Record<string, unknown> = {}
-  for (const key of keys) {
-    if (opts[key] !== undefined) filtered[key] = opts[key]
-  }
-  return filtered
+/** Validate API key and return an authenticated Exa client. */
+export function createAuthenticatedClient() {
+  requireApiKey()
+  return createClient()
+}
+
+/** Check if the user requested any contents fields. */
+export function wantsContents(opts: Readonly<Record<string, unknown>>) {
+  return Boolean(opts.contents || opts.text || opts.highlights || opts.summary)
 }
 
 /**
@@ -50,10 +45,11 @@ export function filterOptions({
  * Each field accepts `true` (shorthand) or an object (fine control).
  */
 export function buildContentsOptions(opts: Readonly<Record<string, unknown>>) {
-  const base: Record<string, unknown> = {}
-  for (const key of ['text', 'highlights', 'summary'] as const) {
-    if (opts[key] === true || (typeof opts[key] === 'object' && opts[key] !== null)) base[key] = opts[key]
-  }
+  const base = Object.fromEntries(
+    (['text', 'highlights', 'summary'] as const)
+      .filter((key) => opts[key] === true || (typeof opts[key] === 'object' && opts[key] !== null))
+      .map((key) => [key, opts[key]]),
+  )
   if (isRecord(opts.contents)) {
     return { ...base, ...opts.contents }
   }

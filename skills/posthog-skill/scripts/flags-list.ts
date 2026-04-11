@@ -25,15 +25,11 @@
  *   tsx scripts/flags-list.ts '{"active":"true","limit":10}'
  */
 
-import { executeAndPrint, parseArgsOptional, requireToken, resolveConfig } from './lib/common.js'
-import { createClient } from './lib/posthog-client.js'
+import { createAuthenticatedClient, executeAndPrint, parseArgsOptional } from './lib/common.js'
 
 const { opts } = parseArgsOptional(import.meta.url)
 
-const config = resolveConfig()
-requireToken(config)
-
-const client = createClient({ config })
+const client = createAuthenticatedClient()
 
 const params: Record<string, string | number> = {}
 if (typeof opts.search === 'string') params.search = opts.search

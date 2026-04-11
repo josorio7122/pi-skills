@@ -30,18 +30,21 @@
  *   tsx scripts/contents.ts '["https://a.com","https://b.com"]' '{"text":true,"highlights":true}'
  */
 
-import { createClient, executeAndPrint, filterOptions, parseArgs, requireApiKey } from './lib/common.js'
+import { createAuthenticatedClient, executeAndPrint, filterOptions, parseArgs } from './lib/common.js'
 
 const { target: urlArg, opts: rawOpts } = parseArgs(import.meta.url)
-requireApiKey()
 
-const exa = createClient()
+const exa = createAuthenticatedClient()
+
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((x) => typeof x === 'string')
+}
 
 function parseUrls(arg: string): string | string[] {
   try {
     const parsed: unknown = JSON.parse(arg)
-    if (Array.isArray(parsed) && parsed.every((x) => typeof x === 'string')) {
-      return parsed as string[]
+    if (isStringArray(parsed)) {
+      return parsed
     }
     return arg
   } catch {

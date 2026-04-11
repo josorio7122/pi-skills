@@ -53,12 +53,11 @@
  */
 
 import {
-  createClient,
+  createAuthenticatedClient,
   executeAndPrint,
   handleError,
   isRecord,
   parseJsonObject,
-  requireApiKey,
   requireArg,
   showHelp,
 } from './lib/common.js'
@@ -66,21 +65,11 @@ import {
 const VALID_MODELS = ['exa-research-fast', 'exa-research', 'exa-research-pro'] as const
 type ResearchModel = (typeof VALID_MODELS)[number]
 
-function parseSubcommandOpts(argvIndex: number): Readonly<Record<string, unknown>> {
-  const raw = process.argv[argvIndex]
-  if (!raw) return {}
-  return parseJsonObject(raw)
-}
-
 function toModel(value: unknown): ResearchModel | undefined {
   if (typeof value === 'string' && (VALID_MODELS as readonly string[]).includes(value)) {
     return value as ResearchModel
   }
   return undefined
-}
-
-function toNumber({ value, fallback }: { readonly value: unknown; readonly fallback: number }) {
-  return typeof value === 'number' ? value : fallback
 }
 
 function buildCreateParams({
@@ -109,22 +98,20 @@ if (process.argv.includes('--help') || process.argv.length <= 2) {
 const subcommand = process.argv[2]
 const arg1 = process.argv[3]
 
-requireApiKey()
-
-const exa = createClient()
+const exa = createAuthenticatedClient()
 
 try {
   switch (subcommand) {
     case 'create': {
       const instructions = requireArg({ value: arg1, name: 'instructions' })
-      const opts = parseSubcommandOpts(4)
+      const opts = process.argv[4] ? parseJsonObject(process.argv[4]) : {}
       await executeAndPrint(() => exa.research.create(buildCreateParams({ instructions, opts })))
       break
     }
 
     case 'get': {
       const researchId = requireArg({ value: arg1, name: 'research-id' })
-      const opts = parseSubcommandOpts(4)
+      const opts = process.argv[4] ? parseJsonObject(process.argv[4]) : {}
       if (opts.stream) {
         const streamResult = await exa.research.get(researchId, { stream: true, ...opts })
         for await (const event of streamResult) {
@@ -138,14 +125,14 @@ try {
 
     case 'poll': {
       const researchId = requireArg({ value: arg1, name: 'research-id' })
-      const opts = parseSubcommandOpts(4)
+      const opts = process.argv[4] ? parseJsonObject(process.argv[4]) : {}
       await executeAndPrint(() => exa.research.pollUntilFinished(researchId, opts))
       break
     }
 
     case 'run': {
       const instructions = requireArg({ value: arg1, name: 'instructions' })
-      const opts = parseSubcommandOpts(4)
+      const opts = process.argv[4] ? parseJsonObject(process.argv[4]) : {}
       const created: unknown = await exa.research.create(buildCreateParams({ instructions, opts }))
       const researchId =
         typeof created === 'object' && created !== null && 'researchId' in created ? created.researchId : undefined
@@ -156,8 +143,8 @@ try {
       process.stderr.write(`Research task created: ${researchId} — polling...\n`)
       await executeAndPrint(() =>
         exa.research.pollUntilFinished(researchId, {
-          pollInterval: toNumber({ value: opts.pollInterval, fallback: 2000 }),
-          timeoutMs: toNumber({ value: opts.timeoutMs, fallback: 300000 }),
+          pollInterval: typeof opts.pollInterval === 'number' ? opts.pollInterval : 2000,
+          timeoutMs: typeof opts.timeoutMs === 'number' ? opts.timeoutMs : 300000,
           ...(typeof opts.events === 'boolean' ? { events: opts.events } : {}),
         }),
       )
@@ -165,7 +152,7 @@ try {
     }
 
     case 'list': {
-      const opts = parseSubcommandOpts(3)
+      const opts = process.argv[3] ? parseJsonObject(process.argv[3]) : {}
       await executeAndPrint(() => exa.research.list(opts))
       break
     }

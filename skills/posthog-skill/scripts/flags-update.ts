@@ -23,19 +23,12 @@
  *   tsx scripts/flags-update.ts 101 '{"name":"New Name","tags":["v2"]}'
  */
 
-import { executeAndPrint, parseArgs, requireToken, resolveConfig } from './lib/common.js'
-import { createClient } from './lib/posthog-client.js'
+import { createAuthenticatedClient, executeAndPrint, filterOptions, parseArgs } from './lib/common.js'
 
 const { target: id, opts } = parseArgs(import.meta.url)
 
-const config = resolveConfig()
-requireToken(config)
+const client = createAuthenticatedClient()
 
-const client = createClient({ config })
-
-const body: Record<string, unknown> = {}
-if (opts.name !== undefined) body.name = opts.name
-if (opts.active !== undefined) body.active = opts.active
-if (opts.tags !== undefined) body.tags = opts.tags
+const body = filterOptions({ opts, keys: ['name', 'active', 'tags'] })
 
 await executeAndPrint(() => client.patchFeatureFlag({ id, body }))

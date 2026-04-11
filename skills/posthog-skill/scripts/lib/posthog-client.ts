@@ -55,7 +55,26 @@ async function requestWithRetry(ctx: RequestContext, req: { url: string; options
       },
     })
 
-    if (response.ok) return response.json()
+    if (response.ok) {
+      let body: unknown
+      try {
+        body = await response.json()
+      } catch {
+        throw new PostHogError({
+          status: response.status,
+          message: `PostHog returned unparseable body on ${endpoint}`,
+          endpoint,
+        })
+      }
+      if (body === null || body === undefined) {
+        throw new PostHogError({
+          status: response.status,
+          message: `PostHog returned empty body on ${endpoint}`,
+          endpoint,
+        })
+      }
+      return body
+    }
 
     if (response.status === 429) {
       if (attempt < MAX_ATTEMPTS - 1) {
