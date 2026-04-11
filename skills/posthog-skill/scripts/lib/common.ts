@@ -58,7 +58,12 @@ export function parseArgsOptional(scriptUrl: string) {
   let opts: Readonly<Record<string, unknown>> = {}
   if (args[0]) {
     try {
-      opts = JSON.parse(args[0]) as Readonly<Record<string, unknown>>
+      const parsed: unknown = JSON.parse(args[0])
+      if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+        process.stderr.write('Error: options argument is not a valid JSON object\n')
+        process.exit(1)
+      }
+      opts = parsed as Readonly<Record<string, unknown>>
     } catch {
       process.stderr.write('Error: options argument is not valid JSON\n')
       process.exit(1)
