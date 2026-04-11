@@ -4,9 +4,9 @@
   "description": "Personal pi skills collection",
   "scripts": {
     "test": "vitest run",
-    "lint": "biome check skills/ tests/",
-    "format": "biome format --write skills/ tests/",
-    "lint:fix": "biome check --fix skills/ tests/",
+    "lint": "biome check skills/ tests/ scripts/",
+    "format": "biome format --write skills/ tests/ scripts/",
+    "lint:fix": "biome check --fix skills/ tests/ scripts/",
     "typecheck": "tsc --noEmit",
     "check": "npm run lint && npm run typecheck && npm run test",
     "test:watch": "vitest"

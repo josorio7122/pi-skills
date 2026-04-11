@@ -7,9 +7,9 @@ Use **npm**: `npm install`, `npm test`, `npm run check`
 | Task | Command |
 |------|---------|
 | Typecheck | `npx tsc --noEmit` |
-| Lint | `npx biome check skills/ tests/` |
-| Lint fix | `npx biome check --fix skills/ tests/` |
-| Format | `npx biome format --write skills/ tests/` |
+| Lint | `npx biome check skills/ tests/ scripts/` |
+| Lint fix | `npx biome check --fix skills/ tests/ scripts/` |
+| Format | `npx biome format --write skills/ tests/ scripts/` |
 | Test | `npx vitest run` |
 | Test file | `npx vitest run tests/posthog-skill/posthog-client.test.ts` |
 | All checks | `npm run check` |
