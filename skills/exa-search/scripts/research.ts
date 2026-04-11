@@ -143,10 +143,20 @@ try {
     case 'run': {
       const instructions = requireArg({ value: arg1, name: 'instructions' })
       const opts = parseSubcommandOpts(4)
-      const created = (await exa.research.create(buildCreateParams({ instructions, opts }))) as { researchId: string }
-      process.stderr.write(`Research task created: ${created.researchId} — polling...\n`)
+      const created: unknown = await exa.research.create(buildCreateParams({ instructions, opts }))
+      if (
+        typeof created !== 'object' ||
+        created === null ||
+        !('researchId' in created) ||
+        typeof (created as Record<string, unknown>).researchId !== 'string'
+      ) {
+        process.stderr.write('Error: unexpected response from exa.research.create — missing researchId\n')
+        process.exit(1)
+      }
+      const researchId = (created as Record<string, unknown>).researchId as string
+      process.stderr.write(`Research task created: ${researchId} — polling...\n`)
       await executeAndPrint(() =>
-        exa.research.pollUntilFinished(created.researchId, {
+        exa.research.pollUntilFinished(researchId, {
           pollInterval: toNumber({ value: opts.pollInterval, fallback: 2000 }),
           timeoutMs: toNumber({ value: opts.timeoutMs, fallback: 300000 }),
           ...(typeof opts.events === 'boolean' ? { events: opts.events } : {}),

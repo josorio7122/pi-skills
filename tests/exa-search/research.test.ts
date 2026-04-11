@@ -1,4 +1,5 @@
 import { spawnSync } from 'node:child_process'
+import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
@@ -17,6 +18,13 @@ function runResearch(args: string[], env: Record<string, string | undefined> = {
     stderr: result.stderr ?? '',
   }
 }
+
+describe('research.ts: run subcommand', () => {
+  it('does not use unsafe type assertion for create response', () => {
+    const src = readFileSync(path.resolve(RESEARCH), 'utf8')
+    expect(src).not.toContain('as { researchId: string }')
+  })
+})
 
 describe('research.ts: invalid JSON handling', () => {
   it('exits 1 with user-friendly message when create opts are invalid JSON', () => {
