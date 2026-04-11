@@ -21,15 +21,11 @@
  *   tsx scripts/flags-activity.ts 101 '{"limit":5}'
  */
 
-import { executeAndPrint, parseArgs, requireToken, resolveConfig } from './lib/common.js'
-import { createClient } from './lib/posthog-client.js'
+import { createAuthenticatedClient, executeAndPrint, parseArgs } from './lib/common.js'
 
 const { target: id, opts } = parseArgs(import.meta.url)
 
-const config = resolveConfig()
-requireToken(config)
-
-const client = createClient({ config })
+const client = createAuthenticatedClient()
 
 const limit = typeof opts.limit === 'number' ? opts.limit : 10
 

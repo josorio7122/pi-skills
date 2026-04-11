@@ -23,15 +23,11 @@
  *   tsx scripts/flags-update.ts 101 '{"name":"New Name","tags":["v2"]}'
  */
 
-import { executeAndPrint, filterOptions, parseArgs, requireToken, resolveConfig } from './lib/common.js'
-import { createClient } from './lib/posthog-client.js'
+import { createAuthenticatedClient, executeAndPrint, filterOptions, parseArgs } from './lib/common.js'
 
 const { target: id, opts } = parseArgs(import.meta.url)
 
-const config = resolveConfig()
-requireToken(config)
-
-const client = createClient({ config })
+const client = createAuthenticatedClient()
 
 const body = filterOptions({ opts, keys: ['name', 'active', 'tags'] })
 

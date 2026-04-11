@@ -1,4 +1,5 @@
 import { handleError as baseHandleError, parseJsonObject, showHelp } from '../../../../scripts/lib/shared.js'
+import { createClient } from './posthog-client.js'
 import { PostHogError } from './posthog-error.js'
 import type { PostHogConfig } from './posthog-types.js'
 
@@ -78,4 +79,11 @@ export function handleError(err: unknown): never {
     process.exit(1)
   }
   baseHandleError(err)
+}
+
+/** Resolve config, require token, return authenticated client. */
+export function createAuthenticatedClient() {
+  const config = resolveConfig()
+  requireToken(config)
+  return createClient({ config })
 }
