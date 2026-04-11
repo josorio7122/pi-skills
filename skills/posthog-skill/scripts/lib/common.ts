@@ -19,7 +19,7 @@ export function resolveConfig() {
   return {
     host: process.env.POSTHOG_HOST ?? 'https://us.posthog.com',
     projectId: requireEnv('POSTHOG_PROJECT_ID'),
-    token: process.env.POSTHOG_PERSONAL_API_KEY ?? '',
+    token: process.env.POSTHOG_PERSONAL_API_KEY,
   }
 }
 

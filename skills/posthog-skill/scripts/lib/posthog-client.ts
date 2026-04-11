@@ -32,7 +32,7 @@ function parseErrorDetail(response: { json(): Promise<unknown> }) {
 
 interface RequestContext {
   readonly fetchFn: FetchFn
-  readonly token: string
+  readonly token: string | undefined
   readonly host: string
   readonly baseDelayMs: number
 }
@@ -46,7 +46,7 @@ async function requestWithRetry(ctx: RequestContext, req: { url: string; options
     const response = await ctx.fetchFn(url, {
       ...options,
       headers: {
-        Authorization: `Bearer ${ctx.token}`,
+        ...(ctx.token ? { Authorization: `Bearer ${ctx.token}` } : {}),
         ...(options.body ? { 'Content-Type': 'application/json' } : {}),
         ...(options.headers ?? {}),
       },

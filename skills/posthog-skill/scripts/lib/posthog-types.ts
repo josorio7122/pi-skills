@@ -5,7 +5,7 @@
 export interface PostHogConfig {
   readonly host: string
   readonly projectId: string
-  readonly token: string
+  readonly token: string | undefined
 }
 
 export interface ClientOptions {

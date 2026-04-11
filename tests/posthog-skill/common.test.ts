@@ -115,3 +115,18 @@ describe('resolveConfig', () => {
     expect(result.stdout).toContain('https://us.posthog.com')
   })
 })
+
+describe('resolveConfig: token is undefined when env var is missing', () => {
+  it('returns undefined token when POSTHOG_PERSONAL_API_KEY is not set', () => {
+    const result = runInline(
+      `
+      import { resolveConfig, out } from '${COMMON}';
+      out(resolveConfig());
+    `,
+      { POSTHOG_PERSONAL_API_KEY: undefined },
+    )
+    expect(result.status).toBe(0)
+    const parsed = JSON.parse(result.stdout) as { token: unknown }
+    expect(parsed.token).toBeUndefined()
+  })
+})
