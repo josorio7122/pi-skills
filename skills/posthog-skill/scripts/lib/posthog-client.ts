@@ -1,3 +1,4 @@
+import { isRecord } from '../../../../scripts/lib/shared.js'
 import { PostHogError } from './posthog-error.js'
 import type {
   ClientOptions,
@@ -18,10 +19,6 @@ import type {
 
 function sleep(ms: number) {
   return new Promise<void>((resolve) => setTimeout(resolve, ms))
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null
 }
 
 function parseErrorDetail(response: { json(): Promise<unknown> }) {

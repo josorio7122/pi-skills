@@ -1,7 +1,7 @@
 import { Exa } from 'exa-js'
 import { out } from '../../../../scripts/lib/shared.js'
 
-export { out, parseArgs, requireArg, showHelp } from '../../../../scripts/lib/shared.js'
+export { isRecord, out, parseArgs, requireArg, showHelp } from '../../../../scripts/lib/shared.js'
 
 /** Create an Exa client instance. Requires EXA_API_KEY env var. */
 export function createClient() {

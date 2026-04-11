@@ -26,7 +26,7 @@
  *   tsx scripts/answer.ts "List top 3 ORMs" '{"outputSchema":{"type":"object","properties":{"items":{"type":"array","items":{"type":"string"}}}}}'
  */
 
-import { createClient, filterOptions, handleError, out, parseArgs, requireApiKey } from './lib/common.js'
+import { createClient, filterOptions, handleError, isRecord, out, parseArgs, requireApiKey } from './lib/common.js'
 
 const { target: query, opts } = parseArgs(import.meta.url)
 requireApiKey()
@@ -34,10 +34,6 @@ requireApiKey()
 const exa = createClient()
 
 const answerOpts = filterOptions({ opts, keys: ['text', 'model', 'systemPrompt', 'outputSchema', 'userLocation'] })
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null
-}
 
 try {
   if (opts.stream) {

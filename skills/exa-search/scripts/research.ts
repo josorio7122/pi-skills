@@ -145,9 +145,7 @@ try {
       const opts = parseSubcommandOpts(4)
       const created: unknown = await exa.research.create(buildCreateParams({ instructions, opts }))
       const researchId =
-        typeof created === 'object' && created !== null && 'researchId' in created
-          ? (created as Record<string, unknown>).researchId
-          : undefined
+        typeof created === 'object' && created !== null && 'researchId' in created ? created.researchId : undefined
       if (typeof researchId !== 'string') {
         process.stderr.write('Error: unexpected response from exa.research.create — missing researchId\n')
         process.exit(1)

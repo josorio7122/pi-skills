@@ -16,6 +16,14 @@ describe('posthog-client: Authorization header', () => {
     await client.createDashboard({ name: 'Test', tags: [] })
     expect((fetch.calls[0]!.options.headers as Record<string, string>).Authorization).toBe(`Bearer ${CONFIG.token}`)
   })
+
+  it('omits Authorization header when token is undefined', async () => {
+    const fetch = makeFetch({ status: 200, body: { results: [] } })
+    const config = { ...CONFIG, token: undefined }
+    const client = createClient({ config, opts: { fetchFn: fetch } })
+    await client.listDashboards()
+    expect((fetch.calls[0]!.options.headers as Record<string, string>).Authorization).toBeUndefined()
+  })
 })
 
 describe('posthog-client: Content-Type header', () => {
