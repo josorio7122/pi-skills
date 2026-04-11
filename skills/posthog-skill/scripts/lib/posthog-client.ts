@@ -20,12 +20,16 @@ function sleep(ms: number) {
   return new Promise<void>((resolve) => setTimeout(resolve, ms))
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+}
+
 function parseErrorDetail(response: { json(): Promise<unknown> }) {
   return response
     .json()
     .then((body) => {
-      const b = body as { detail?: string; message?: string }
-      return b.detail ?? b.message ?? ''
+      if (!isRecord(body)) return ''
+      return (typeof body.detail === 'string' && body.detail) || (typeof body.message === 'string' && body.message) || ''
     })
     .catch(() => '')
 }
