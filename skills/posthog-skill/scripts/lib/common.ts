@@ -1,8 +1,8 @@
-import { out, showHelp } from '../../../../scripts/lib/shared.js'
+import { handleError as baseHandleError, showHelp } from '../../../../scripts/lib/shared.js'
 import { PostHogError } from './posthog-error.js'
 import type { PostHogConfig } from './posthog-types.js'
 
-export { out, parseArgs, requireArg, showHelp } from '../../../../scripts/lib/shared.js'
+export { executeAndPrint, out, parseArgs, requireArg, showHelp } from '../../../../scripts/lib/shared.js'
 
 /** Require an environment variable, exit with error if missing. */
 export function requireEnv(name: string) {
@@ -31,16 +31,6 @@ export function requireToken(config: PostHogConfig) {
         'Set it in your environment: export POSTHOG_PERSONAL_API_KEY=phx_...\n',
     )
     process.exit(1)
-  }
-}
-
-/** Execute an async API call, print JSON result, exit on error. */
-export async function executeAndPrint<T>(apiCall: () => Promise<T>) {
-  try {
-    const result = await apiCall()
-    out(result)
-  } catch (err) {
-    handleError(err)
   }
 }
 
@@ -87,8 +77,7 @@ export function handleError(err: unknown): never {
   if (err instanceof PostHogError) {
     const formatter = STATUS_MESSAGES[err.status]
     process.stderr.write(formatter ? formatter(err.endpoint) : `Error: ${err.message}\n`)
-  } else {
-    process.stderr.write(`Error: ${err instanceof Error ? err.message : String(err)}\n`)
+    process.exit(1)
   }
-  process.exit(1)
+  baseHandleError(err)
 }

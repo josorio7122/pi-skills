@@ -1,7 +1,14 @@
 import { Exa } from 'exa-js'
-import { out } from '../../../../scripts/lib/shared.js'
 
-export { isRecord, out, parseArgs, requireArg, showHelp } from '../../../../scripts/lib/shared.js'
+export {
+  executeAndPrint,
+  handleError,
+  isRecord,
+  out,
+  parseArgs,
+  requireArg,
+  showHelp,
+} from '../../../../scripts/lib/shared.js'
 
 /** Create an Exa client instance. Requires EXA_API_KEY env var. */
 export function createClient() {
@@ -16,24 +23,6 @@ export function requireApiKey() {
     process.stderr.write('Error: EXA_API_KEY environment variable is required.\n')
     process.stderr.write('Get one at: https://dashboard.exa.ai/api-keys\n')
     process.exit(1)
-  }
-}
-
-/**
- * Standardized error handler for all exa scripts.
- */
-export function handleError(err: unknown): never {
-  process.stderr.write(`Error: ${err instanceof Error ? err.message : String(err)}\n`)
-  process.exit(1)
-}
-
-/** Execute an async API call, print JSON result, exit on error. */
-export async function executeAndPrint<T>(apiCall: () => Promise<T>) {
-  try {
-    const result = await apiCall()
-    out(result)
-  } catch (err) {
-    handleError(err)
   }
 }
 

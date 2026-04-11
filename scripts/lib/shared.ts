@@ -70,3 +70,19 @@ export function parseArgs(scriptUrl: string) {
 
   return { target, opts }
 }
+
+/** Write error to stderr and exit. */
+export function handleError(err: unknown): never {
+  process.stderr.write(`Error: ${err instanceof Error ? err.message : String(err)}\n`)
+  process.exit(1)
+}
+
+/** Execute an async API call, print JSON result, exit on error. */
+export async function executeAndPrint<T>(apiCall: () => Promise<T>) {
+  try {
+    const result = await apiCall()
+    out(result)
+  } catch (err) {
+    handleError(err)
+  }
+}
