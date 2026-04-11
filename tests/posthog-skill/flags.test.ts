@@ -10,10 +10,10 @@ interface RunFlagOptions {
 }
 
 function runFlag({ script, args = [], env = {} }: RunFlagOptions) {
-  return runScript(`${SCRIPTS}/${script}`, args, {
-    POSTHOG_PROJECT_ID: 'test-123',
-    POSTHOG_PERSONAL_API_KEY: '',
-    ...env,
+  return runScript({
+    scriptPath: `${SCRIPTS}/${script}`,
+    args,
+    env: { POSTHOG_PROJECT_ID: 'test-123', POSTHOG_PERSONAL_API_KEY: '', ...env },
   })
 }
 

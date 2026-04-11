@@ -52,7 +52,16 @@
  *   tsx scripts/research.ts list '{"limit":5}'
  */
 
-import { createClient, executeAndPrint, handleError, isRecord, parseJsonObject, requireApiKey, requireArg, showHelp } from './lib/common.js'
+import {
+  createClient,
+  executeAndPrint,
+  handleError,
+  isRecord,
+  parseJsonObject,
+  requireApiKey,
+  requireArg,
+  showHelp,
+} from './lib/common.js'
 
 const VALID_MODELS = ['exa-research-fast', 'exa-research', 'exa-research-pro'] as const
 type ResearchModel = (typeof VALID_MODELS)[number]

@@ -118,7 +118,7 @@ describe('requireApiKey', () => {
 describe('showHelp: extracts help from JSDoc', () => {
   it('extracts help text from a script with shebang before JSDoc', () => {
     const SEARCH = new URL('../../skills/exa-search/scripts/search.ts', import.meta.url).pathname
-    const result = runScript(SEARCH, ['--help'], { EXA_API_KEY: 'test-key' })
+    const result = runScript({ scriptPath: SEARCH, args: ['--help'], env: { EXA_API_KEY: 'test-key' } })
     expect(result.status).toBe(0)
     expect(result.stdout).toContain('Usage:')
   })

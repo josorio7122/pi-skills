@@ -4,7 +4,7 @@ import { runScript } from '../helpers/run-script.js'
 const RESEARCH = new URL('../../skills/exa-search/scripts/research.ts', import.meta.url).pathname
 
 function runResearch(args: string[], env: Record<string, string | undefined> = {}) {
-  return runScript(RESEARCH, args, { EXA_API_KEY: 'test-key', ...env })
+  return runScript({ scriptPath: RESEARCH, args, env: { EXA_API_KEY: 'test-key', ...env } })
 }
 
 describe('research.ts: invalid JSON handling', () => {

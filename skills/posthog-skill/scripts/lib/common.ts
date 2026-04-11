@@ -2,7 +2,14 @@ import { handleError as baseHandleError, parseJsonObject, showHelp } from '../..
 import { PostHogError } from './posthog-error.js'
 import type { PostHogConfig } from './posthog-types.js'
 
-export { executeAndPrint, out, parseArgs, parseJsonObject, requireArg, showHelp } from '../../../../scripts/lib/shared.js'
+export {
+  executeAndPrint,
+  out,
+  parseArgs,
+  parseJsonObject,
+  requireArg,
+  showHelp,
+} from '../../../../scripts/lib/shared.js'
 
 /** Require an environment variable, exit with error if missing. */
 export function requireEnv(name: string) {
