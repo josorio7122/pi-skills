@@ -29,15 +29,27 @@ export function requireApiKey() {
   }
 }
 
+/** Validate API key and return an authenticated Exa client. */
+export function createAuthenticatedClient() {
+  requireApiKey()
+  return createClient()
+}
+
+/** Check if the user requested any contents fields. */
+export function wantsContents(opts: Readonly<Record<string, unknown>>) {
+  return Boolean(opts.contents || opts.text || opts.highlights || opts.summary)
+}
+
 /**
  * Build contents options from text/highlights/summary fields.
  * Each field accepts `true` (shorthand) or an object (fine control).
  */
 export function buildContentsOptions(opts: Readonly<Record<string, unknown>>) {
-  const base: Record<string, unknown> = {}
-  for (const key of ['text', 'highlights', 'summary'] as const) {
-    if (opts[key] === true || (typeof opts[key] === 'object' && opts[key] !== null)) base[key] = opts[key]
-  }
+  const base = Object.fromEntries(
+    (['text', 'highlights', 'summary'] as const)
+      .filter((key) => opts[key] === true || (typeof opts[key] === 'object' && opts[key] !== null))
+      .map((key) => [key, opts[key]]),
+  )
   if (isRecord(opts.contents)) {
     return { ...base, ...opts.contents }
   }

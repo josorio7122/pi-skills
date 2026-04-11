@@ -46,20 +46,18 @@
 
 import {
   buildContentsOptions,
-  createClient,
+  createAuthenticatedClient,
   executeAndPrint,
   filterOptions,
   parseArgs,
-  requireApiKey,
+  wantsContents,
 } from './lib/common.js'
 
 const { target: query, opts } = parseArgs(import.meta.url)
-requireApiKey()
 
-const exa = createClient()
+const exa = createAuthenticatedClient()
 
-// Determine if we need contents
-const wantContents = opts.contents || opts.text || opts.highlights || opts.summary
+const hasContents = wantsContents(opts)
 
 // Build contents options
 const contentsOpts = buildContentsOptions(opts)
@@ -94,7 +92,7 @@ const searchKeys = [
 const searchOpts = filterOptions({ opts, keys: searchKeys })
 
 await executeAndPrint(async () => {
-  if (wantContents) {
+  if (hasContents) {
     return await exa.searchAndContents(query, { ...searchOpts, ...contentsOpts })
   } else {
     return await exa.search(query, searchOpts)

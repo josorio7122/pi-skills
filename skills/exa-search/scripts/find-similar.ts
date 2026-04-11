@@ -35,19 +35,18 @@
 
 import {
   buildContentsOptions,
-  createClient,
+  createAuthenticatedClient,
   executeAndPrint,
   filterOptions,
   parseArgs,
-  requireApiKey,
+  wantsContents,
 } from './lib/common.js'
 
 const { target: url, opts } = parseArgs(import.meta.url)
-requireApiKey()
 
-const exa = createClient()
+const exa = createAuthenticatedClient()
 
-const wantContents = opts.contents || opts.text || opts.highlights || opts.summary
+const hasContents = wantsContents(opts)
 
 const contentsOpts = buildContentsOptions(opts)
 
@@ -68,7 +67,7 @@ const findSimilarKeys = [
 const searchOpts = filterOptions({ opts, keys: findSimilarKeys })
 
 await executeAndPrint(async () => {
-  if (wantContents) {
+  if (hasContents) {
     return await exa.findSimilarAndContents(url, { ...searchOpts, ...contentsOpts })
   } else {
     return await exa.findSimilar(url, searchOpts)
