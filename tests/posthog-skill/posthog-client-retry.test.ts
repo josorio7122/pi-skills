@@ -40,22 +40,17 @@ describe('posthog-client: PostHogError on 4xx', () => {
   it('token does not appear in PostHogError.message', async () => {
     const fetch = makeFetch({ status: 401, body: { detail: 'bad token' } })
     const client = createClient({ config: CONFIG, opts: { fetchFn: fetch } })
-    try {
-      await client.listDashboards()
-    } catch (err) {
-      expect((err as PostHogError).message).not.toContain(CONFIG.token)
-    }
+    await expect(client.listDashboards()).rejects.toMatchObject({
+      message: expect.not.stringContaining(CONFIG.token),
+    })
   })
 
   it('PostHogError has an endpoint property', async () => {
     const fetch = makeFetch({ status: 404, body: {} })
     const client = createClient({ config: CONFIG, opts: { fetchFn: fetch } })
-    try {
-      await client.getDashboard(999)
-    } catch (err) {
-      expect(typeof (err as PostHogError).endpoint).toBe('string')
-      expect((err as PostHogError).endpoint).not.toContain(CONFIG.token)
-    }
+    await expect(client.getDashboard(999)).rejects.toMatchObject({
+      endpoint: expect.not.stringContaining(CONFIG.token),
+    })
   })
 })
 
@@ -63,14 +58,10 @@ describe('posthog-client: exhausted retries throw descriptive error', () => {
   it('throws PostHogError with rate-limit message after all 429 attempts', async () => {
     const fetch = makeFetch({ status: 429, body: {} }, { status: 429, body: {} }, { status: 429, body: {} })
     const client = createClient({ config: CONFIG, opts: { fetchFn: fetch, retryDelayMs: 0 } })
-    try {
-      await client.listDashboards()
-      expect.fail('should have thrown')
-    } catch (err) {
-      expect(err).toBeInstanceOf(PostHogError)
-      expect((err as PostHogError).status).toBe(429)
-      expect((err as PostHogError).message).toContain('rate limit')
-    }
+    await expect(client.listDashboards()).rejects.toMatchObject({
+      status: 429,
+      message: expect.stringContaining('rate limit'),
+    })
   })
 })
 
