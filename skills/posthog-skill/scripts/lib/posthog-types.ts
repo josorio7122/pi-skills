@@ -1,7 +1,3 @@
-// ---------------------------------------------------------------------------
-// Config & client option types
-// ---------------------------------------------------------------------------
-
 export interface PostHogConfig {
   readonly host: string
   readonly projectId: string
@@ -13,10 +9,6 @@ export interface ClientOptions {
   readonly retryDelayMs?: number
 }
 
-// ---------------------------------------------------------------------------
-// Fetch abstraction (permissive for test mocks)
-// ---------------------------------------------------------------------------
-
 export interface MinimalResponse {
   readonly status: number
   readonly ok: boolean
@@ -24,10 +16,6 @@ export interface MinimalResponse {
 }
 
 export type FetchFn = (url: string, options: RequestInit) => Promise<MinimalResponse>
-
-// ---------------------------------------------------------------------------
-// Dashboard types
-// ---------------------------------------------------------------------------
 
 export interface DashboardSummary {
   readonly id: number
@@ -52,10 +40,6 @@ export interface Dashboard {
   readonly tiles: readonly DashboardTile[]
   readonly [key: string]: unknown
 }
-
-// ---------------------------------------------------------------------------
-// Insight types
-// ---------------------------------------------------------------------------
 
 export interface InsightQuerySource {
   readonly kind: string
@@ -93,10 +77,6 @@ export interface HogQLResult {
   readonly is_cached?: boolean
   readonly [key: string]: unknown
 }
-
-// ---------------------------------------------------------------------------
-// Feature flag types
-// ---------------------------------------------------------------------------
 
 export interface FeatureFlagSummary {
   readonly id: number
@@ -146,19 +126,11 @@ export interface FeatureFlagActivityResponse {
   readonly total_count: number
 }
 
-// ---------------------------------------------------------------------------
-// Insight creation params
-// ---------------------------------------------------------------------------
-
 export interface CreateInsightOnDashboardParams {
   readonly name: string
   readonly query: Readonly<Record<string, unknown>>
   readonly dashboardId: number
 }
-
-// ---------------------------------------------------------------------------
-// Client interface
-// ---------------------------------------------------------------------------
 
 export interface PostHogClient {
   request(url: string, options: RequestInit): Promise<unknown>
