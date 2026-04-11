@@ -39,7 +39,11 @@ const exa = createClient()
 
 function parseUrls(arg: string): string | string[] {
   try {
-    return JSON.parse(arg) as string[]
+    const parsed: unknown = JSON.parse(arg)
+    if (Array.isArray(parsed) && parsed.every((x) => typeof x === 'string')) {
+      return parsed as string[]
+    }
+    return arg
   } catch {
     return arg
   }
