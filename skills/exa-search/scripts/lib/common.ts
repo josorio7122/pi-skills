@@ -6,6 +6,7 @@ export {
   isRecord,
   out,
   parseArgs,
+  parseJsonObject,
   requireArg,
   showHelp,
 } from '../../../../scripts/lib/shared.js'

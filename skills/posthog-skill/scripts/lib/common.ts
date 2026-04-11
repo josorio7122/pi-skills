@@ -1,8 +1,8 @@
-import { handleError as baseHandleError, showHelp } from '../../../../scripts/lib/shared.js'
+import { handleError as baseHandleError, parseJsonObject, showHelp } from '../../../../scripts/lib/shared.js'
 import { PostHogError } from './posthog-error.js'
 import type { PostHogConfig } from './posthog-types.js'
 
-export { executeAndPrint, out, parseArgs, requireArg, showHelp } from '../../../../scripts/lib/shared.js'
+export { executeAndPrint, out, parseArgs, parseJsonObject, requireArg, showHelp } from '../../../../scripts/lib/shared.js'
 
 /** Require an environment variable, exit with error if missing. */
 export function requireEnv(name: string) {
@@ -47,17 +47,7 @@ export function parseArgsOptional(scriptUrl: string) {
 
   let opts: Readonly<Record<string, unknown>> = {}
   if (args[0]) {
-    try {
-      const parsed: unknown = JSON.parse(args[0])
-      if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
-        process.stderr.write('Error: options argument is not a valid JSON object\n')
-        process.exit(1)
-      }
-      opts = parsed as Readonly<Record<string, unknown>>
-    } catch {
-      process.stderr.write('Error: options argument is not valid JSON\n')
-      process.exit(1)
-    }
+    opts = parseJsonObject(args[0])
   }
 
   return { opts }

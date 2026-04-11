@@ -52,7 +52,7 @@
  *   tsx scripts/research.ts list '{"limit":5}'
  */
 
-import { createClient, executeAndPrint, handleError, requireApiKey, requireArg, showHelp } from './lib/common.js'
+import { createClient, executeAndPrint, handleError, parseJsonObject, requireApiKey, requireArg, showHelp } from './lib/common.js'
 
 const VALID_MODELS = ['exa-research-fast', 'exa-research', 'exa-research-pro'] as const
 type ResearchModel = (typeof VALID_MODELS)[number]
@@ -60,12 +60,7 @@ type ResearchModel = (typeof VALID_MODELS)[number]
 function parseSubcommandOpts(argvIndex: number): Readonly<Record<string, unknown>> {
   const raw = process.argv[argvIndex]
   if (!raw) return {}
-  try {
-    return JSON.parse(raw) as Record<string, unknown>
-  } catch {
-    process.stderr.write('Error: options argument is not valid JSON\n')
-    process.exit(1)
-  }
+  return parseJsonObject(raw)
 }
 
 function toModel(value: unknown): ResearchModel | undefined {

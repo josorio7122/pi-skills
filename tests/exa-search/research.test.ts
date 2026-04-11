@@ -19,4 +19,10 @@ describe('research.ts: invalid JSON handling', () => {
     expect(result.status).toBe(1)
     expect(result.stderr).toContain('not valid JSON')
   })
+
+  it('exits 1 when create opts are a JSON array', () => {
+    const result = runResearch(['create', 'test instructions', '[1,2,3]'])
+    expect(result.status).toBe(1)
+    expect(result.stderr).toContain('not a valid JSON object')
+  })
 })

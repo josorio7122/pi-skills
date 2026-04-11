@@ -41,6 +41,22 @@ export function showHelp(scriptUrl: string) {
   process.exit(0)
 }
 
+/** Parse a string as a JSON object. Rejects arrays, primitives, and null. */
+export function parseJsonObject(raw: string): Readonly<Record<string, unknown>> {
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(raw)
+  } catch {
+    process.stderr.write('Error: options argument is not valid JSON\n')
+    process.exit(1)
+  }
+  if (!isRecord(parsed)) {
+    process.stderr.write('Error: options argument is not a valid JSON object\n')
+    process.exit(1)
+  }
+  return parsed
+}
+
 /**
  * Parse CLI args: show help if --help or no args, return target and options.
  * Pattern: <target> [options-json]
@@ -55,17 +71,7 @@ export function parseArgs(scriptUrl: string) {
   const target = requireArg({ value: args[0], name: 'target' })
   let opts: Readonly<Record<string, unknown>> = {}
   if (args[1]) {
-    try {
-      const parsed: unknown = JSON.parse(args[1])
-      if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
-        process.stderr.write('Error: options argument is not a valid JSON object\n')
-        process.exit(1)
-      }
-      opts = parsed as Readonly<Record<string, unknown>>
-    } catch {
-      process.stderr.write('Error: options argument is not valid JSON\n')
-      process.exit(1)
-    }
+    opts = parseJsonObject(args[1])
   }
 
   return { target, opts }
