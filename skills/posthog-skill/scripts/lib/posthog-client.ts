@@ -29,7 +29,9 @@ function parseErrorDetail(response: { json(): Promise<unknown> }) {
     .json()
     .then((body) => {
       if (!isRecord(body)) return ''
-      return (typeof body.detail === 'string' && body.detail) || (typeof body.message === 'string' && body.message) || ''
+      return (
+        (typeof body.detail === 'string' && body.detail) || (typeof body.message === 'string' && body.message) || ''
+      )
     })
     .catch(() => '')
 }
