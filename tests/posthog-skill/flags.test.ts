@@ -1,10 +1,7 @@
-import { spawnSync } from 'node:child_process'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
+import { runScript } from '../helpers/run-script.js'
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const SCRIPTS = path.join(__dirname, '..', '..', 'skills', 'posthog-skill', 'scripts')
+const SCRIPTS = new URL('../../skills/posthog-skill/scripts', import.meta.url).pathname
 
 interface RunFlagOptions {
   script: string
@@ -13,20 +10,11 @@ interface RunFlagOptions {
 }
 
 function runFlag({ script, args = [], env = {} }: RunFlagOptions) {
-  const result = spawnSync('npx', ['tsx', path.join(SCRIPTS, script), ...args], {
-    encoding: 'utf8',
-    env: {
-      ...process.env,
-      POSTHOG_PROJECT_ID: 'test-123',
-      POSTHOG_PERSONAL_API_KEY: '',
-      ...env,
-    },
+  return runScript(`${SCRIPTS}/${script}`, args, {
+    POSTHOG_PROJECT_ID: 'test-123',
+    POSTHOG_PERSONAL_API_KEY: '',
+    ...env,
   })
-  return {
-    status: result.status ?? -1,
-    stdout: result.stdout ?? '',
-    stderr: result.stderr ?? '',
-  }
 }
 
 describe('flags-get.ts', () => {

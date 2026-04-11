@@ -1,21 +1,10 @@
-import { spawnSync } from 'node:child_process'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
+import { runScript } from '../helpers/run-script.js'
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const RESEARCH = path.join(__dirname, '..', '..', 'skills', 'exa-search', 'scripts', 'research.ts')
+const RESEARCH = new URL('../../skills/exa-search/scripts/research.ts', import.meta.url).pathname
 
 function runResearch(args: string[], env: Record<string, string | undefined> = {}) {
-  const result = spawnSync('npx', ['tsx', RESEARCH, ...args], {
-    encoding: 'utf8',
-    env: { ...process.env, EXA_API_KEY: 'test-key', ...env },
-  })
-  return {
-    status: result.status ?? -1,
-    stdout: result.stdout ?? '',
-    stderr: result.stderr ?? '',
-  }
+  return runScript(RESEARCH, args, { EXA_API_KEY: 'test-key', ...env })
 }
 
 describe('research.ts: invalid JSON handling', () => {

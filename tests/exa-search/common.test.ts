@@ -1,26 +1,8 @@
-import { spawnSync } from 'node:child_process'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { buildContentsOptions, filterOptions, requireArg } from '../../skills/exa-search/scripts/lib/common.js'
+import { runInline, runScript } from '../helpers/run-script.js'
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const COMMON = path.join(__dirname, '..', '..', 'skills', 'exa-search', 'scripts', 'lib', 'common.ts')
-
-function runInline(
-  code: string,
-  env: Record<string, string | undefined> = {},
-): { status: number; stdout: string; stderr: string } {
-  const result = spawnSync('npx', ['tsx', '--eval', code], {
-    encoding: 'utf8',
-    env: { ...process.env, ...env },
-  })
-  return {
-    status: result.status ?? -1,
-    stdout: result.stdout ?? '',
-    stderr: result.stderr ?? '',
-  }
-}
+const COMMON = new URL('../../skills/exa-search/scripts/lib/common.ts', import.meta.url).pathname
 
 describe('requireArg', () => {
   it('returns value when provided', () => {
@@ -135,11 +117,8 @@ describe('requireApiKey', () => {
 
 describe('showHelp: extracts help from JSDoc', () => {
   it('extracts help text from a script with shebang before JSDoc', () => {
-    const SEARCH = path.join(__dirname, '..', '..', 'skills', 'exa-search', 'scripts', 'search.ts')
-    const result = spawnSync('npx', ['tsx', SEARCH, '--help'], {
-      encoding: 'utf8',
-      env: { ...process.env, EXA_API_KEY: 'test-key' },
-    })
+    const SEARCH = new URL('../../skills/exa-search/scripts/search.ts', import.meta.url).pathname
+    const result = runScript(SEARCH, ['--help'], { EXA_API_KEY: 'test-key' })
     expect(result.status).toBe(0)
     expect(result.stdout).toContain('Usage:')
   })

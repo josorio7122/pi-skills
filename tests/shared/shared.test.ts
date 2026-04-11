@@ -1,23 +1,8 @@
-import { spawnSync } from 'node:child_process'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { isRecord } from '../../scripts/lib/shared.js'
+import { runInline } from '../helpers/run-script.js'
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const SHARED = path.join(__dirname, '..', '..', 'scripts', 'lib', 'shared.ts')
-
-function runInline(code: string) {
-  const result = spawnSync('npx', ['tsx', '--eval', code], {
-    encoding: 'utf8',
-    env: { ...process.env },
-  })
-  return {
-    status: result.status ?? -1,
-    stdout: result.stdout ?? '',
-    stderr: result.stderr ?? '',
-  }
-}
+const SHARED = new URL('../../scripts/lib/shared.ts', import.meta.url).pathname
 
 describe('isRecord', () => {
   it('returns false for arrays', () => {

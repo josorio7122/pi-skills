@@ -1,27 +1,16 @@
-import { spawnSync } from 'node:child_process'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
+import { runInline } from '../helpers/run-script.js'
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const COMMON = path.join(__dirname, '..', '..', 'skills', 'posthog-skill', 'scripts', 'lib', 'common.ts')
-const ERROR = path.join(__dirname, '..', '..', 'skills', 'posthog-skill', 'scripts', 'lib', 'posthog-error.ts')
+const COMMON = new URL('../../skills/posthog-skill/scripts/lib/common.ts', import.meta.url).pathname
+const ERROR = new URL('../../skills/posthog-skill/scripts/lib/posthog-error.ts', import.meta.url).pathname
 
-function runInline(code: string, env: Record<string, string | undefined> = {}) {
-  const result = spawnSync('npx', ['tsx', '--eval', code], {
-    encoding: 'utf8',
-    env: { ...process.env, POSTHOG_PROJECT_ID: 'test-123', ...env },
-  })
-  return {
-    status: result.status ?? -1,
-    stdout: result.stdout ?? '',
-    stderr: result.stderr ?? '',
-  }
+function run(code: string, env: Record<string, string | undefined> = {}) {
+  return runInline(code, { POSTHOG_PROJECT_ID: 'test-123', ...env })
 }
 
 describe('handleError: PostHogError 401', () => {
   it('prints unauthorized message to stderr', () => {
-    const result = runInline(`
+    const result = run(`
       import { handleError } from '${COMMON}';
       import { PostHogError } from '${ERROR}';
       handleError(new PostHogError({ status: 401, message: 'test', endpoint: '/api/test' }));
@@ -34,7 +23,7 @@ describe('handleError: PostHogError 401', () => {
 
 describe('handleError: PostHogError 403', () => {
   it('prints forbidden message to stderr', () => {
-    const result = runInline(`
+    const result = run(`
       import { handleError } from '${COMMON}';
       import { PostHogError } from '${ERROR}';
       handleError(new PostHogError({ status: 403, message: 'test', endpoint: '/api/test' }));
@@ -47,7 +36,7 @@ describe('handleError: PostHogError 403', () => {
 
 describe('handleError: PostHogError 429', () => {
   it('prints rate limit message to stderr', () => {
-    const result = runInline(`
+    const result = run(`
       import { handleError } from '${COMMON}';
       import { PostHogError } from '${ERROR}';
       handleError(new PostHogError({ status: 429, message: 'test', endpoint: '/api/test' }));
@@ -59,7 +48,7 @@ describe('handleError: PostHogError 429', () => {
 
 describe('handleError: PostHogError generic status', () => {
   it('prints the error message for unknown status codes', () => {
-    const result = runInline(`
+    const result = run(`
       import { handleError } from '${COMMON}';
       import { PostHogError } from '${ERROR}';
       handleError(new PostHogError({ status: 500, message: 'Internal Server Error', endpoint: '/api/test' }));
@@ -71,7 +60,7 @@ describe('handleError: PostHogError generic status', () => {
 
 describe('handleError: plain Error', () => {
   it('prints the error message to stderr', () => {
-    const result = runInline(`
+    const result = run(`
       import { handleError } from '${COMMON}';
       handleError(new Error('plain-error-message'));
     `)
@@ -82,7 +71,7 @@ describe('handleError: plain Error', () => {
 
 describe('handleError: non-Error value', () => {
   it('stringifies non-Error values to stderr', () => {
-    const result = runInline(`
+    const result = run(`
       import { handleError } from '${COMMON}';
       handleError('something went wrong');
     `)
@@ -93,7 +82,7 @@ describe('handleError: non-Error value', () => {
 
 describe('requireToken', () => {
   it('exits 1 when token is empty', () => {
-    const result = runInline(`
+    const result = run(`
       import { requireToken } from '${COMMON}';
       requireToken({ host: 'https://us.posthog.com', projectId: 'test-123', token: '' });
     `)
@@ -104,7 +93,7 @@ describe('requireToken', () => {
 
 describe('resolveConfig', () => {
   it('uses default host when POSTHOG_HOST is not set', () => {
-    const result = runInline(
+    const result = run(
       `
       import { resolveConfig, out } from '${COMMON}';
       out(resolveConfig());
@@ -118,7 +107,7 @@ describe('resolveConfig', () => {
 
 describe('resolveConfig: token is undefined when env var is missing', () => {
   it('returns undefined token when POSTHOG_PERSONAL_API_KEY is not set', () => {
-    const result = runInline(
+    const result = run(
       `
       import { resolveConfig, out } from '${COMMON}';
       out(resolveConfig());
