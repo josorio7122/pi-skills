@@ -73,6 +73,16 @@
           }
         }
       }
+    },
+    {
+      "includes": ["**/lib/common.ts"],
+      "linter": {
+        "rules": {
+          "performance": {
+            "noBarrelFile": "off"
+          }
+        }
+      }
     }
   ]
 }

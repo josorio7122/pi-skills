@@ -1,55 +1,11 @@
-import { readFileSync } from 'node:fs'
 import { Exa } from 'exa-js'
+import { out } from '../../../../scripts/lib/shared.js'
+
+export { out, parseArgs, requireArg, showHelp } from '../../../../scripts/lib/shared.js'
 
 /** Create an Exa client instance. Requires EXA_API_KEY env var. */
 export function createClient() {
   return new Exa()
-}
-
-/** Require a CLI argument, exit with error if missing. */
-export function requireArg({ value, name }: { readonly value: string | undefined; readonly name: string }) {
-  if (!value) {
-    process.stderr.write(`Error: ${name} is required\n`)
-    process.exit(1)
-  }
-  return value
-}
-
-/** Write JSON to stdout. */
-export function out(data: unknown) {
-  process.stdout.write(JSON.stringify(data, null, 2) + '\n')
-}
-
-/** Execute an async API call, print JSON result, exit on error. */
-export async function executeAndPrint<T>(apiCall: () => Promise<T>) {
-  try {
-    const result = await apiCall()
-    out(result)
-  } catch (err) {
-    handleError(err)
-  }
-}
-
-/**
- * Show help text extracted from the JSDoc comment at the top of a script file.
- */
-export function showHelp(scriptUrl: string) {
-  const lines: string[] = []
-  const src = readFileSync(new URL(scriptUrl), 'utf8')
-  let inJsDoc = false
-  for (const line of src.split('\n')) {
-    if (!inJsDoc && line.trimStart().startsWith('/**')) {
-      inJsDoc = true
-      continue
-    }
-    if (inJsDoc) {
-      if (line.trimStart().startsWith('*/')) break
-      const content = line.replace(/^\s*\* ?/, '')
-      lines.push(content)
-    }
-  }
-  process.stdout.write(lines.join('\n') + '\n')
-  process.exit(0)
 }
 
 /**
@@ -64,35 +20,21 @@ export function requireApiKey() {
 }
 
 /**
- * Parse CLI args: show help if --help or no args, return target and options.
- */
-export function parseArgs(scriptUrl: string) {
-  const args = process.argv.slice(2)
-
-  if (args.includes('--help') || args.length === 0) {
-    showHelp(scriptUrl)
-  }
-
-  const target = requireArg({ value: args[0], name: 'target' })
-  let opts: Readonly<Record<string, unknown>> = {}
-  if (args[1]) {
-    try {
-      opts = JSON.parse(args[1]) as Readonly<Record<string, unknown>>
-    } catch {
-      process.stderr.write('Error: options argument is not valid JSON\n')
-      process.exit(1)
-    }
-  }
-
-  return { target, opts }
-}
-
-/**
  * Standardized error handler for all exa scripts.
  */
 export function handleError(err: unknown): never {
   process.stderr.write(`Error: ${err instanceof Error ? err.message : String(err)}\n`)
   process.exit(1)
+}
+
+/** Execute an async API call, print JSON result, exit on error. */
+export async function executeAndPrint<T>(apiCall: () => Promise<T>) {
+  try {
+    const result = await apiCall()
+    out(result)
+  } catch (err) {
+    handleError(err)
+  }
 }
 
 /**
