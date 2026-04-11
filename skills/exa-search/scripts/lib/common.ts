@@ -3,6 +3,7 @@ import { isRecord } from '../../../../scripts/lib/shared.js'
 
 export {
   executeAndPrint,
+  filterOptions,
   handleError,
   isRecord,
   out,
@@ -26,23 +27,6 @@ export function requireApiKey() {
     process.stderr.write('Get one at: https://dashboard.exa.ai/api-keys\n')
     process.exit(1)
   }
-}
-
-/**
- * Pick allowed keys from an options object, skipping undefined values.
- */
-export function filterOptions({
-  opts,
-  keys,
-}: {
-  readonly opts: Readonly<Record<string, unknown>>
-  readonly keys: readonly string[]
-}): Readonly<Record<string, unknown>> {
-  const filtered: Record<string, unknown> = {}
-  for (const key of keys) {
-    if (opts[key] !== undefined) filtered[key] = opts[key]
-  }
-  return filtered
 }
 
 /**

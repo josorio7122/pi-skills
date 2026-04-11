@@ -91,3 +91,14 @@ export async function executeAndPrint<T>(apiCall: () => Promise<T>) {
     handleError(err)
   }
 }
+
+/** Pick allowed keys from an options object, skipping undefined values. */
+export function filterOptions({
+  opts,
+  keys,
+}: {
+  readonly opts: Readonly<Record<string, unknown>>
+  readonly keys: readonly string[]
+}): Readonly<Record<string, unknown>> {
+  return Object.fromEntries(keys.filter((key) => opts[key] !== undefined).map((key) => [key, opts[key]]))
+}
