@@ -1,3 +1,4 @@
+import type { SpawnSyncReturns } from 'node:child_process'
 import { spawnSync } from 'node:child_process'
 
 interface RunResult {
@@ -6,16 +7,21 @@ interface RunResult {
   readonly stderr: string
 }
 
-export function runInline(code: string, env: Record<string, string | undefined> = {}): RunResult {
-  const result = spawnSync('npx', ['tsx', '--eval', code], {
-    encoding: 'utf8',
-    env: { ...process.env, ...env },
-  })
+function toRunResult(result: SpawnSyncReturns<string>): RunResult {
   return {
     status: result.status ?? -1,
     stdout: result.stdout ?? '',
     stderr: result.stderr ?? '',
   }
+}
+
+export function runInline(code: string, env: Record<string, string | undefined> = {}): RunResult {
+  return toRunResult(
+    spawnSync('npx', ['tsx', '--eval', code], {
+      encoding: 'utf8',
+      env: { ...process.env, ...env },
+    }),
+  )
 }
 
 interface RunScriptParams {
@@ -25,13 +31,10 @@ interface RunScriptParams {
 }
 
 export function runScript({ scriptPath, args = [], env = {} }: RunScriptParams): RunResult {
-  const result = spawnSync('npx', ['tsx', scriptPath, ...args], {
-    encoding: 'utf8',
-    env: { ...process.env, ...env },
-  })
-  return {
-    status: result.status ?? -1,
-    stdout: result.stdout ?? '',
-    stderr: result.stderr ?? '',
-  }
+  return toRunResult(
+    spawnSync('npx', ['tsx', scriptPath, ...args], {
+      encoding: 'utf8',
+      env: { ...process.env, ...env },
+    }),
+  )
 }
