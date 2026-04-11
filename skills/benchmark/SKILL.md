@@ -1,6 +1,6 @@
 ---
 name: benchmark
-description: Performance regression detection using playwright. Establishes baselines for page load times, Core Web Vitals, and resource sizes. Compares before/after on every PR. Tracks performance trends over time. Use when: "performance", "benchmark", "page speed", "lighthouse", "web vitals", "bundle size", "load time".
+description: "Performance regression detection using playwright. Establishes baselines for page load times, Core Web Vitals, and resource sizes. Compares before/after on every PR. Tracks performance trends over time. Use when: \"performance\", \"benchmark\", \"page speed\", \"lighthouse\", \"web vitals\", \"bundle size\", \"load time\"."
 ---
 
 # Performance Regression Detection

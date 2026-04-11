@@ -1,6 +1,6 @@
 ---
 name: design-review
-description: Designer's eye QA: finds visual inconsistency, spacing issues, hierarchy problems, AI slop patterns, and slow interactions — then fixes them. Iteratively fixes issues in source code, committing each fix atomically and re-verifying with before/after screenshots. For plan-mode design review (before implementation), use the plan design review. Use when asked to "audit the design", "visual QA", "check if it looks good", or "design polish". Also use when the user mentions visual inconsistencies or wants to polish the look of a live site.
+description: "Designer's eye QA: finds visual inconsistency, spacing issues, hierarchy problems, AI slop patterns, and slow interactions — then fixes them. Iteratively fixes issues in source code, committing each fix atomically and re-verifying with before/after screenshots. For plan-mode design review (before implementation), use the plan design review. Use when asked to \"audit the design\", \"visual QA\", \"check if it looks good\", or \"design polish\". Also use when the user mentions visual inconsistencies or wants to polish the look of a live site."
 ---
 
 # Design Review: Design Audit → Fix → Verify
