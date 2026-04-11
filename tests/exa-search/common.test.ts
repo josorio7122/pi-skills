@@ -134,6 +134,18 @@ describe('requireApiKey', () => {
   })
 })
 
+describe('showHelp: extracts help from JSDoc', () => {
+  it('extracts help text from a script with shebang before JSDoc', () => {
+    const SEARCH = path.join(__dirname, '..', '..', 'skills', 'exa-search', 'scripts', 'search.ts')
+    const result = spawnSync('npx', ['tsx', SEARCH, '--help'], {
+      encoding: 'utf8',
+      env: { ...process.env, EXA_API_KEY: 'test-key' },
+    })
+    expect(result.status).toBe(0)
+    expect(result.stdout).toContain('Usage:')
+  })
+})
+
 describe('contents.ts: parseUrls validation', () => {
   it('validates parsed JSON is a string array', () => {
     const CONTENTS = path.join(__dirname, '..', '..', 'skills', 'exa-search', 'scripts', 'contents.ts')

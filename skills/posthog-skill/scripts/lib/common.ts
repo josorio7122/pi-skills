@@ -62,10 +62,16 @@ export function out(data: unknown) {
 export function showHelp(scriptUrl: string) {
   const lines: string[] = []
   const src = readFileSync(new URL(scriptUrl), 'utf8')
+  let inJsDoc = false
   for (const line of src.split('\n')) {
-    if (line.startsWith(' * ') || line.startsWith(' */')) {
-      if (line.startsWith(' */')) break
-      lines.push(line.slice(3))
+    if (!inJsDoc && line.trimStart().startsWith('/**')) {
+      inJsDoc = true
+      continue
+    }
+    if (inJsDoc) {
+      if (line.trimStart().startsWith('*/')) break
+      const content = line.replace(/^\s*\* ?/, '')
+      lines.push(content)
     }
   }
   process.stdout.write(lines.join('\n') + '\n')
@@ -121,26 +127,20 @@ export function parseArgsOptional(scriptUrl: string) {
   return { opts }
 }
 
+const STATUS_MESSAGES: Readonly<Record<number, (endpoint: string) => string>> = {
+  401: (ep) =>
+    `Error: PostHog returned 401 (Unauthorized) on ${ep}\nVerify that POSTHOG_PERSONAL_API_KEY is valid and has not expired.\n`,
+  403: (ep) => `Error: PostHog returned 403 (Forbidden) on ${ep}\nCheck that your API key has the required scopes.\n`,
+  429: (ep) => `Error: PostHog rate limit exceeded on ${ep} — tried 3 times.\n`,
+}
+
 /**
  * Standardized error handler with PostHogError awareness.
  */
 export function handleError(err: unknown): never {
   if (err instanceof PostHogError) {
-    if (err.status === 401) {
-      process.stderr.write(
-        `Error: PostHog returned 401 (Unauthorized) on ${err.endpoint}\n` +
-          'Verify that POSTHOG_PERSONAL_API_KEY is valid and has not expired.\n',
-      )
-    } else if (err.status === 403) {
-      process.stderr.write(
-        `Error: PostHog returned 403 (Forbidden) on ${err.endpoint}\n` +
-          'Check that your API key has the required scopes.\n',
-      )
-    } else if (err.status === 429) {
-      process.stderr.write(`Error: PostHog rate limit exceeded on ${err.endpoint} — tried 3 times.\n`)
-    } else {
-      process.stderr.write(`Error: ${err.message}\n`)
-    }
+    const formatter = STATUS_MESSAGES[err.status]
+    process.stderr.write(formatter ? formatter(err.endpoint) : `Error: ${err.message}\n`)
   } else {
     process.stderr.write(`Error: ${err instanceof Error ? err.message : String(err)}\n`)
   }

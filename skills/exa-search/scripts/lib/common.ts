@@ -36,10 +36,16 @@ export async function executeAndPrint<T>(apiCall: () => Promise<T>) {
 export function showHelp(scriptUrl: string) {
   const lines: string[] = []
   const src = readFileSync(new URL(scriptUrl), 'utf8')
+  let inJsDoc = false
   for (const line of src.split('\n')) {
-    if (line.startsWith(' * ') || line.startsWith(' */')) {
-      if (line.startsWith(' */')) break
-      lines.push(line.slice(3))
+    if (!inJsDoc && line.trimStart().startsWith('/**')) {
+      inJsDoc = true
+      continue
+    }
+    if (inJsDoc) {
+      if (line.trimStart().startsWith('*/')) break
+      const content = line.replace(/^\s*\* ?/, '')
+      lines.push(content)
     }
   }
   process.stdout.write(lines.join('\n') + '\n')
