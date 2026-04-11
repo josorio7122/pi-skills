@@ -35,16 +35,19 @@ const exa = createClient()
 
 const answerOpts = filterOptions({ opts, keys: ['text', 'model', 'systemPrompt', 'outputSchema', 'userLocation'] })
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+}
+
 try {
   if (opts.stream) {
     // Streaming mode — write chunks as they arrive
     for await (const chunk of exa.streamAnswer(query, answerOpts)) {
-      if (typeof chunk !== 'object' || chunk === null) continue
-      const c = chunk as Record<string, unknown>
-      if (typeof c.content === 'string') process.stdout.write(c.content)
-      if (c.citations != null) {
+      if (!isRecord(chunk)) continue
+      if (typeof chunk.content === 'string') process.stdout.write(chunk.content)
+      if (chunk.citations != null) {
         process.stdout.write('\n')
-        out({ citations: c.citations })
+        out({ citations: chunk.citations })
       }
     }
     process.stdout.write('\n')
