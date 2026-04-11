@@ -9,7 +9,7 @@ export function requireArg({ value, name }: { readonly value: string | undefined
   return value
 }
 
-/** Write JSON to stdout. */
+/** Write JSON to stdout. Callers must ensure data is not circular. */
 export function out(data: unknown) {
   process.stdout.write(JSON.stringify(data, null, 2) + '\n')
 }
