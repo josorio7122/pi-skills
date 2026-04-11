@@ -31,21 +31,16 @@ function parseErrorDetail(response: { json(): Promise<unknown> }) {
 }
 
 interface RequestContext {
-  fetchFn: FetchFn
-  token: string
-  host: string
-  baseDelayMs: number
+  readonly fetchFn: FetchFn
+  readonly token: string
+  readonly host: string
+  readonly baseDelayMs: number
 }
 
 async function requestWithRetry(ctx: RequestContext, req: { url: string; options: RequestInit }) {
   const { url, options } = req
   const endpoint = url.replace(ctx.host, '').split('?')[0] ?? url
   const MAX_ATTEMPTS = 3
-  let lastError: PostHogError = new PostHogError({
-    status: 429,
-    message: 'PostHog rate limit exceeded (retries exhausted)',
-    endpoint: url.replace(ctx.host, '').split('?')[0] ?? url,
-  })
 
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
     const response = await ctx.fetchFn(url, {
@@ -60,16 +55,15 @@ async function requestWithRetry(ctx: RequestContext, req: { url: string; options
     if (response.ok) return response.json()
 
     if (response.status === 429) {
-      lastError = new PostHogError({
-        status: 429,
-        message: `PostHog rate limit exceeded (attempt ${attempt + 1} of ${MAX_ATTEMPTS})`,
-        endpoint,
-      })
       if (attempt < MAX_ATTEMPTS - 1) {
         await sleep(ctx.baseDelayMs * Math.pow(2, attempt))
         continue
       }
-      throw lastError
+      throw new PostHogError({
+        status: 429,
+        message: 'PostHog rate limit exceeded (retries exhausted)',
+        endpoint,
+      })
     }
 
     if (response.status >= 500) {
@@ -88,7 +82,8 @@ async function requestWithRetry(ctx: RequestContext, req: { url: string; options
     })
   }
 
-  throw lastError
+  // Unreachable — the loop always returns or throws — but satisfies the type checker
+  throw new PostHogError({ status: 429, message: 'PostHog rate limit exceeded (retries exhausted)', endpoint: url })
 }
 
 export function createClient({
@@ -149,12 +144,11 @@ export function createClient({
 
     listFeatureFlags: (params: FeatureFlagListParams = {}) => {
       const qs = new URLSearchParams()
-      const { search, active, type, limit, offset } = params
-      if (search != null && search !== '') qs.append('search', search)
-      if (active != null && active !== '') qs.append('active', active)
-      if (type != null && type !== '') qs.append('type', type)
-      if (limit != null) qs.append('limit', String(limit))
-      if (offset != null) qs.append('offset', String(offset))
+      if (params.search) qs.append('search', params.search)
+      if (params.active) qs.append('active', params.active)
+      if (params.type) qs.append('type', params.type)
+      if (params.limit != null) qs.append('limit', String(params.limit))
+      if (params.offset != null) qs.append('offset', String(params.offset))
       const suffix = qs.size > 0 ? `?${qs.toString()}` : ''
       return request(`${projBase}/feature_flags/${suffix}`, { method: 'GET' }) as Promise<FeatureFlagListResponse>
     },

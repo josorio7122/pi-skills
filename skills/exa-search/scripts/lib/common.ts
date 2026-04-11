@@ -98,7 +98,7 @@ export function filterOptions({
 }: {
   readonly opts: Readonly<Record<string, unknown>>
   readonly keys: readonly string[]
-}) {
+}): Readonly<Record<string, unknown>> {
   const filtered: Record<string, unknown> = {}
   for (const key of keys) {
     if (opts[key] !== undefined) filtered[key] = opts[key]
