@@ -88,6 +88,14 @@ describe('buildContentsOptions', () => {
     expect('text' in result).toBe(true)
     expect('highlights' in result).toBe(true)
   })
+
+  it('ignores null values for text/highlights/summary', () => {
+    expect(buildContentsOptions({ text: null, highlights: null, summary: null })).toEqual({})
+  })
+
+  it('ignores null opts.contents', () => {
+    expect(buildContentsOptions({ contents: null })).toEqual({})
+  })
 })
 
 describe('handleError', () => {

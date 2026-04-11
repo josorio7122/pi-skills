@@ -68,10 +68,10 @@ export function parseArgs(scriptUrl: string) {
   }
 
   const target = requireArg({ value: args[0], name: 'target' })
-  let opts: Record<string, unknown> = {}
+  let opts: Readonly<Record<string, unknown>> = {}
   if (args[1]) {
     try {
-      opts = JSON.parse(args[1]) as Record<string, unknown>
+      opts = JSON.parse(args[1]) as Readonly<Record<string, unknown>>
     } catch {
       process.stderr.write('Error: options argument is not valid JSON\n')
       process.exit(1)
@@ -108,15 +108,15 @@ export function filterOptions({
 
 /**
  * Build contents options from text/highlights/summary fields.
+ * Each field accepts `true` (shorthand) or an object (fine control).
  */
 export function buildContentsOptions(opts: Readonly<Record<string, unknown>>) {
   const base: Record<string, unknown> = {}
-  if (opts.text === true) base.text = true
-  else if (typeof opts.text === 'object') base.text = opts.text
-  if (opts.highlights === true) base.highlights = true
-  else if (typeof opts.highlights === 'object') base.highlights = opts.highlights
-  if (opts.summary === true) base.summary = true
-  else if (typeof opts.summary === 'object') base.summary = opts.summary
-  if (typeof opts.contents === 'object') return { ...base, ...(opts.contents as Record<string, unknown>) }
+  for (const key of ['text', 'highlights', 'summary'] as const) {
+    if (opts[key] === true || (typeof opts[key] === 'object' && opts[key] !== null)) base[key] = opts[key]
+  }
+  if (typeof opts.contents === 'object' && opts.contents !== null) {
+    return { ...base, ...(opts.contents as Record<string, unknown>) }
+  }
   return base
 }
