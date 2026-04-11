@@ -4,6 +4,7 @@ import type { PostHogConfig } from './posthog-types.js'
 
 export {
   executeAndPrint,
+  filterOptions,
   out,
   parseArgs,
   parseJsonObject,
