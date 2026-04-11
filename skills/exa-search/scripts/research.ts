@@ -60,7 +60,12 @@ type ResearchModel = (typeof VALID_MODELS)[number]
 function parseSubcommandOpts(argvIndex: number): Readonly<Record<string, unknown>> {
   const raw = process.argv[argvIndex]
   if (!raw) return {}
-  return JSON.parse(raw) as Record<string, unknown>
+  try {
+    return JSON.parse(raw) as Record<string, unknown>
+  } catch {
+    process.stderr.write('Error: options argument is not valid JSON\n')
+    process.exit(1)
+  }
 }
 
 function toModel(value: unknown): ResearchModel | undefined {
@@ -110,7 +115,7 @@ try {
     case 'create': {
       const instructions = requireArg({ value: arg1, name: 'instructions' })
       const opts = parseSubcommandOpts(4)
-      await executeAndPrint(async () => exa.research.create(buildCreateParams({ instructions, opts })))
+      await executeAndPrint(() => exa.research.create(buildCreateParams({ instructions, opts })))
       break
     }
 
@@ -123,7 +128,7 @@ try {
           process.stdout.write(JSON.stringify(event) + '\n')
         }
       } else {
-        await executeAndPrint(async () => exa.research.get(researchId, opts))
+        await executeAndPrint(() => exa.research.get(researchId, opts))
       }
       break
     }
@@ -131,7 +136,7 @@ try {
     case 'poll': {
       const researchId = requireArg({ value: arg1, name: 'research-id' })
       const opts = parseSubcommandOpts(4)
-      await executeAndPrint(async () => exa.research.pollUntilFinished(researchId, opts))
+      await executeAndPrint(() => exa.research.pollUntilFinished(researchId, opts))
       break
     }
 
@@ -140,7 +145,7 @@ try {
       const opts = parseSubcommandOpts(4)
       const created = (await exa.research.create(buildCreateParams({ instructions, opts }))) as { researchId: string }
       process.stderr.write(`Research task created: ${created.researchId} — polling...\n`)
-      await executeAndPrint(async () =>
+      await executeAndPrint(() =>
         exa.research.pollUntilFinished(created.researchId, {
           pollInterval: toNumber({ value: opts.pollInterval, fallback: 2000 }),
           timeoutMs: toNumber({ value: opts.timeoutMs, fallback: 300000 }),
@@ -151,8 +156,8 @@ try {
     }
 
     case 'list': {
-      const opts = arg1 ? (JSON.parse(arg1) as Record<string, unknown>) : {}
-      await executeAndPrint(async () => exa.research.list(opts))
+      const opts = parseSubcommandOpts(3)
+      await executeAndPrint(() => exa.research.list(opts))
       break
     }
 
