@@ -101,6 +101,9 @@ export function createClient({
   const projBase = `${host}/api/projects/${projectId}`
   const ctx: RequestContext = { fetchFn, token, host, baseDelayMs }
 
+  // Returns Promise<unknown>. Each client method casts the result to a concrete API type.
+  // This is an intentional trade-off: the PostHog API contract is trusted at this boundary.
+  // If runtime validation becomes needed, add a validate() wrapper per method.
   function request(url: string, options: RequestInit) {
     return requestWithRetry(ctx, { url, options })
   }
