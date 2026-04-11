@@ -58,7 +58,7 @@
     }
   },
   "files": {
-    "includes": ["skills/**/*.ts", "tests/**/*.ts"]
+    "includes": ["scripts/**/*.ts", "skills/**/*.ts", "tests/**/*.ts"]
   },
   "overrides": [
     {
