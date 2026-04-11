@@ -16,15 +16,10 @@ export interface MockResponse {
   body?: Record<string, unknown>
 }
 
-export interface MockFetchFn {
-  (url: string, options: RequestInit): Promise<MinimalResponse>
-  calls: MockCall[]
-}
-
-export function makeFetch(...responses: MockResponse[]): MockFetchFn {
+export function makeFetch(...responses: MockResponse[]) {
   let call = 0
   const calls: MockCall[] = []
-  const mockFetch = async (url: string, options: RequestInit) => {
+  const fetch = async (url: string, options: RequestInit): Promise<MinimalResponse> => {
     calls.push({ url, options })
     const resp = responses[call] ?? responses[responses.length - 1] ?? {}
     call++
@@ -35,6 +30,5 @@ export function makeFetch(...responses: MockResponse[]): MockFetchFn {
       json: async (): Promise<unknown> => body,
     }
   }
-  ;(mockFetch as MockFetchFn).calls = calls
-  return mockFetch as MockFetchFn
+  return { fetch, calls }
 }
