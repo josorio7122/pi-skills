@@ -138,6 +138,21 @@ describe('posthog-client: PostHogError on 4xx', () => {
   })
 })
 
+describe('posthog-client: exhausted retries throw descriptive error', () => {
+  it('throws PostHogError with rate-limit message after all 429 attempts', async () => {
+    const fetch = makeFetch({ status: 429, body: {} }, { status: 429, body: {} }, { status: 429, body: {} })
+    const client = createClient({ config: CONFIG, opts: { fetchFn: fetch, retryDelayMs: 0 } })
+    try {
+      await client.listDashboards()
+      expect.fail('should have thrown')
+    } catch (err) {
+      expect(err).toBeInstanceOf(PostHogError)
+      expect((err as PostHogError).status).toBe(429)
+      expect((err as PostHogError).message).toContain('rate limit')
+    }
+  })
+})
+
 describe('posthog-client: 5xx does not retry', () => {
   it('throws PostHogError immediately on 500 without retry', async () => {
     const fetch = makeFetch({ status: 500, body: { detail: 'server error' } }, { status: 200, body: {} })

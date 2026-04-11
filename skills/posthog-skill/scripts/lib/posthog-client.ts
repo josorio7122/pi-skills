@@ -41,7 +41,11 @@ async function requestWithRetry(ctx: RequestContext, req: { url: string; options
   const { url, options } = req
   const endpoint = url.replace(ctx.host, '').split('?')[0] ?? url
   const MAX_ATTEMPTS = 3
-  let lastError: PostHogError | undefined
+  let lastError: PostHogError = new PostHogError({
+    status: 429,
+    message: 'PostHog rate limit exceeded (retries exhausted)',
+    endpoint: url.replace(ctx.host, '').split('?')[0] ?? url,
+  })
 
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
     const response = await ctx.fetchFn(url, {
@@ -84,7 +88,7 @@ async function requestWithRetry(ctx: RequestContext, req: { url: string; options
     })
   }
 
-  throw lastError!
+  throw lastError
 }
 
 export function createClient({
@@ -145,13 +149,14 @@ export function createClient({
 
     listFeatureFlags: (params: FeatureFlagListParams = {}) => {
       const qs = new URLSearchParams()
-      if (params.search != null && params.search !== '') qs.append('search', params.search)
-      if (params.active != null && params.active !== '') qs.append('active', params.active)
-      if (params.type != null && params.type !== '') qs.append('type', params.type)
-      if (params.limit != null) qs.append('limit', String(params.limit))
-      if (params.offset != null) qs.append('offset', String(params.offset))
-      const query = qs.toString() ? `?${qs.toString()}` : ''
-      return request(`${projBase}/feature_flags/${query}`, { method: 'GET' }) as Promise<FeatureFlagListResponse>
+      const { search, active, type, limit, offset } = params
+      if (search != null && search !== '') qs.append('search', search)
+      if (active != null && active !== '') qs.append('active', active)
+      if (type != null && type !== '') qs.append('type', type)
+      if (limit != null) qs.append('limit', String(limit))
+      if (offset != null) qs.append('offset', String(offset))
+      const suffix = qs.size > 0 ? `?${qs.toString()}` : ''
+      return request(`${projBase}/feature_flags/${suffix}`, { method: 'GET' }) as Promise<FeatureFlagListResponse>
     },
 
     getFeatureFlag: (id) =>
