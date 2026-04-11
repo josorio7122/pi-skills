@@ -9,7 +9,6 @@ export function requireArg({ value, name }: { readonly value: string | undefined
   return value
 }
 
-/** Type guard: narrows unknown to Record<string, unknown>. */
 export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
