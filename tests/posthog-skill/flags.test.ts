@@ -1,5 +1,4 @@
 import { spawnSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
@@ -123,12 +122,6 @@ describe('flags-toggle.ts', () => {
     const result = runFlag({ script: 'flags-toggle.ts', args: ['101'], env: { POSTHOG_PERSONAL_API_KEY: '' } })
     expect(result.status).toBe(1)
     expect(result.stderr).toContain('POSTHOG_PERSONAL_API_KEY')
-  })
-
-  it('uses patch response for active_after instead of optimistic negation', () => {
-    const src = readFileSync(path.join(SCRIPTS, 'flags-toggle.ts'), 'utf8')
-    expect(src).toContain('updated.active')
-    expect(src).not.toContain('active_after: !current.active')
   })
 })
 

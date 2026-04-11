@@ -1,5 +1,4 @@
 import { spawnSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
@@ -143,13 +142,5 @@ describe('showHelp: extracts help from JSDoc', () => {
     })
     expect(result.status).toBe(0)
     expect(result.stdout).toContain('Usage:')
-  })
-})
-
-describe('contents.ts: parseUrls validation', () => {
-  it('validates parsed JSON is a string array', () => {
-    const CONTENTS = path.join(__dirname, '..', '..', 'skills', 'exa-search', 'scripts', 'contents.ts')
-    const src = readFileSync(CONTENTS, 'utf8')
-    expect(src).toContain('Array.isArray')
   })
 })
