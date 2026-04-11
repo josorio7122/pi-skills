@@ -39,6 +39,7 @@ try {
   if (opts.stream) {
     // Streaming mode — write chunks as they arrive
     for await (const chunk of exa.streamAnswer(query, answerOpts)) {
+      if (typeof chunk !== 'object' || chunk === null) continue
       const c = chunk as Record<string, unknown>
       if (typeof c.content === 'string') process.stdout.write(c.content)
       if (c.citations != null) {
