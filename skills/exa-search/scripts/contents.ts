@@ -33,19 +33,21 @@
 import { createClient, executeAndPrint, filterOptions, parseArgs, requireApiKey } from './lib/common.js'
 
 const { target: urlArg, opts: rawOpts } = parseArgs(import.meta.url)
-
-let urls: string | string[] = urlArg
-try {
-  urls = JSON.parse(urlArg) as string[]
-} catch {
-  // Single URL string — keep as-is
-}
-
-const opts: Record<string, unknown> = Object.keys(rawOpts).length > 0 ? rawOpts : { text: true }
-
 requireApiKey()
 
 const exa = createClient()
+
+function parseUrls(arg: string): string | string[] {
+  try {
+    return JSON.parse(arg) as string[]
+  } catch {
+    return arg
+  }
+}
+
+const urls = parseUrls(urlArg)
+
+const opts: Readonly<Record<string, unknown>> = Object.keys(rawOpts).length > 0 ? rawOpts : { text: true }
 
 const contentsOpts = filterOptions({
   opts,
@@ -62,6 +64,4 @@ const contentsOpts = filterOptions({
   ],
 })
 
-await executeAndPrint(async () => {
-  return await exa.getContents(urls, contentsOpts)
-})
+await executeAndPrint(() => exa.getContents(urls, contentsOpts))
