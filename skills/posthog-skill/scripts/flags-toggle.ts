@@ -27,11 +27,11 @@ const client = createClient({ config })
 
 await executeAndPrint(async () => {
   const current = await client.getFeatureFlag(id)
-  await client.patchFeatureFlag({ id, body: { active: !current.active } })
+  const updated = await client.patchFeatureFlag({ id, body: { active: !current.active } })
   return {
     id: current.id,
     key: current.key,
     active_before: current.active,
-    active_after: !current.active,
+    active_after: updated.active,
   }
 })

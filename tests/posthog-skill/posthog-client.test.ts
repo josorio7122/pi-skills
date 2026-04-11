@@ -255,6 +255,17 @@ describe('posthog-client: createFeatureFlag', () => {
   })
 })
 
+describe('posthog-client: patchFeatureFlag returns updated flag', () => {
+  it('returns the full flag object from the PATCH response', async () => {
+    const updated = { id: 101, key: 'my-flag', active: false, name: 'My Flag' }
+    const fetch = makeFetch({ status: 200, body: updated })
+    const client = createClient({ config: CONFIG, opts: { fetchFn: fetch } })
+    const result = await client.patchFeatureFlag({ id: 101, body: { active: false } })
+    expect(result.active).toBe(false)
+    expect(result.id).toBe(101)
+  })
+})
+
 describe('posthog-client: getFeatureFlagActivity', () => {
   it('sends GET to /feature_flags/123/activity/?limit=10', async () => {
     const fetch = makeFetch({ status: 200, body: { results: [] } })
