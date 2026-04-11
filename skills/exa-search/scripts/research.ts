@@ -52,7 +52,7 @@
  *   tsx scripts/research.ts list '{"limit":5}'
  */
 
-import { createClient, executeAndPrint, handleError, parseJsonObject, requireApiKey, requireArg, showHelp } from './lib/common.js'
+import { createClient, executeAndPrint, handleError, isRecord, parseJsonObject, requireApiKey, requireArg, showHelp } from './lib/common.js'
 
 const VALID_MODELS = ['exa-research-fast', 'exa-research', 'exa-research-pro'] as const
 type ResearchModel = (typeof VALID_MODELS)[number]
@@ -82,8 +82,7 @@ function buildCreateParams({
   readonly opts: Readonly<Record<string, unknown>>
 }) {
   const model = toModel(opts.model)
-  const outputSchema =
-    typeof opts.outputSchema === 'object' ? (opts.outputSchema as Record<string, unknown>) : undefined
+  const outputSchema = isRecord(opts.outputSchema) ? opts.outputSchema : undefined
   return {
     instructions,
     ...(model ? { model } : {}),

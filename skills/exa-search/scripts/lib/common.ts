@@ -1,4 +1,5 @@
 import { Exa } from 'exa-js'
+import { isRecord } from '../../../../scripts/lib/shared.js'
 
 export {
   executeAndPrint,
@@ -53,8 +54,8 @@ export function buildContentsOptions(opts: Readonly<Record<string, unknown>>) {
   for (const key of ['text', 'highlights', 'summary'] as const) {
     if (opts[key] === true || (typeof opts[key] === 'object' && opts[key] !== null)) base[key] = opts[key]
   }
-  if (typeof opts.contents === 'object' && opts.contents !== null) {
-    return { ...base, ...(opts.contents as Record<string, unknown>) }
+  if (isRecord(opts.contents)) {
+    return { ...base, ...opts.contents }
   }
   return base
 }
