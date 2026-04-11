@@ -24,7 +24,7 @@ export function resolveConfig() {
 }
 
 /** Require a valid API token in the config. Exits if missing. */
-export function requireToken(config: PostHogConfig) {
+export function requireToken(config: PostHogConfig): asserts config is PostHogConfig & { readonly token: string } {
   if (!config.token) {
     process.stderr.write(
       'Error: POSTHOG_PERSONAL_API_KEY is required for this command.\n' +
