@@ -11,7 +11,7 @@ export function requireArg({ value, name }: { readonly value: string | undefined
 
 /** Type guard: narrows unknown to Record<string, unknown>. */
 export function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
 /** Write JSON to stdout. Callers must ensure data is not circular. */

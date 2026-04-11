@@ -2,6 +2,7 @@ import { spawnSync } from 'node:child_process'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
+import { isRecord } from '../../scripts/lib/shared.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const SHARED = path.join(__dirname, '..', '..', 'scripts', 'lib', 'shared.ts')
@@ -17,6 +18,27 @@ function runInline(code: string) {
     stderr: result.stderr ?? '',
   }
 }
+
+describe('isRecord', () => {
+  it('returns false for arrays', () => {
+    expect(isRecord([1, 2, 3])).toBe(false)
+  })
+  it('returns false for null', () => {
+    expect(isRecord(null)).toBe(false)
+  })
+  it('returns true for plain objects', () => {
+    expect(isRecord({ a: 1 })).toBe(true)
+  })
+  it('returns true for empty objects', () => {
+    expect(isRecord({})).toBe(true)
+  })
+  it('returns false for strings', () => {
+    expect(isRecord('hello')).toBe(false)
+  })
+  it('returns false for numbers', () => {
+    expect(isRecord(42)).toBe(false)
+  })
+})
 
 describe('parseArgs: options validation', () => {
   it('exits 1 when options JSON is an array', () => {
